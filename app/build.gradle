@@ -1,0 +1,27 @@
+apply plugin: 'com.android.application'
+
+android {
+	useLibrary 'org.apache.http.legacy'
+	compileSdkVersion 28
+	
+	defaultConfig {
+		applicationId "com.google.android.youtube.pro"
+		minSdkVersion 21
+		targetSdkVersion 28
+		versionCode 1
+		versionName "1.0"
+	}
+	buildTypes {
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+		}
+	}
+}
+
+dependencies {
+	compile fileTree(dir: 'libs', include: ['*.jar'])
+	implementation 'com.github.bumptech.glide:glide:3.7.0'
+	implementation 'com.google.code.gson:gson:2.8.0'
+	implementation 'com.squareup.okhttp3:okhttp:3.9.1'
+}
