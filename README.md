@@ -11,6 +11,11 @@
 
 ---
 
+<p align="center">
+<img src='.github/img/YT PRO.jpg'  >
+</p>
+
+## Download YT PRO
 
 [![Download zip](https://custom-icon-badges.herokuapp.com/badge/-Download-ff0000?style=for-the-badge&logo=download&logoColor=white "Download Apk")](https://github.com/prateek-chaubey/YTPro/releases/download/V1.0/YTPro.apk)
 
