@@ -28,8 +28,9 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v1
       with:
-          name: Signed Apk
-          path: "app/build/outputs/apk/release/youtube_pro_signed.apk"
-      with:
-          name: Unsigned Apk
-          path: "app/build/outputs/apk/release/app-release-unsigned.apk"
+          name: Apk
+          path: |
+          "app/build/outputs/apk/release/youtube_pro_signed.apk"
+          "app/build/outputs/apk/release/app-release-unsigned.apk"
+
+          
