@@ -1,7 +1,11 @@
-//Few Stupid Inits
+/*****YTPRO*******
+Author: Prateek Chaubey
+Version: 1.0
+URI: https://github.com/prateek-chaubey/
+*/
+/*Few Stupid Inits*/
 var ytprof1,ytprov1;
 var ytoldV=(new URLSearchParams(window.location.search)).get('v');
-
 function ytproGetURL(o){
 var sig=(new URLSearchParams(o)).get('s');
 var url=(new URLSearchParams(o)).get('url');
@@ -10,7 +14,7 @@ url=decodeURIComponent(url);
 return  url+"&sig="+sig;
 }
 
-///Utils for Deciphers
+/*Utils for Deciphers*/
 var utils={
 between:(haystack, left, right) => {
 let pos;
@@ -64,7 +68,7 @@ return mixedJson.substr(0, i + 1);
 throw Error("Can't cut unsupported JSON (no matching closing bracket found)");
 }
 }
-//Decipher Code , Credits:NODE-YTDL-CORE
+/*Decipher Code , Credits:NODE-YTDL-CORE*/
 var extractFunctions = (body)=> {
 const functions = [];
 const extractManipulations = caller => {
@@ -104,7 +108,6 @@ extractFunctions(request.responseText);
 
 
 
-//YTPRO Video Downloader
 function ytproDownVid(){
 var ytproDown=document.createElement("div");
 var ytproDownDiv=document.createElement("div");
@@ -148,13 +151,13 @@ alert("AN ERROR OCCURED , PLEASE UPDATE YT PRO");
 function YTDownVid(o){
 Android.downvid((o.getAttribute("data-ytprotit")+".mp4"),o.getAttribute("data-ytprourl"),navigator.userAgent+"");
 }
-//THE 0NE AND 0NLY FUNCTION
+/*THE 0NE AND 0NLY FUNCTION*/
 function pkc(){
 if(window.location.href.indexOf("youtube.com/watch") > -1){
-//Dark and Light Mode
+/*Dark and Light Mode*/
 var c ="#000";
 if(document.cookie.indexOf("f6=400") > -1){c ="#fff";}else{c="#000";}
-//Fetch The Dislikes 
+/*Fetch The Dislikes*/
 fetch("https://youtubedislikeviewer.xyz/api/v1/getdata/"+(new URLSearchParams(window.location.search)).get('v'))
 .then(response => {
 return response.json();
@@ -163,7 +166,7 @@ if('data' in jsonObject){
 document.querySelectorAll('[aria-label="Dislike this video"]')[0].children[0].children[1].innerHTML=jsonObject.data.dislikes;
 }
 }).catch(error => {});
-//Check If Element Already Exists
+/*Check If Element Already Exists*/
 if(document.getElementById("ytproMainDivE") == null){
 function insertAfter(referenceNode, newNode) {try{referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);}catch{}}
 var ytproMainDiv=document.createElement("div");
@@ -215,7 +218,7 @@ function(){
 ytproAudPlayer();
 });
 }
-//Watch The old and New URL
+/*Watch The old and New URL*/
 if(ytoldV != (new URLSearchParams(window.location.search)).get('v')){
 try{document.getElementById("ytproMainAudDivE").remove();}catch{console.log("");}
 ytoldV=(new URLSearchParams(window.location.search)).get('v');
@@ -226,7 +229,7 @@ window.location.href=window.location.href;
 
 
 
-//YTPRO Audio Player
+/*YTPRO Audio Player*/
 function ytproAudPlayer(){
 var ytproTitle="";
 var ytproURL="";
@@ -280,13 +283,13 @@ ytproAudDivElem.appendChild(ytproAudPlayerElem);
 ytproAudDivElem.appendChild(ytproAudX);
 document.getElementsByClassName('video-stream')[0].pause();
 ytproAudX.addEventListener("click",function(){this.parentElement.remove();});
-//Listen To the Song
+/*Listen To the Song*/
 ytproAudPlayerElem.onloadeddata = function() {
 ytproAudPlayerElem.play();
 Android.showToast("Now Playing \n"+ytproTitle);
 Android.gohome("ok");
 };
-//Watch The Audio Player
+/*Watch The Audio Player*/
 ytproAudPlayerElem.addEventListener("timeupdate",function(){
 if(ytproAudPlayerElem.currentTime==ytproAudPlayerElem.duration){
 window.location.href="https://m.youtube.com"+document.getElementsByTagName("lazy-list")[1].children[1].children[0].children[0].getAttribute("href")+"&auds=ab";
@@ -300,7 +303,7 @@ alert("AN ERROR OCCURED , PLEASE UPDATE YT PRO");
 setInterval(pkc,1);
 
 
-///YT ADS BLOCKER , I know it's Copy Paste
+/*YT ADS BLOCKER , I know it's Copy Paste*/
 window.onload = function(){ 
 var outerLayer = document.getElementsByClassName('video-ads ytp-ad-module');
 var adPlayerOverlay = document.getElementsByClassName('ytp-ad-player-overlay'); // popup ads in video
