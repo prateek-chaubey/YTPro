@@ -61,7 +61,11 @@ public class MainActivity extends Activity {
 			@Override
 			public void onPageFinished(WebView _param1, String _param2) {
 				final String _url = _param2;
-				inject();
+				//For Auto Updation 
+		          	web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://cdn.jsdelivr.net/gh/prateek-chaubey/YTPro/app/src/main/assets/app.min.js'; document.body.appendChild(script);  })();");
+				
+		        //For Using Local JS file uncomment the below line
+		 	//	inject();
 				super.onPageFinished(_param1, _param2);
 			}
 		});
@@ -240,7 +244,6 @@ public class MainActivity extends Activity {
 		
 		try {
 			InputStream inputStream = getAssets().open("app.js");
-			//InputStream inputStream=new FileInputStream("/sdcard/app.js");
 			byte[] buffer = new byte[inputStream.available()];
 			inputStream.read(buffer);
 			inputStream.close();
