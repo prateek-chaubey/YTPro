@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle _savedInstanceState) {
 		super.onCreate(_savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.main);
 		
 		web = findViewById(R.id.web);
 		web.getSettings().setJavaScriptEnabled(true);
