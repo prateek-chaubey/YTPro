@@ -7,7 +7,7 @@
 <h1 align=center>YT PRO </h1>
 
 ---
-**If you like the tool and for my personal motivation so as to develop other tools please leave a +1 star **
+**If you like the tool and for my personal motivation so as to develop other tools please leave a +1 star**
 
 ---
 
