@@ -62,7 +62,7 @@ public class MainActivity extends Activity {
 			public void onPageFinished(WebView _param1, String _param2) {
 				final String _url = _param2;
 				//For Auto Updation 
-		          	web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://cdn.jsdelivr.net/gh/prateek-chaubey/YTPro/app/src/main/assets/app.min.js'; document.body.appendChild(script);  })();");
+		          	web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://cdn.jsdelivr.net/gh/prateek-chaubey/YTPro@latest/app/src/main/assets/app.js'; document.body.appendChild(script);  })();");
 				
 		        //For Using Local JS file uncomment the below line
 		 	//	inject();
