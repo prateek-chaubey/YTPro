@@ -158,12 +158,12 @@ if(window.location.href.indexOf("youtube.com/watch") > -1){
 var c ="#000";
 if(document.cookie.indexOf("f6=400") > -1){c ="#fff";}else{c="#000";}
 /*Fetch The Dislikes*/
-fetch("https://youtubedislikeviewer.xyz/api/v1/getdata/"+(new URLSearchParams(window.location.search)).get('v'))
+fetch("https://returnyoutubedislikeapi.com/votes?videoId="+(new URLSearchParams(window.location.search)).get('v'))
 .then(response => {
 return response.json();
 }).then(jsonObject => {
-if('data' in jsonObject){
-document.querySelectorAll('[aria-label="Dislike this video"]')[0].children[0].children[1].innerHTML=jsonObject.data.dislikes;
+if('dislikes' in jsonObject){
+document.querySelectorAll('[aria-label="Dislike this video"]')[0].children[0].children[1].innerHTML=jsonObject.dislikes;
 }
 }).catch(error => {});
 /*Check If Element Already Exists*/
