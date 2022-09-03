@@ -117,7 +117,8 @@ public class MainActivity extends Activity {
 			
 			if (MainActivity.this == null) {
 				
-			return null; }
+			return null;
+                            }   
 			
 		return BitmapFactory.decodeResource(MainActivity.this.getApplicationContext().getResources(), 2130837573); }
 		
