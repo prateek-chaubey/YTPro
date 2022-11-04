@@ -34,10 +34,6 @@
  * Minimal
  * Almost 0 Dependencies
 
-## Credits
- *  [node-ytdl-core](https://github.com/fent/node-ytdl-core)
- * ...
-
 ## ToDo
  * Improve PIP and Background Player
 
