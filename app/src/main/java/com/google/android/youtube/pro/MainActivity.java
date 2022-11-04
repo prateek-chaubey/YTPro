@@ -95,6 +95,11 @@ public class MainActivity extends Activity {
 			web.loadUrl("javascript:(function(){"+"setTimeout( () => {"+"document.getElementById('player-container-id').style.position='fixed';"+"document.getElementById('player-container-id').style.top='48px'; "+"document.getElementsByClassName('mobile-topbar-header')[0].style.display='flex'; "+"},50);})()");
 		}
 	}
+       	@Override
+         protected void onUserLeaveHint() {
+         super.onUserLeaveHint();
+	 web.loadUrl("javascript:PIPlayer();");
+         }
 	
 	
 	
@@ -159,18 +164,16 @@ public class MainActivity extends Activity {
 		
 	}
 	
-	      private void downloadFile(String filename, String url, String userAgent) {
+	      private void downloadFile(String filename, String url, String mtype) {
         try {
-            String cookie = CookieManager.getInstance().getCookie(url);
             DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
             request.setTitle(filename)
-                    .setDescription("Downloading...")
-                    .addRequestHeader("cookie", cookie)
-                    .addRequestHeader("User-Agent", userAgent)
-                    .setMimeType("video/mp4")
+                    .setDescription(filename)
+                    .setMimeType(mtype)
                     .setAllowedOverMetered(true)
                     .setAllowedOverRoaming(true)
+                    .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS.toString(), filename)				 
                     .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE |
                             DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
             downloadManager.enqueue(request);
@@ -207,8 +210,8 @@ public class MainActivity extends Activity {
 		}
 		
 		@JavascriptInterface
-		public void downvid(String namee,String urll, String uaa) {
-		downloadFile(namee,urll,uaa);
+		public void downvid(String namee,String urll, String m) {
+		downloadFile(namee,urll,m);
 		}
 		@JavascriptInterface
 		public void oplink(String urll) {			
