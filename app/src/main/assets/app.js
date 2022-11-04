@@ -1,11 +1,24 @@
 /*****YTPRO*******
 Author: Prateek Chaubey
-Version: 1.0
+Version: 2.3
 URI: https://github.com/prateek-chaubey/
 */
+
+
 /*Few Stupid Inits*/
-var ytprof1,ytprov1;
-var ytoldV=(new URLSearchParams(window.location.search)).get('v');
+var YTProVer="2.3";
+if(ytprof1 == undefined && ytprov1 == undefined){
+var ytprof1="";
+var ytprov1="";
+}
+var ytoldv="";
+if(window.location.pathname.indexOf("shorts") > -1){
+ytoldV=window.location.pathname;
+}
+else{
+ytoldV=(new URLSearchParams(window.location.search)).get('v') ;
+}
+
 function ytproGetURL(o){
 var sig=(new URLSearchParams(o)).get('s');
 var url=(new URLSearchParams(o)).get('url');
@@ -13,6 +26,28 @@ sig=eval(ytprov1+ytprof1+"('"+decodeURIComponent(sig)+"');");
 url=decodeURIComponent(url);
 return  url+"&sig="+sig;
 }
+/*Dark and Light Mode*/
+var c="#000";
+var d="#f2f2f2";
+var dislikes="...";
+
+if(document.cookie.indexOf("PREF") < 0){
+document.cookie="PREF=f6=400&f7=100;";
+window.location.href=window.location.href;
+}
+if(document.cookie.indexOf("f6=400") > -1){
+c ="#fff";d="rgba(255,255,255,0.1)";
+}else{
+c="#000";d="rgba(0,0,0,0.1)";
+}
+var downBtn=`<svg  xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${c}"  viewBox="0 0 16 16">
+<path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+<path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+</svg>`;
+
+
+
+
 
 /*Utils for Deciphers*/
 var utils={
@@ -96,107 +131,278 @@ ytprov1=functionBody;
 };
 extractDecipher();
 };
+/*Fetch Script*/
 var scripts = document.getElementsByTagName('script');
 for(var i=0;i<scripts.length;i++){
 if(scripts[i].src.indexOf("/base.js") > 0){
-var request = new XMLHttpRequest();
-request.open("GET", scripts[i].src, false);
-request.send(null);
-extractFunctions(request.responseText);
+fetch(scripts[i].src).then((res) => res.text()).then((r) => extractFunctions(r));
 }
 }
 
-
-
-function ytproDownVid(){
-var ytproDown=document.createElement("div");
-var ytproDownDiv=document.createElement("div");
-ytproDownDiv.setAttribute("id","downytprodiv");
-ytproDown.style.height="100%";
-ytproDown.style.width="100%";
-ytproDown.style.position="fixed";
-ytproDown.style.display="flex";
-ytproDown.style.background="rgba(0,0,0,.7)";
-ytproDown.style.top="0";
-ytproDown.style.left="0";
-ytproDown.style.justifyContent="center";
-ytproDown.style.alignItems="center";
-ytproDown.style.zIndex="99999999999999";
-ytproDownDiv.style.height="auto";
-ytproDownDiv.style.width="80%";
-ytproDownDiv.style.maxHeight="90%";
-ytproDownDiv.style.overflow="scroll";
-ytproDownDiv.style.background="rgba(0,0,0,1)";
-ytproDownDiv.style.justifyContent="center";
-ytproDownDiv.style.alignItems="center";
-ytproDownDiv.style.zIndex="99999999999999";
-ytproDownDiv.style.padding="20px";
-ytproDownDiv.style.borderRadius="5px";
-ytproDownDiv.style.color="white";
-ytproDownDiv.style.textAlign="center";
-ytproDownDiv.innerHTML="<style>#downytprodiv a{text-decoration:none;color:white;} #downytprodiv li{list-style:none;color:#0dd;padding:10px;background:#001;border:1px solid silver;margin:5px;text-align:lft;}</style>";
-ytproDownDiv.innerHTML+="<span style='position:absolute;top:15px;left:15px;color:red;font-size:30px;' onclick='"+"this.parentElement.parentElement.style.display="+'"'+"none"+'"'+";'>&#x2715;</span>Select Avilaible Quality<ul id='listurl'>";
-document.body.appendChild(ytproDown);
-ytproDown.appendChild(ytproDownDiv);
-if("ytplayer" in window){
-for(x in ytplayer.config.args.raw_player_response.streamingData.formats){
-if("signatureCipher" in ytplayer.config.args.raw_player_response.streamingData.formats[x]){
-ytproDownDiv.innerHTML+="<li data-ytprotit='"+ytplayer.config.args.title+"'  onclick='YTDownVid(this)'  data-ytprourl='"+ytproGetURL(ytplayer.config.args.raw_player_response.streamingData.formats[x].signatureCipher)+"'>"+  (ytplayer.config.args.raw_player_response.streamingData.formats[x].qualityLabel ) +"</li>" ;
-}else{
-ytproDownDiv.innerHTML+="<li data-ytprotit='"+ytplayer.config.args.title+"'  onclick='YTDownVid(this)'  data-ytprourl='"+ytplayer.config.args.raw_player_response.streamingData.formats[x].url+"'>"+  (ytplayer.config.args.raw_player_response.streamingData.formats[x].qualityLabel ) +"</li>" ;
-}}}else {
-alert("AN ERROR OCCURED , PLEASE UPDATE YT PRO");
+/*Dislikes To Locale, Credits: Return YT Dislikes*/
+function getDislikesInLocale(num){
+var nn=num;
+if (num < 1000){
+nn = num;
+}
+else{
+const int = Math.floor(Math.log10(num) - 2);
+const decimal = int + (int % 3 ? 1 : 0);
+const value = Math.floor(num / 10 ** decimal);
+nn= value * 10 ** decimal;
+}
+let userLocales;
+if (document.documentElement.lang) {
+userLocales = document.documentElement.lang;
+} else if (navigator.language) {
+userLocales = navigator.language;
+} else {
+try {
+userLocales = new URL(
+Array.from(document.querySelectorAll("head > link[rel='search']"))
+?.find((n) => n?.getAttribute("href")?.includes("?locale="))
+?.getAttribute("href")
+)?.searchParams?.get("locale");
+} catch {
+userLocales = "en";
 }
 }
-function YTDownVid(o){
-Android.downvid((o.getAttribute("data-ytprotit")+".mp4"),o.getAttribute("data-ytprourl"),navigator.userAgent+"");
+return Intl.NumberFormat(userLocales, {
+notation: "compact",
+compactDisplay: "short",
+}).format(nn);
 }
-/*THE 0NE AND 0NLY FUNCTION*/
-function pkc(){
-if(window.location.href.indexOf("youtube.com/watch") > -1){
-/*Dark and Light Mode*/
-var c ="#000";
-if(document.cookie.indexOf("f6=400") > -1){c ="#fff";}else{c="#000";}
 /*Fetch The Dislikes*/
 fetch("https://returnyoutubedislikeapi.com/votes?videoId="+(new URLSearchParams(window.location.search)).get('v'))
 .then(response => {
 return response.json();
 }).then(jsonObject => {
 if('dislikes' in jsonObject){
-document.querySelectorAll('[aria-label="Dislike this video"]')[0].children[0].children[1].innerHTML=jsonObject.dislikes;
+dislikes=getDislikesInLocale(parseInt(jsonObject.dislikes));
 }
 }).catch(error => {});
+
+
+/*Unmute The Video*/
+var unV=setInterval(() => {
+document.getElementsByClassName('video-stream')[0].muted=false;
+if(!document.getElementsByClassName('video-stream')[0].muted){
+clearInterval(unV);
+}
+}, 5);
+
+
+
+
+/*Funtion to set Element Styles*/
+function sty(e,v){
+var s={
+display:"flex",
+alignItems:"center",
+justifyContent:"center",
+fontWeight:"550",
+height:"65%",
+width:"80px",
+borderRadius:"20px",
+background:d,
+fontSize:"12px",
+marginRight:"5px",
+textAlign:"center"
+};
+for(x in s){
+e.style[x]=s[x];
+}
+}
+function formatFileSize(x){
+var s=parseInt(x);
+let ss = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+for (var i=0; s > 1024; i++) s /= 1024;
+return ` | ${s.toFixed(1)} ${ss[i]}`;
+}
+async function getSize(u){
+const r = await fetch(u, {
+method: 'HEAD'
+});
+try{
+document.querySelectorAll(`[data-ytprourl="${u}"]`)[0].children[1].innerHTML+= formatFileSize(r.headers.get("Content-Length"));
+}catch{}
+}
+
+
+async function ytproDownVid(){
+var ytproDown=document.createElement("div");
+var ytproDownDiv=document.createElement("div");
+ytproDownDiv.setAttribute("id","downytprodiv");
+ytproDown.setAttribute("id","outerdownytprodiv");
+ytproDown.setAttribute("style",`
+height:100%;width:100%;position:fixed;top:0;left:0;
+display:flex;justify-content:center;
+background:rgba(0,0,0,0.7);
+z-index:99999999999999;
+`);
+ytproDown.addEventListener("click",
+function(ev){
+if(ev.target != ytproDownDiv ){
+history.back();
+}
+});
+
+ytproDownDiv.setAttribute("style",`
+height:50%;width:85%;overflow:auto;background:#212121;
+position:absolute;bottom:20px;
+z-index:99999999999999;padding:20px;text-align:center;border-radius:25px;color:white;text-align:center;
+`);
+
+ytproDownDiv.innerHTML="<style>#downytprodiv a{text-decoration:none;color:white;} #downytprodiv li{list-style:none; display:flex;align-items:center;justify-content:center;color:#fff;border-radius:25px;padding:10px;background:#000;margin:5px;}</style>";
+ytproDownDiv.innerHTML+="Select Avilaible Formats<ul id='listurl'>";
+
+document.body.appendChild(ytproDown);
+ytproDown.appendChild(ytproDownDiv);
+
+
+
+if("ytplayer" in window){
+
+var t=ytplayer.config.args.title.replaceAll("|","").replaceAll("\\","").replaceAll("?","").replaceAll("*","").replaceAll("<","").replaceAll("/","").replaceAll(":","").replaceAll('"',"").replaceAll(">","");
+var f=ytplayer.config.args.raw_player_response.streamingData.formats;
+var af=ytplayer.config.args.raw_player_response.streamingData.adaptiveFormats;
+var thumb=ytplayer.config.args.raw_player_response.videoDetails.thumbnail?.thumbnails;
+for(x in f){
+if("signatureCipher" in f[x]){
+
+ytproDownDiv.innerHTML+=`<li data-ytprotit="${t}" style="background:#001;"  onclick="YTDownVid(this,'.mp4')"  data-ytprourl="${ytproGetURL(f[x].signatureCipher)}">
+${downBtn}<span style='margin-left:10px;'  >${f[x].qualityLabel}
+</span></li>`;
+
+getSize(ytproGetURL(f[x].signatureCipher));
+}else{
+
+ytproDownDiv.innerHTML+=`<li data-ytprotit="${t}"  style="background:#001;"  onclick="YTDownVid(this,'.mp4')"  data-ytprourl="${f[x].url}">
+${downBtn}<span style="margin-left:10px;"  >${f[x].qualityLabel} </span></li>` ;
+getSize(f[x].url);
+}
+}
+
+for(x in af){
+if(af[x].mimeType.indexOf("audio") > -1){
+if("signatureCipher" in af[x]){
+ytproDownDiv.innerHTML+=`<li data-ytprotit="${t}"  onclick="YTDownVid(this,'.mp3')"  data-ytprourl="${ytproGetURL(af[x].signatureCipher)}">
+${downBtn}<span style='margin-left:10px;'  >Audio${formatFileSize(af[x].contentLength)}
+</span></li>`;
+}else{
+ytproDownDiv.innerHTML+=`<li data-ytprotit="${t}"  onclick="YTDownVid(this,'.mp3')"  data-ytprourl="${af[x].url}">
+${downBtn}<span style="margin-left:10px;"  >Audio${formatFileSize(af[x].contentLength)} 
+</span></li>` ;
+}}
+}
+
+if(thumb != undefined){
+
+ytproDownDiv.innerHTML+="<br>Thumbnails<br><br><style>.thu{height:80px;border-radius:10px;}.thu img{max-height:97%;max-width:70%;border-radius:10px;border:1px solid silver;}</style>";
+for(x in thumb){
+ytproDownDiv.innerHTML+=`<li data-ytprotit="${t+Date.now()}"  onclick="YTDownVid(this,'.png')" class="thu" data-ytprourl="${thumb[x].url}">
+<img src="${thumb[x].url}"><br>
+<span style="margin-left:30px;display:flex;align-items:center;justify-content:center;"  >${downBtn}<span style="margin-left:10px;"  >${thumb[x].height} &#x2715; ${thumb[x].width}
+</span></span></li>` ;
+}
+
+}
+
+
+}else {
+alert("AN ERROR OCCURED , PLEASE UPDATE YT PRO");
+}
+}
+
+
+function YTDownVid(o,ex){
+var mtype="";
+if(ex ==".png"){
+mtype="image/png";
+}else if(ex ==".mp4"){
+mtype="video/mp4";
+}
+else if(ex ==".mp3"){
+mtype="audio/mp3";
+}
+Android.downvid((o.getAttribute("data-ytprotit")+ex),o.getAttribute("data-ytprourl"),mtype);
+}
+
+
+/*THE 0NE AND 0NLY FUNCTION*/
+function pkc(){
+
+if(window.location.href.indexOf("youtube.com/watch") > -1){
+
+try{
+var elm=document.getElementsByTagName('ytm-segmented-like-dislike-button-renderer')[0].getElementsByTagName("ytm-toggle-button-renderer")[1];
+elm.children[0].children[0].style.position="absolute";
+elm.children[0].children[0].style.left="10px";
+elm.children[0].style.width="80px";
+if(elm.children[0].children[2] == null){
+elm.children[0].innerHTML+=`<span style="margin-left:20px">${dislikes}<span>`;
+}
+else{
+elm.children[0].children[2].innerHTML=dislikes;
+}
+}catch{}
+
+
 /*Check If Element Already Exists*/
 if(document.getElementById("ytproMainDivE") == null){
 function insertAfter(referenceNode, newNode) {try{referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);}catch{}}
+var ytproMainDivA=document.createElement("div");
+ytproMainDivA.setAttribute("id","ytproMainDivE");
+ytproMainDivA.setAttribute("style",`
+height:50px;width:100%;display:block;overflow:auto;
+`);
+
+insertAfter(document.getElementsByClassName('slim-video-action-bar-actions')[0],ytproMainDivA);
+
 var ytproMainDiv=document.createElement("div");
-ytproMainDiv.style.height="50px";
-ytproMainDiv.style.width="100%";
-ytproMainDiv.style.display="flex";
-ytproMainDiv.setAttribute("id","ytproMainDivE");
-ytproMainDiv.style.alignItems="center";
-ytproMainDiv.style.justifyContent="center";
-ytproMainDiv.style.overflow="hidden";
-insertAfter(document.getElementsByClassName('slim-video-action-bar-actions')[0],ytproMainDiv);
+ytproMainDiv.setAttribute("style",`
+height:50px;width:100%;display:flex;overflow:auto;
+align-items:center;justify-content:center;padding-left:20px;padding-right:20px;
+`);
+ytproMainDivA.appendChild(ytproMainDiv);
+
+/*Heart Button*/
+var ytproFavElem=document.createElement("div");
+sty(ytproFavElem);
+if(!isHeart()){
+ytproFavElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${c}" viewBox="0 0 16 16">
+<path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+</svg><span style="margin-left:8px">Heart<span>`;
+}else{
+ytproFavElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#f00" viewBox="0 0 16 16">
+<path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+</svg><span style="margin-left:8px">Heart<span>`;
+}
+ytproMainDiv.appendChild(ytproFavElem);
+ytproFavElem.addEventListener("click",()=>{ytProHeart(ytproFavElem);});
+
+
+
+/*Download Button*/
 var ytproDownVidElem=document.createElement("div");
-ytproDownVidElem.style.display="block";
-ytproDownVidElem.style.height="90%";
-ytproDownVidElem.style.width="auto";
-ytproDownVidElem.style.textAlign="center";
-ytproDownVidElem.style.marginRight="10px";
-ytproDownVidElem.style.fontSize="12px";
-ytproDownVidElem.innerHTML='	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="'+c+'" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>								<br>Download';
+sty(ytproDownVidElem);
+ytproDownVidElem.style.width="110px";
+ytproDownVidElem.innerHTML=`${downBtn}<span style="margin-left:8px">Download<span>`;
 ytproMainDiv.appendChild(ytproDownVidElem);
 ytproDownVidElem.addEventListener("click",
-function(){ytproDownVid();});
+function(){
+window.location.hash="download";
+});
+
+/*PIP Button*/
 var ytproPIPVidElem=document.createElement("div");
-ytproPIPVidElem.style.display="block";
-ytproPIPVidElem.style.height="90%";
-ytproPIPVidElem.style.width="auto";
-ytproPIPVidElem.style.textAlign="center";
-ytproPIPVidElem.style.fontSize="12px";
-ytproPIPVidElem.style.marginLeft="10px";
-ytproPIPVidElem.innerHTML='	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"   fill="'+c+'" viewBox="0 0 24 24"><path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm0 16.01H3V4.98h18v14.03z"/></svg>								<br>PIP Mode';
+sty(ytproPIPVidElem);
+ytproPIPVidElem.style.width="110px";
+ytproPIPVidElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${c}"  viewBox="0 0 16 16">
+<path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h13A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 12.5v-9zM1.5 3a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-13z"/>
+<path d="M8 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-3z"/>
+</svg>
+<span style="margin-left:8px">PIP Mode<span>`;
 ytproMainDiv.appendChild(ytproPIPVidElem);
 ytproPIPVidElem.addEventListener("click",
 function(){
@@ -204,30 +410,98 @@ document.getElementsByClassName('video-stream')[0].play();
 try{document.getElementById("ytproMainAudDivE").remove();}catch{console.log("");}
 Android.pipvid("pip");
 });
+
+/*Music Button*/
 var ytproAudElem=document.createElement("div");
-ytproAudElem.style.display="block";
-ytproAudElem.style.height="90%";
-ytproAudElem.style.width="auto";
-ytproAudElem.style.textAlign="center";
-ytproAudElem.style.fontSize="12px";
-ytproAudElem.style.marginLeft="20px";
-ytproAudElem.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="'+c+'" class="bi bi-music-note-list" viewBox="0 0 16 16"><path d="M12 13c0 1.105-1.12 2-2.5 2S7 14.105 7 13s1.12-2 2.5-2 2.5.895 2.5 2z"/><path fill-rule="evenodd" d="M12 3v10h-1V3h1z"/><path d="M11 2.82a1 1 0 0 1 .804-.98l3-.6A1 1 0 0 1 16 2.22V4l-5 1V2.82z"/><path fill-rule="evenodd" d="M0 11.5a.5.5 0 0 1 .5-.5H4a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 .5 7H8a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 .5 3H8a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5z"/></svg><br>Music '
+sty(ytproAudElem);
+ytproAudElem.style.width="90px";
+ytproAudElem.innerHTML=`
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${c}" viewBox="0 0 16 16">
+<path fill-rule="evenodd" d="M8.5 2a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-1 0v-11a.5.5 0 0 1 .5-.5zm-2 2a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zm4 0a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zm-6 1.5A.5.5 0 0 1 5 6v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm8 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm-10 1A.5.5 0 0 1 3 7v2a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5zm12 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5z"/>
+</svg>
+<span style="margin-left:8px">BG Play<span>`;
 ytproMainDiv.appendChild(ytproAudElem);
 ytproAudElem.addEventListener("click",
 function(){
 ytproAudPlayer();
 });
+
+if(ytprof1.length =="" && ytprov1.length ==""){
+ytproAudElem.style.opacity=".5";
+ytproAudElem.style.pointerEvents="none";
+ytproDownVidElem.style.opacity=".5";
+ytproDownVidElem.style.pointerEvents="none";
+}
+else if(ytprof1.length !="" && ytprov1.length !=""){
+ytproAudElem.style.opacity="1";
+ytproAudElem.style.pointerEvents="auto";
+ytproDownVidElem.style.opacity="1";
+ytproDownVidElem.style.pointerEvents="auto";
+}
 }
 /*Watch The old and New URL*/
+
 if(ytoldV != (new URLSearchParams(window.location.search)).get('v')){
 try{document.getElementById("ytproMainAudDivE").remove();}catch{console.log("");}
 ytoldV=(new URLSearchParams(window.location.search)).get('v');
 window.location.href=window.location.href;
 }
+
+
+}
+
+
+/*
+* Shorts Vidoes
+* Probably will Expand This in future updates.
+if(window.location.href.indexOf("youtube.com/shorts") > -1){
+if(ytoldV != window.location.pathname){
+try{document.getElementById("ytproMainAudDivE").remove();}catch{console.log("");}
+ytoldV=window.location.pathname;
+window.location.href=window.location.href;
+}
+}*/
+
+
+}
+
+
+function ytProHeart(x){
+
+var vid=(new URLSearchParams(window.location.search)).get('v');
+if(localStorage.getItem("vids")?.indexOf(vid) > -1){
+var ritem=localStorage.getItem("vids");
+ritem=ritem.substr(0,(ritem?.indexOf(vid)-1))+ritem.substr((ritem?.indexOf(vid)+vid.length),ritem.length);
+localStorage.setItem("vids",ritem);
+x.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${c}" viewBox="0 0 16 16">
+<path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+</svg><span style="margin-left:8px">Heart<span>`;
+}else{
+localStorage.setItem("vids",localStorage.getItem("vids")+","+(new URLSearchParams(window.location.search)).get('v'));
+x.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#f00" viewBox="0 0 16 16">
+<path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+</svg><span style="margin-left:8px">Heart<span>`;
 }
 }
 
 
+function isHeart(){
+if(localStorage.getItem("vids")?.indexOf((new URLSearchParams(window.location.search)).get('v')) > -1){
+return true;
+}else{
+return false;
+}
+}
+
+function PIPlayer(){
+if(!document.getElementsByClassName('video-stream')[0].paused){
+try{document.getElementById("ytproMainAudDivE").remove();}catch{console.log("");}
+/*Idk why i have done this but this really solves the issue LOL*/
+var o=0;
+var h=setInterval(()=>{o+=1;if(o==10){clearInterval(h);}document.getElementsByClassName('video-stream')[0].play(); },10);
+Android.pipvid("pip");
+}
+}
 
 /*YTPRO Audio Player*/
 function ytproAudPlayer(){
@@ -303,14 +577,25 @@ alert("AN ERROR OCCURED , PLEASE UPDATE YT PRO");
 setInterval(pkc,1);
 
 
-/*YT ADS BLOCKER , I know it's Copy Paste*/
+/*Check The Hash Change*/
+window.onhashchange=()=>{
+if(window.location.hash == "#download"){
+ytproDownVid();
+}else{
+try{document.getElementById("outerdownytprodiv").remove();}catch{}
+}
+}
+
+
+
+
+/*YT ADS BLOCKER , Credits: Unknown Source*/
 window.onload = function(){ 
 var outerLayer = document.getElementsByClassName('video-ads ytp-ad-module');
 var adPlayerOverlay = document.getElementsByClassName('ytp-ad-player-overlay'); // popup ads in video
 var adImageOverlay = document.getElementsByClassName('ytp-ad-image-overlay');
 var button = document.getElementsByClassName('ytp-ad-skip-button ytp-button');
 var firstAd = document.getElementsByClassName('ytp-ad-text');
-document.getElementsByClassName('video-stream')[0].muted=false;
 function skipFirstInner(callback) {
 if (adPlayerOverlay[0] && adPlayerOverlay.length > 0) {
 adPlayerOverlay[0].style.visibility = 'hidden';
@@ -347,3 +632,5 @@ if((new URLSearchParams(window.location.search)).get('auds') == "ab"){
 ytproAudPlayer();
 }
 };
+
+
