@@ -15,13 +15,15 @@
 
 ---
 
-<p align="center">
-<img src='.github/img/YT PRO.jpg'  >
-</p>
+
+| | |
+|:--:|:--:| 
+|<img src='.github/img/ytpro3.png'  > | <img src='.github/img/ytpro2.png'  > |
+
 
 ## Download YT PRO
 
-[![Download zip](https://custom-icon-badges.herokuapp.com/badge/-Download-ff0000?style=for-the-badge&logo=download&logoColor=white "Download Apk")](https://github.com/prateek-chaubey/YTPro/releases/download/V1.0/YTPro.apk)
+[![Download zip](https://custom-icon-badges.herokuapp.com/badge/-Download-ff0000?style=for-the-badge&logo=download&logoColor=white "Download Apk")](https://github.com/prateek-chaubey/YTPro/releases/download/v2.3/YTPRO.apk)
 
 ## Features
  * Video Downloader
