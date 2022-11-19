@@ -61,11 +61,11 @@ public class MainActivity extends Activity {
 			@Override
 			public void onPageFinished(WebView _param1, String _param2) {
 				final String _url = _param2;
-				//For Auto Updation 
-		          	web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://cdn.jsdelivr.net/gh/prateek-chaubey/YTPro@latest/app/src/main/assets/app.js'; document.body.appendChild(script);  })();");
+				 
+		          	//web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://cdn.jsdelivr.net/gh/prateek-chaubey/YTPro@latest/app/src/main/assets/app.js'; document.body.appendChild(script);  })();");
 				
 		        //For Using Local JS file uncomment the below line
-		 	//	inject();
+		 		inject();
 				super.onPageFinished(_param1, _param2);
 			}
 		});
