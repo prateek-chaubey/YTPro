@@ -31,7 +31,6 @@
  * Picture in Picture Mode
  * Shows Number of Dislikes
  * Background Audio Player
- * Auto Updation of App
  * APK size under 30KB
  * Minimal
  * Almost 0 Dependencies
