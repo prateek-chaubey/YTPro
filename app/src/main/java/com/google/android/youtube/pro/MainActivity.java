@@ -111,7 +111,7 @@ public class MainActivity extends Activity {
 		
 		protected FrameLayout frame;
 				
-		private int mOriginalOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+		private int mOriginalOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
 		
 		private int mOriginalSystemUiVisibility;
 				
@@ -156,7 +156,7 @@ public class MainActivity extends Activity {
 			
 			MainActivity.this.setRequestedOrientation(this.mOriginalOrientation);
 						
-			this.mOriginalOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE; this.mCustomViewCallback.onCustomViewHidden();
+			this.mOriginalOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE; this.mCustomViewCallback.onCustomViewHidden();
 			
 			this.mCustomViewCallback = null;
 			
