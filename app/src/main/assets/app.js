@@ -1,17 +1,32 @@
 /*****YTPRO*******
 Author: Prateek Chaubey
-Version: 2.3
+Version: 3.1
 URI: https://github.com/prateek-chaubey/
 */
 
 
 /*Few Stupid Inits*/
-var YTProVer="2.3";
+
+var YTProVer="3.1";
 if(ytprof1 == undefined && ytprov1 == undefined){
 var ytprof1="";
 var ytprov1="";
 }
 var ytoldv="";
+var isF=false;
+var isAP=false;
+var sTime=[];
+
+if(localStorage.getItem("autoSpn") == null){
+localStorage.setItem("autoSpn","true");
+localStorage.setItem("fzoom","false");
+}
+if(localStorage.getItem("fzoom") == "true"){
+document.getElementsByName("viewport")[0].setAttribute("content","");
+}
+
+
+
 if(window.location.pathname.indexOf("shorts") > -1){
 ytoldV=window.location.pathname;
 }
@@ -31,7 +46,14 @@ var c="#000";
 var d="#f2f2f2";
 var dislikes="...";
 
-if(document.cookie.indexOf("PREF") < 0){
+if(document.cookie.indexOf("PREF") < 0 || document.cookie.indexOf("f6=") < 0){
+document.cookie.replace(
+/(?<=^|;).+?(?=\=|;|$)/g,
+name => location.hostname
+.split(/\.(?=[^\.]+\.)/)
+.reduceRight((acc, val, i, arr) => i ? arr[i]='.'+val+acc : (arr[i]='', arr), '')
+.map(domain => document.cookie=`${name}=;max-age=0;path=/;domain=${domain}`)
+);
 document.cookie="PREF=f6=400&f7=100;";
 window.location.href=window.location.href;
 }
@@ -131,6 +153,37 @@ ytprov1=functionBody;
 };
 extractDecipher();
 };
+function insertAfter(referenceNode, newNode) {try{referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);}catch{}}
+
+/*Add Settings Tab*/
+setInterval(()=>{
+if(document.getElementById("setDiv") == null){
+var setDiv=document.createElement("div");
+setDiv.setAttribute("style",`
+height:30px;width:30px;
+z-index:9999999999;
+font-size:22px;
+text-align:center;line-height:35px;
+`);
+setDiv.setAttribute("id","setDiv");
+var svg=document.createElement("div");
+svg.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-gear-fill" viewBox="0 0 16 16">
+<path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
+</svg>`;
+setDiv.appendChild(svg);
+insertAfter(document.getElementsByTagName("ytm-home-logo")[0],setDiv);
+setDiv.addEventListener("click",
+function(ev){
+console.log(ev.target)
+if(ev.target == svg  || svg.contains(ev.target)){
+window.location.hash="settings";
+}
+});
+}
+},50);
+
+
+
 /*Fetch Script*/
 var scripts = document.getElementsByTagName('script');
 for(var i=0;i<scripts.length;i++){
@@ -172,6 +225,32 @@ notation: "compact",
 compactDisplay: "short",
 }).format(nn);
 }
+
+
+
+function skipSponsor(){
+var sDiv=document.createElement("div");
+sDiv.setAttribute("style",`height:3px;pointer-events:none;width:100%;background:transparent;position:fixed;z-index:99999999;`)
+sDiv.setAttribute("id","sDiv");
+var dur=document.getElementsByClassName('video-stream')[0].duration;
+
+for(var x in sTime){
+var s1=document.createElement("div");
+var s2=sTime[x];
+s1.setAttribute("style",`height:3px;width:${(100/dur) * (s2[1]-s2[0])}%;background:#0f8;position:fixed;z-index:99999999;left:${(100/dur) * s2[0]}%;`)
+sDiv.appendChild(s1);
+}
+if(document.getElementById("sDiv") == null){
+if(document.getElementsByClassName('chaptered-player-bar-renderer')[0] != null){
+document.getElementsByClassName('chaptered-player-bar-renderer')[0].appendChild(sDiv);
+}else{
+try{document.getElementsByClassName('progress-bar-line')[0].appendChild(sDiv);}catch{}
+}
+}
+}
+
+
+if(window.location.pathname.indexOf("watch") > -1){
 /*Fetch The Dislikes*/
 fetch("https://returnyoutubedislikeapi.com/votes?videoId="+(new URLSearchParams(window.location.search)).get('v'))
 .then(response => {
@@ -179,6 +258,18 @@ return response.json();
 }).then(jsonObject => {
 if('dislikes' in jsonObject){
 dislikes=getDislikesInLocale(parseInt(jsonObject.dislikes));
+}
+}).catch(error => {});
+
+
+/*Check For Sponsorships*/
+fetch("https://sponsor.ajay.app/api/skipSegments?videoID="+(new URLSearchParams(window.location.search)).get('v'))
+.then(response => {
+return response.json();
+}).then(jsonObject => {
+for(var x in jsonObject){
+var time=jsonObject[x].segment;
+sTime.push(time);
 }
 }).catch(error => {});
 
@@ -191,7 +282,55 @@ clearInterval(unV);
 }
 }, 5);
 
+/*Skip the Sponsor*/
+document.getElementsByClassName('video-stream')[0].ontimeupdate=()=>{
+var cur=document.getElementsByClassName('video-stream')[0].currentTime;
+for(var x in sTime){
+var s2=sTime[x];
+if(Math.floor(cur) == Math.floor(s2[0])){
+if(localStorage.getItem("autoSpn") == "true"){
+document.getElementsByClassName('video-stream')[0].currentTime=s2[1];
+addSkipper(s2[0]);
+}
+}
+}
+};
 
+/*Remove Promotion Element*/
+try{document.getElementsByTagName("ytm-paid-content-overlay-renderer")[0].style.display="none";}catch{}
+
+setInterval(skipSponsor,50);
+}
+
+
+
+
+
+/*Add Skip Sponsor Element*/
+function addSkipper(sT){
+var sSDiv=document.createElement("div");
+sSDiv.setAttribute("style",`
+height:50px;${(screen.width > screen.height) ? "width:50%;" : "width:80%;"}overflow:auto;background:rgba(130,130,130,.3);
+backdrop-filter:blur(6px);
+position:absolute;bottom:40px;
+line-height:50px;
+left:calc(15% / 2 );padding-left:10px;padding-right:10px;
+z-index:99999999999999;text-align:center;border-radius:25px;
+color:white;text-align:center;
+`);
+sSDiv.innerHTML=`<span style="height:30px;line-height:30px;margin-top:10px;display:block;font-family:monospace;font-size:16px;float:left;">Skipped Sponsor</span>
+<span style="height:30px;line-height:44px;float:right;padding-right:30px;margin-top:10px;display:block;padding-left:30px;border-left:1px solid white;">
+<svg onclick="this.parentElement.parentElement.remove();document.getElementsByClassName('video-stream')[0].currentTime=${sT+1};" xmlns="http://www.w3.org/2000/svg" width="23" height="23" style="margin-top:0px;" fill="currentColor" viewBox="0 0 16 16">
+<path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+<path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+</svg>
+<svg onclick="this.parentElement.parentElement.remove();" xmlns="http://www.w3.org/2000/svg" width="20" height="20" style="margin-left:30px;" fill="#f24" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+</svg>
+</span>`;
+document.getElementById("player-control-container").appendChild(sSDiv);
+setTimeout(()=>{sSDiv.remove();},5000);
+}
 
 
 /*Funtion to set Element Styles*/
@@ -227,6 +366,154 @@ try{
 document.querySelectorAll(`[data-ytprourl="${u}"]`)[0].children[1].innerHTML+= formatFileSize(r.headers.get("Content-Length"));
 }catch{}
 }
+
+async function ytproSettings(){
+var ytpSet=document.createElement("div");
+var ytpSetI=document.createElement("div");
+ytpSet.setAttribute("id","settingsprodiv");
+ytpSetI.setAttribute("id","ssprodivI");
+ytpSet.setAttribute("style",`
+height:100%;width:100%;position:fixed;top:0;left:0;
+display:flex;justify-content:center;
+background:rgba(0,0,0,0.7);
+z-index:9999;
+`);
+ytpSet.addEventListener("click",
+function(ev){
+if(!(ev.target == ytpSetI  || ytpSetI.contains(ev.target))){
+history.back();
+}
+});
+
+ytpSetI.setAttribute("style",`
+height:50%;width:85%;overflow:auto;background:#212121;
+position:absolute;bottom:20px;
+z-index:99999999999999;padding:20px;text-align:center;border-radius:25px;color:white;text-align:center;
+`);
+
+ytpSetI.innerHTML=`<style>
+#settingsprodiv a{text-decoration:underline;color:white;} #settingsprodiv li{list-style:none; display:flex;align-items:center;justify-content:center;color:#fff;border-radius:25px;padding:10px;background:#000;margin:5px;}
+#ssprodivI div{
+height:10px;
+width:calc(100% - 20px);
+padding:10px;
+font-size:16px;
+font-family:monospace;
+text-align:left;
+display:block;
+}
+#ssprodivI div span{
+display:block;
+height:15px;
+width:30px;
+border-radius:20px;
+float:right;
+position:relative;
+background:rgba(255,0,0,.5);
+}
+#ssprodivI div span b{
+display:block;
+height:20px;
+width:20px;
+position:absolute;
+right:-6px;
+top:-2px;
+border-radius:50px;
+background:rgba(255,0,0,5);
+}
+#ssprodivI div input::placeholder{color:white;}
+#ssprodivI div input,#ssprodivI div button{
+height:30px;
+background:rgba(255,255,255,.1);
+width:100%;
+border:0;
+border-radius:20px;
+padding:10px;
+font-size:14px;
+}
+#ssprodivI div button{
+background:linear-gradient(90deg,#0f8,#0aa);
+font-size:14px;
+width:47%;
+border-radius:10px;
+padding:0;
+color:black;
+}
+
+</style>`;
+ytpSetI.innerHTML+=`<b style='font-size:18px' >YT PRO Settings</b>
+<span style="font-size:10px">v${YTProVer}</span>
+<br><br>
+<div><input type="url" placeholder="Enter Youtube URL" onkeyup="searchUrl(this,event)"></div>
+<br>
+<div style="text-align:center" ><button onclick="alert('Coming Soon...');">Hearted Videos</button><button style="margin-left:10px" onclick="${(parseInt(Android.getInfo()) < parseInt(2.4)) ? "alert('New version available.\\n\\nPlease Update Your YT PRO')" : "alert('YT PRO is upto date');"}">Check for Updates</button></div>
+<br>
+<div>Autoskip Sponsors <span onclick="sttCnf(this,'autoSpn');" style="${sttCnf(0,0,"autoSpn")}" ><b style="${sttCnf(0,1,"autoSpn")}"></b></span></div>
+<br>
+<div>Force Zoom <span onclick="sttCnf(this,'fzoom');" style="${sttCnf(0,0,"fzoom")}" ><b style="${sttCnf(0,1,"fzoom")}" ></b></span></div> 
+<br>
+<div style="display:flex;justify-content:center;font-family:cursive;text-align:center;font-size:22px;font-weight:bolder;color:#0f8;">Made with 
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#f00" style="margin:6px;margin-top:5px" viewBox="0 0 16 16">
+<path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+</svg> by Prateek Chaubey</div>
+<br><br>
+<div style="font-size:13px;"><b style="font-weight:bold">Disclaimer</b>: This is an unofficial OSS Youtube Mod , all the logos and brands are property of Google LLC.<br>
+You can get the source code at <a href="#" onclick="Android.oplink('https://github.com/prateek-chaubey/YTPRO')" > https://github.com/prateek-chaubey/YTPRO</a>
+<br><br><center>
+<a href="#" onclick="Android.oplink('https://github.com/prateek-chaubey/YTPRO/issues')" >Report Bugs</a>
+</center></div>`;
+
+document.body.appendChild(ytpSet);
+ytpSet.appendChild(ytpSetI);
+
+}
+
+function searchUrl(x,e){
+console.log(e); 
+if(e.keyCode === 13 || e === "Enter"){
+window.location.href=x.value;
+}
+}
+
+function sttCnf(x,z,y){
+if(typeof y == "string"){
+if(localStorage.getItem(y) == "false"){
+if(z == 1){
+return 'background:rgba(255,255,255,.7);left:-6px;'
+}else{
+return 'background:rgba(255,255,255,.1)';
+}
+}else{
+if(z == 1){
+return 'background:rgba(255,0,0,7);left:auto;right:-6px;'
+}else{
+return 'background:rgba(255,0,0,.5)';
+}
+}
+}
+
+if(localStorage.getItem(z) == "true"){
+localStorage.setItem(z,"false");
+x.style.background="rgba(255,255,255,.1)";
+x.children[0].style.left="-6px";
+x.children[0].style.background="rgba(255,255,255,.7)";
+}
+else{
+localStorage.setItem(z,"true");
+x.style.background="rgba(255,0,0,.5)";
+x.children[0].style.left="auto";
+x.children[0].style.right="-6px";
+x.children[0].style.background="rgba(255,0,0,7)";
+}
+
+if(localStorage.getItem("fzoom") == "false"){
+document.getElementsByName("viewport")[0].setAttribute("content","width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no,");
+}else{
+document.getElementsByName("viewport")[0].setAttribute("content","");
+}
+
+}
+
 
 
 async function ytproDownVid(){
@@ -350,7 +637,6 @@ elm.children[0].children[2].innerHTML=dislikes;
 
 /*Check If Element Already Exists*/
 if(document.getElementById("ytproMainDivE") == null){
-function insertAfter(referenceNode, newNode) {try{referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);}catch{}}
 var ytproMainDivA=document.createElement("div");
 ytproMainDivA.setAttribute("id","ytproMainDivE");
 ytproMainDivA.setAttribute("style",`
@@ -406,9 +692,8 @@ ytproPIPVidElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" he
 ytproMainDiv.appendChild(ytproPIPVidElem);
 ytproPIPVidElem.addEventListener("click",
 function(){
-document.getElementsByClassName('video-stream')[0].play();
-try{document.getElementById("ytproMainAudDivE").remove();}catch{console.log("");}
-Android.pipvid("pip");
+isAP=false;
+PIPlayer2();
 });
 
 /*Music Button*/
@@ -439,29 +724,17 @@ ytproDownVidElem.style.opacity="1";
 ytproDownVidElem.style.pointerEvents="auto";
 }
 }
-/*Watch The old and New URL*/
 
+/*Watch The old and New URL*/
 if(ytoldV != (new URLSearchParams(window.location.search)).get('v')){
-try{document.getElementById("ytproMainAudDivE").remove();}catch{console.log("");}
+try{document.getElementById("ytproMainAudDivE").remove();}catch{console.log("No Element Found");}
+isAPlaying=false;
 ytoldV=(new URLSearchParams(window.location.search)).get('v');
 window.location.href=window.location.href;
 }
 
 
 }
-
-
-/*
-* Shorts Vidoes
-* Probably will Expand This in future updates.
-if(window.location.href.indexOf("youtube.com/shorts") > -1){
-if(ytoldV != window.location.pathname){
-try{document.getElementById("ytproMainAudDivE").remove();}catch{console.log("");}
-ytoldV=window.location.pathname;
-window.location.href=window.location.href;
-}
-}*/
-
 
 }
 
@@ -493,15 +766,61 @@ return false;
 }
 }
 
+function removePIP(){
+if(!isF){
+document.getElementsByClassName("fullscreen-icon")[0].click();
+}
+isAP=false;
+}
+
+
+
+
 function PIPlayer(){
+if(isAP == false) PIPlayer1();
+}
+
+function PIPlayer1(){
+
+try{document.getElementById("ytproMainAudDivE").remove();}catch{console.log("No Element Found");}
+if(window.innerWidth == screen.width && window.innerHeight == screen.height){
+isF=true;
+}
+else{
+isF=false;
+}
 if(!document.getElementsByClassName('video-stream')[0].paused){
-try{document.getElementById("ytproMainAudDivE").remove();}catch{console.log("");}
-/*Idk why i have done this but this really solves the issue LOL*/
+if(!isF){
+document.getElementsByClassName("fullscreen-icon")[0].click();
+}
+Android.pipvid("pip");
 var o=0;
 var h=setInterval(()=>{o+=1;if(o==10){clearInterval(h);}document.getElementsByClassName('video-stream')[0].play(); },10);
+}
+}
+
+
+
+function PIPlayer2(){
+try{document.getElementById("ytproMainAudDivE").remove();}catch{console.log("No Element Found");}
+if(window.innerWidth == screen.width && window.innerHeight == screen.height){
+isF=true;
+}
+else{
+isF=false;
+}
+isHPIP=false;
 Android.pipvid("pip");
+if(!isF){
+document.getElementsByClassName("fullscreen-icon")[0].click();
 }
+document.getElementsByClassName('video-stream')[0].play();
 }
+
+
+
+
+
 
 /*YTPRO Audio Player*/
 function ytproAudPlayer(){
@@ -517,7 +836,7 @@ ytproURL=ytproGetURL(ytplayer.config.args.raw_player_response.streamingData.adap
 ytproTitle=ytplayer.config.args.title;
 ytproURL=ytplayer.config.args.raw_player_response.streamingData.adaptiveFormats[x].url;
 }}}
-try{document.getElementById("ytproMainAudDivE").remove();}catch{console.log("");}
+try{document.getElementById("ytproMainAudDivE").remove();}catch{console.log("No Element Found");}
 var ytproAudDivElem=document.createElement("div");
 var ytproAudPlayerElem=document.createElement("audio");
 var ytproAudX=document.createElement("div");
@@ -556,13 +875,18 @@ document.body.appendChild(ytproAudDivElem);
 ytproAudDivElem.appendChild(ytproAudPlayerElem);
 ytproAudDivElem.appendChild(ytproAudX);
 document.getElementsByClassName('video-stream')[0].pause();
-ytproAudX.addEventListener("click",function(){this.parentElement.remove();});
+ytproAudX.addEventListener("click",function(){
+isAP=false;
+this.parentElement.remove();
+});
 /*Listen To the Song*/
 ytproAudPlayerElem.onloadeddata = function() {
 ytproAudPlayerElem.play();
+isAP=true;
 Android.showToast("Now Playing \n"+ytproTitle);
-Android.gohome("ok");
+console.log(Android.gohome("ok"));
 };
+
 /*Watch The Audio Player*/
 ytproAudPlayerElem.addEventListener("timeupdate",function(){
 if(ytproAudPlayerElem.currentTime==ytproAudPlayerElem.duration){
@@ -581,8 +905,11 @@ setInterval(pkc,1);
 window.onhashchange=()=>{
 if(window.location.hash == "#download"){
 ytproDownVid();
+}else if(window.location.hash == "#settings"){
+ytproSettings();
 }else{
 try{document.getElementById("outerdownytprodiv").remove();}catch{}
+try{document.getElementById("settingsprodiv").remove();}catch{}
 }
 }
 
@@ -632,5 +959,3 @@ if((new URLSearchParams(window.location.search)).get('auds') == "ab"){
 ytproAudPlayer();
 }
 };
-
-
