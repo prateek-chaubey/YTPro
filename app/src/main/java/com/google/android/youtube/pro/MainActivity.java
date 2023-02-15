@@ -35,7 +35,8 @@ import android.app.DialogFragment;
 import android.util.Base64;
 import java.io.InputStream;
 import android.content.pm.PackageInfo;
-
+import android.content.pm.PackageManager;
+import android.content.pm.*;
 
 public class MainActivity extends Activity {
 
