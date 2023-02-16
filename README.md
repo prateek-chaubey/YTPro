@@ -23,21 +23,26 @@
 
 ## Download YT PRO
 
-[![Download zip](https://custom-icon-badges.herokuapp.com/badge/-Download-ff0000?style=for-the-badge&logo=download&logoColor=white "Download Apk")](https://github.com/prateek-chaubey/YTPro/releases/download/v2.3/YTPRO.apk)
+[![Download zip](https://custom-icon-badges.herokuapp.com/badge/-Download-ff0000?style=for-the-badge&logo=download&logoColor=white "Download Apk")](https://github.com/prateek-chaubey/YTPro/releases/download/v3.1/YTPRO.apk)
 
 ## Features
  * Video Downloader
+ * Thumbnails Downloader 
  * Ads Blocker
  * Picture in Picture Mode
  * Shows Number of Dislikes
  * Background Audio Player
- * APK size under 30KB
+ * Skip Sponsers
+ * Force Zoom
+ * APK size under 50KB
  * Minimal
  * Almost 0 Dependencies
 
 ## ToDo
- * Improve PIP and Background Player
+ * Improve Background Player and Heart Feature
 
+### Credits
+* [node-ytdl](https://github.com/fent/node-ytdl) , [Sponsor Block](https://github.com/ajayyy/SponsorBlock) , [return-youtube-dislike](https://github.com/Anarios/return-youtube-dislike)
 
 ### ❤️Supporters❤️
 [![Stargazers repo roster for @prateek-chaubey/YTPro](https://reporoster.com/stars/dark/prateek-chaubey/YTPro)](https://github.com/prateek-chaubey/YTPro/stargazers)
