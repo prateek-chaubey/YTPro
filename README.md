@@ -5,6 +5,8 @@
 
 <div align="center">
 
+[![ytpro Versions](https://badges.openbase.com/js/versions/ytpro.svg?style=openbase&token=tg/gabGDNqhbVyY+IHwP1eIZpxursVmf1vfdiqDPiaQ=)](https://openbase.com/js/ytpro?utm_source=embedded&amp;utm_medium=badge&amp;utm_campaign=rate-badge)
+
 [![Gradle](https://github.com/prateek-chaubey/YTPro/actions/workflows/gradle.yml/badge.svg)](https://github.com/prateek-chaubey/YTPro/actions/workflows/gradle.yml)
 <img alt="jsDelivr monthly hits badge" src="https://data.jsdelivr.com/v1/package/npm/ytpro/badge">
 
