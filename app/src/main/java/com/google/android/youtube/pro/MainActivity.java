@@ -69,7 +69,7 @@ super.onPageStarted(p1, p2, p3);
 @Override
 public void onPageFinished(WebView p1, String p2) {
 
-web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://cdn.jsdelivr.net/npm/ytpro@latest/script.js'; document.body.appendChild(script);  })();");
+web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://cdn.jsdelivr.net/npm/ytpro'; document.body.appendChild(script);  })();");
 
 //For Using Local JS file uncomment the below line
 //inject();
