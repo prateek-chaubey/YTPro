@@ -136,6 +136,7 @@ MainActivity.this.getWindow().getDecorView().setSystemUiVisibility(this.mOrigina
 MainActivity.this.setRequestedOrientation(this.mOriginalOrientation);
 this.mOriginalOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE; this.mCustomViewCallback.onCustomViewHidden();
 this.mCustomViewCallback = null;
+web.clearFocus();
 }
 }
 
@@ -168,12 +169,12 @@ mContext = c;
 }
 
 @JavascriptInterface
-public void showToast(String fko) {
+public void showToast(String txt) {
 
-Toast.makeText(getApplicationContext(), fko+"", Toast.LENGTH_SHORT).show();
+Toast.makeText(getApplicationContext(), txt+"", Toast.LENGTH_SHORT).show();
 }
 @JavascriptInterface
-public void gohome(String fko) {
+public void gohome(String x) {
 Intent startMain = new Intent(Intent.ACTION_MAIN);
 startMain.addCategory(Intent.CATEGORY_HOME);
 startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -181,15 +182,15 @@ startActivity(startMain);
 }
 
 @JavascriptInterface
-public void downvid(String namee,String urll, String m) {
-downloadFile(namee,urll,m);
+public void downvid(String name,String url, String m) {
+downloadFile(name,url,m);
 }
 @JavascriptInterface
-public void oplink(String urll) {			
-Intent ka = new Intent();
-ka.setAction(Intent.ACTION_VIEW);
-ka.setData(Uri.parse(urll));
-startActivity(ka);
+public void oplink(String url) {			
+Intent i = new Intent();
+i.setAction(Intent.ACTION_VIEW);
+i.setData(Uri.parse(url));
+startActivity(i);
 }
 @JavascriptInterface
 public String getInfo() {	
@@ -203,7 +204,7 @@ return "1.0";
 
 }
 @JavascriptInterface
-public void pipvid(String fk) {
+public void pipvid(String x) {
 if (android.os.Build.VERSION.SDK_INT >= 26) {
 try {
 enterPictureInPictureMode();
