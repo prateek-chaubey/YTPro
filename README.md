@@ -29,6 +29,7 @@
 
 ## Features
  * Video Downloader
+ * Shorts Downloader 
  * Thumbnails Downloader 
  * Ads Blocker
  * Picture in Picture Mode
@@ -38,7 +39,7 @@
  * Force Zoom
  * APK size under 50KB
  * Minimal
- * Almost 0 Dependencies
+ * Almost 0 Internal Dependencies
 
 ## ToDo
  * Improve Background Player and Heart Feature
