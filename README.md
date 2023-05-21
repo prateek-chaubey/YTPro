@@ -32,6 +32,7 @@
  * Shorts Downloader 
  * Thumbnails Downloader 
  * Ads Blocker
+ * Minimize Video
  * Picture in Picture Mode
  * Shows Number of Dislikes
  * Background Audio Player
