@@ -41,6 +41,7 @@
  * APK size under 50KB
  * Minimal
  * Almost 0 Internal Dependencies
+ * Auto Updation of App
 
 ## ToDo
  * Improve Background Player and Heart Feature
