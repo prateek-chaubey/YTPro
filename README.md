@@ -36,6 +36,7 @@
  * Picture in Picture Mode
  * Shows Number of Dislikes
  * Background Audio Player
+ * Custom Heart feature to save videos without logging into your account
  * Skip Sponsers
  * Force Zoom
  * APK size under 50KB
@@ -44,7 +45,7 @@
  * Auto Updation of App
 
 ## ToDo
- * Improve Background Player and Heart Feature
+ * Improve Background Player
 
 ### Credits
 * [node-ytdl](https://github.com/fent/node-ytdl) , [Sponsor Block](https://github.com/ajayyy/SponsorBlock) , [return-youtube-dislike](https://github.com/Anarios/return-youtube-dislike) , [ytdl](https://github.com/prateek-chaubey/ytdl)
