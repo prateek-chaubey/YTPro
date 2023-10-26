@@ -37,12 +37,16 @@ import java.io.InputStream;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.*;
+import android.app.PictureInPictureParams;
+import android.util.Rational;
 
 public class MainActivity extends Activity {
 
 private WebView web;
 private Intent i = new Intent();
+private boolean portrait = false;
 
+	
 @Override
 protected void onCreate(Bundle savedInstanceState) {
 super.onCreate(savedInstanceState);
@@ -111,16 +115,28 @@ public class CustomWebClient extends WebChromeClient {
 private View mCustomView;
 private WebChromeClient.CustomViewCallback mCustomViewCallback;
 protected FrameLayout frame;
-private int mOriginalOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+private int mOriginalOrientation;
 private int mOriginalSystemUiVisibility;
 public CustomWebClient() {}
+
+  
 public Bitmap getDefaultVideoPoster() {
 
 if (MainActivity.this == null) {
 return null;
 }
-return BitmapFactory.decodeResource(MainActivity.this.getApplicationContext().getResources(), 2130837573); }
+return BitmapFactory.decodeResource(MainActivity.this.getApplicationContext().getResources(), 2130837573);
+}
+
+  
 public void onShowCustomView(View paramView, WebChromeClient.CustomViewCallback viewCallback) {
+
+if(portrait){
+this.mOriginalOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT; 
+}else{
+this.mOriginalOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE; 
+}  
+  
 if (this.mCustomView != null) {
 onHideCustomView();
 return; }
@@ -130,11 +146,19 @@ MainActivity.this.setRequestedOrientation(this.mOriginalOrientation);
 this.mOriginalOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;this.mCustomViewCallback = viewCallback; ((FrameLayout)MainActivity.this.getWindow().getDecorView()).addView(this.mCustomView, new FrameLayout.LayoutParams(-1, -1)); MainActivity.this.getWindow().getDecorView().setSystemUiVisibility(3846);
 }
 public void onHideCustomView() {
+  
 ((FrameLayout)MainActivity.this.getWindow().getDecorView()).removeView(this.mCustomView);
 this.mCustomView = null;
 MainActivity.this.getWindow().getDecorView().setSystemUiVisibility(this.mOriginalSystemUiVisibility);
 MainActivity.this.setRequestedOrientation(this.mOriginalOrientation);
-this.mOriginalOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE; this.mCustomViewCallback.onCustomViewHidden();
+
+
+if(portrait){
+this.mOriginalOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT; 
+}else{
+this.mOriginalOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE; 
+}
+  
 this.mCustomViewCallback = null;
 web.clearFocus();
 }
@@ -186,6 +210,10 @@ public void downvid(String name,String url, String m) {
 downloadFile(name,url,m);
 }
 @JavascriptInterface
+public void fullScreen(boolean value){
+portrait =  value;  
+}
+@JavascriptInterface
 public void oplink(String url) {			
 Intent i = new Intent();
 i.setAction(Intent.ACTION_VIEW);
@@ -207,10 +235,18 @@ return "1.0";
 public void pipvid(String x) {
 if (android.os.Build.VERSION.SDK_INT >= 26) {
 try {
-enterPictureInPictureMode();
+PictureInPictureParams params;
+if(portrait){
+params = new PictureInPictureParams.Builder().setAspectRatio(new Rational(9,16)).build();
+}
+else{
+params = new PictureInPictureParams.Builder().setAspectRatio(new Rational(16, 9)).build();
+}    
+enterPictureInPictureMode(params);
 } catch (IllegalStateException e) {
 e.printStackTrace();
 }
+  
 } else {
 Toast.makeText(getApplicationContext(), "PIP not Supported", Toast.LENGTH_SHORT).show();
 }
