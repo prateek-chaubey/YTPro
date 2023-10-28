@@ -6,7 +6,7 @@ android {
 	
 	defaultConfig {
 		applicationId "com.google.android.youtube.pro"
-		minSdkVersion 29
+		minSdkVersion 21
 		targetSdkVersion 31
 		versionCode 1
 		versionName "3.3"
