@@ -39,6 +39,8 @@ import android.content.pm.PackageManager;
 import android.content.pm.*;
 import android.app.PictureInPictureParams;
 import android.util.Rational;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 public class MainActivity extends Activity {
 
@@ -83,6 +85,20 @@ super.onPageFinished(p1, p2);
 
 }
 
+
+@Override
+public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+if(requestCode == 101){
+if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+web.loadUrl("https://m.youtube.com");
+}else{
+Toast.makeText(getApplicationContext(),"Please Grant Microphone Permission in order to use Speech Recognition", Toast.LENGTH_SHORT).show();
+}
+}
+
+}	
 
 @Override
 public void onBackPressed() {
@@ -162,10 +178,28 @@ this.mOriginalOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_S
 this.mCustomViewCallback = null;
 web.clearFocus();
 }
+
+@Override
+public void onPermissionRequest(final PermissionRequest request) {
+
+if(request.getOrigin().toString().contains("youtube.com")){
+
+if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED) {
+requestPermissions(new String[] {Manifest.permission.RECORD_AUDIO}, 101);
+} else {
+request.grant(request.getResources());
+}
+
+}
+}
+	
 }
 
 private void downloadFile(String filename, String url, String mtype) {
 try {
+try {	
+String encodedFileName = URLEncoder.encode(filename, "UTF-8").replaceAll("\\+", "%20");
+	
 DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
 DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
 request.setTitle(filename)
@@ -173,11 +207,14 @@ request.setTitle(filename)
 .setMimeType(mtype)
 .setAllowedOverMetered(true)
 .setAllowedOverRoaming(true)
-.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS.toString(), filename)				 
+.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS.toString(), encodedFileName)				 
 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE |
 DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
 downloadManager.enqueue(request);
 Toast.makeText(this, "Download Started", Toast.LENGTH_SHORT).show();
+} catch (UnsupportedEncodingException e) {
+e.printStackTrace();
+}
 } catch (Exception ignored) {
 Toast.makeText(this, ignored.toString(), Toast.LENGTH_SHORT).show();
 }
