@@ -1,5 +1,6 @@
 package com.google.android.youtube.pro;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.*;
 import android.os.*;
