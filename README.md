@@ -30,7 +30,8 @@
 ## Features
  * Video Downloader
  * Shorts Downloader 
- * Thumbnails Downloader 
+ * Thumbnails Downloader
+ * Captions Downloader 
  * Ads Blocker
  * Minimize Video
  * Picture in Picture Mode
