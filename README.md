@@ -55,3 +55,7 @@
 [![Stargazers repo roster for @prateek-chaubey/YTPro](http://reporoster.com/stars/dark/prateek-chaubey/YTPro)](https://github.com/prateek-chaubey/YTPro/stargazers)
      
 [![Forkers repo roster for @prateek-chaubey/YTPro](http://reporoster.com/forks/dark/prateek-chaubey/YTPro)](https://github.com/prateek-chaubey/YTPro/network/members)
+
+
+## Disclaimer 
+This is an educational project trying to showcase the javascript injection into a webview for enhancing the productivity.
