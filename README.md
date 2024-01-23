@@ -40,6 +40,7 @@
  * Custom Heart feature to save videos without logging into your account
  * Skip Sponsers
  * Force Zoom
+ * Hide Shorts
  * APK size under 50KB
  * Minimal
  * Almost 0 Internal Dependencies
