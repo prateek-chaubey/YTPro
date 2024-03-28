@@ -6,7 +6,6 @@
 <div align="center">
 
 
-
 [![Gradle](https://github.com/prateek-chaubey/YTPro/actions/workflows/gradle.yml/badge.svg)](https://github.com/prateek-chaubey/YTPro/actions/workflows/gradle.yml)
 <img alt="jsDelivr monthly hits badge" src="https://data.jsdelivr.com/v1/package/npm/ytpro/badge">
 
