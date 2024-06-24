@@ -1,46 +1,18 @@
 package com.google.android.youtube.pro;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.*;
 import android.os.*;
 import android.view.*;
-import android.view.View.*;
 import android.widget.*;
 import android.content.*;
 import android.content.res.*;
 import android.graphics.*;
-import android.graphics.drawable.*;
-import android.media.*;
 import android.net.*;
-import android.text.*;
-import android.text.style.*;
 import android.util.*;
 import android.webkit.*;
-import android.animation.*;
-import android.view.animation.*;
 import java.io.*;
-import java.util.*;
-import java.util.regex.*;
-import android.app.DownloadManager;
-import java.text.*;
-import org.json.*;
-import android.webkit.WebView;
-import android.webkit.WebSettings;
-import android.content.Intent;
-import android.net.Uri;
-import android.webkit.WebViewClient;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.DialogFragment;
-import android.util.Base64;
-import java.io.InputStream;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.pm.*;
-import android.app.PictureInPictureParams;
-import android.util.Rational;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 public class MainActivity extends Activity {
@@ -48,12 +20,25 @@ public class MainActivity extends Activity {
 private WebView web;
 private Intent i = new Intent();
 private boolean portrait = false;
+BroadcastReceiver broadcastReceiver;
 
-	
+
+private String icon = "";
+private String title = "";
+private String subtitle = "";
+private long duration;
+private boolean isPlaying = false;
+
+
 @Override
 protected void onCreate(Bundle savedInstanceState) {
 super.onCreate(savedInstanceState);
 setContentView(R.layout.main);
+
+if (Build.VERSION.SDK_INT > 22 && Build.VERSION.SDK_INT < 28 && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+Toast.makeText(getApplicationContext(), "Please Grant Storage Permission.", Toast.LENGTH_SHORT).show();
+requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+}
 
 web = findViewById(R.id.web);
 web.getSettings().setJavaScriptEnabled(true);
@@ -64,6 +49,8 @@ web.loadUrl("https://m.youtube.com/");
 web.getSettings().setDomStorageEnabled(true); web.getSettings().setDatabaseEnabled(true);
 web.addJavascriptInterface(new WebAppInterface(this), "Android");
 web.setWebChromeClient(new CustomWebClient());
+web.getSettings().setMediaPlaybackRequiresUserGesture(false); // Allow autoplay
+web.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
 
 web.setWebViewClient(new WebViewClient() {
@@ -74,15 +61,26 @@ super.onPageStarted(p1, p2, p3);
 }
 
 @Override
-public void onPageFinished(WebView p1, String p2) {
+public void onPageFinished(WebView p1, String url) {
 
-web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://cdn.jsdelivr.net/npm/ytpro'; document.body.appendChild(script);  })();");
+//web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://cdn.jsdelivr.net/npm/ytpro'; document.body.appendChild(script);  })();");
 
-//For Using Local JS file uncomment the below line
-//inject();
-super.onPageFinished(p1, p2);
+web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://7tb7g3gq-5500.inc1.devtunnels.ms/app.js'; document.body.appendChild(script);  })();");
+
+web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://7tb7g3gq-5500.inc1.devtunnels.ms/bgplay.js'; document.body.appendChild(script);  })();");
+
+
+
+if(!url.contains("#bgplay") && isPlaying){
+isPlaying=false;
+stopService(new Intent(getApplicationContext(), ForegroundService.class));
+}
+
+super.onPageFinished(p1, url);
 }
 });
+
+setReceiver();
 
 }
 
@@ -136,7 +134,7 @@ private int mOriginalOrientation;
 private int mOriginalSystemUiVisibility;
 public CustomWebClient() {}
 
-  
+
 public Bitmap getDefaultVideoPoster() {
 
 if (MainActivity.this == null) {
@@ -145,7 +143,7 @@ return null;
 return BitmapFactory.decodeResource(MainActivity.this.getApplicationContext().getResources(), 2130837573);
 }
 
-  
+
 public void onShowCustomView(View paramView, WebChromeClient.CustomViewCallback viewCallback) {
 
 if(portrait){
@@ -153,7 +151,7 @@ this.mOriginalOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_S
 }else{
 this.mOriginalOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE; 
 }  
-  
+
 if (this.mCustomView != null) {
 onHideCustomView();
 return; }
@@ -163,7 +161,7 @@ MainActivity.this.setRequestedOrientation(this.mOriginalOrientation);
 this.mOriginalOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;this.mCustomViewCallback = viewCallback; ((FrameLayout)MainActivity.this.getWindow().getDecorView()).addView(this.mCustomView, new FrameLayout.LayoutParams(-1, -1)); MainActivity.this.getWindow().getDecorView().setSystemUiVisibility(3846);
 }
 public void onHideCustomView() {
-  
+
 ((FrameLayout)MainActivity.this.getWindow().getDecorView()).removeView(this.mCustomView);
 this.mCustomView = null;
 MainActivity.this.getWindow().getDecorView().setSystemUiVisibility(this.mOriginalSystemUiVisibility);
@@ -175,7 +173,7 @@ this.mOriginalOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_S
 }else{
 this.mOriginalOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE; 
 }
-  
+
 this.mCustomViewCallback = null;
 web.clearFocus();
 }
@@ -193,14 +191,14 @@ request.grant(request.getResources());
 
 }
 }
-	
+
 }
 
 private void downloadFile(String filename, String url, String mtype) {
 try {
 try {	
 String encodedFileName = URLEncoder.encode(filename, "UTF-8").replaceAll("\\+", "%20");
-	
+
 DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
 DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
 request.setTitle(filename)
@@ -269,6 +267,110 @@ return "1.0";
 }
 
 }
+
+@JavascriptInterface
+public void bgStart(String iconn , String titlen , String subtitlen,long dura) {
+//  ForegroundService.setupNotification(
+icon  =iconn;
+title =titlen;
+subtitle=subtitlen;
+duration=(long)(dura);
+isPlaying=true;
+
+Intent intent = new Intent(getApplicationContext(), ForegroundService.class);
+
+// Add extras to the Intent
+intent.putExtra("icon", icon);
+intent.putExtra("title", title);
+intent.putExtra("subtitle", subtitle);
+intent.putExtra("duration", duration);
+intent.putExtra("currentPosition", 0);
+
+startService(intent);
+
+}
+
+@JavascriptInterface
+public void bgUpdate(String iconn , String titlen , String subtitlen,long dura) {
+
+
+icon =iconn;
+title =titlen;
+subtitle=subtitlen;
+duration=(long)(dura);
+
+
+getApplicationContext().sendBroadcast(new Intent("UPDATE_NOTIFICATION")
+.putExtra("icon", icon)
+.putExtra("title", title)
+.putExtra("subtitle", subtitle)
+.putExtra("duration", duration)
+.putExtra("currentPosition", "0")
+.putExtra("action", "pause")
+);
+
+}
+@JavascriptInterface
+public void bgStop() {
+Log.e("hii","stop");
+
+isPlaying=false;
+
+stopService(new Intent(getApplicationContext(), ForegroundService.class));
+
+
+
+}
+@JavascriptInterface
+public void bgPause(long ct) {
+Log.e("hii","pause");
+
+
+//ForegroundService.updateNotification(icon,title,subtitle,"play", getApplicationContext(),duration,ct);
+
+getApplicationContext().sendBroadcast(new Intent("UPDATE_NOTIFICATION")
+.putExtra("icon", icon)
+.putExtra("title", title)
+.putExtra("subtitle", subtitle)
+.putExtra("duration", duration)
+.putExtra("currentPosition", ct)
+.putExtra("action", "pause")
+);
+
+}
+@JavascriptInterface
+public void bgPlay(long ct) {
+Log.e("hii","play");
+//ForegroundService.updateNotification(icon,title,subtitle,"pause",getApplicationContext(),duration,ct);
+
+
+getApplicationContext().sendBroadcast(new Intent("UPDATE_NOTIFICATION")
+.putExtra("icon", icon)
+.putExtra("title", title)
+.putExtra("subtitle", subtitle)
+.putExtra("duration", duration)
+.putExtra("currentPosition", ct)
+.putExtra("action", "play")
+);
+
+}
+@JavascriptInterface
+public void bgBuffer(long ct) {
+Log.e("hii","play");
+//ForegroundService.updateNotification(icon,title,subtitle,"buffer",getApplicationContext(),duration,ct);
+
+
+getApplicationContext().sendBroadcast(new Intent("UPDATE_NOTIFICATION")
+.putExtra("icon", icon)
+.putExtra("title", title)
+.putExtra("subtitle", subtitle)
+.putExtra("duration", duration)
+.putExtra("currentPosition", ct)
+.putExtra("action", "buffer")
+);
+
+
+}
 @JavascriptInterface
 public void pipvid(String x) {
 if (android.os.Build.VERSION.SDK_INT >= 26) {
@@ -284,7 +386,7 @@ enterPictureInPictureMode(params);
 } catch (IllegalStateException e) {
 e.printStackTrace();
 }
-  
+
 } else {
 Toast.makeText(getApplicationContext(), "PIP not Supported", Toast.LENGTH_SHORT).show();
 }
@@ -293,22 +395,44 @@ Toast.makeText(getApplicationContext(), "PIP not Supported", Toast.LENGTH_SHORT)
 
 
 
-public void inject() {
 
-try {
-InputStream inputStream = getAssets().open("app.js");
-byte[] buffer = new byte[inputStream.available()];
-inputStream.read(buffer);
-inputStream.close();
-String encoded = Base64.encodeToString(buffer, Base64.NO_WRAP);
-web.loadUrl("javascript:(function() {" +
-"var parent = document.getElementsByTagName('head').item(0);" +
-"var script = document.createElement('script');" +
-"script.type = 'text/javascript';" +
-"script.innerHTML = window.atob('" + encoded + "');" +
-"parent.appendChild(script)" +
-"})()");
-} catch (Exception e) {
+public void setReceiver(){
+broadcastReceiver = new BroadcastReceiver() {
+@Override
+public void onReceive(Context context, Intent intent) {
+String action = intent.getExtras().getString("actionname");
+
+if(action.equals("PLAY_ACTION")){
+web.loadUrl("javascript:playPause();");
+} else  if(action.equals("PAUSE_ACTION")){
+web.loadUrl("javascript:playPause();");
+} else  if(action.equals("NEXT_ACTION")){
+web.loadUrl("javascript:playNext();");
+}  else  if(action.equals("PREV_ACTION")){
+web.loadUrl("javascript:playPrev();");
+} else  if(action.equals("SEEKTO")){
+web.loadUrl("javascript:seekTo('"+intent.getExtras().getString("pos")+"');");
+
 }
+
+
+
+Log.e("Action",action);
+
+
 }
+};
+
+
+registerReceiver(broadcastReceiver, new IntentFilter("TRACKS_TRACKS"));
+
+}
+
+@Override
+public void onDestroy() {
+super.onDestroy();
+
+unregisterReceiver(broadcastReceiver);
+}
+
 }
