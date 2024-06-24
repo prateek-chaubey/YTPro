@@ -17,11 +17,10 @@
 
 ---
 
-
-| | |
-|:--:|:--:| 
-|<img src='.github/img/ytpro3.png'  > | <img src='.github/img/ytpro2.png'  > |
-
+#### Screenshots
+| | | |
+|:--:|:--:|:--:| 
+|<img src='.github/img/01103.png'  > | <img src='.github/img/01102.png'  > |<img src='.github/img/01101.png'  > |
 
 ## Download YT PRO
 
@@ -41,13 +40,15 @@
  * Skip Sponsers
  * Force Zoom
  * Hide Shorts
- * APK size under 50KB
+ * APK size under 5MB
  * Minimal
  * Almost 0 Internal Dependencies
  * Auto Updation of App
 
+
 ## ToDo
- * Improve Background Player
+ * Add basic features to the video player
+ * Improve mini player
 
 ### Credits
 * [node-ytdl](https://github.com/fent/node-ytdl) , [Sponsor Block](https://github.com/ajayyy/SponsorBlock) , [return-youtube-dislike](https://github.com/Anarios/return-youtube-dislike) , [ytdl](https://github.com/prateek-chaubey/ytdl)
