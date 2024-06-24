@@ -1,3 +1,8 @@
 <resources>
 	<string	name="app_name"	translatable="false">YouTube Pro</string>
+	<string	name="grant_mic">Please Grant Microphone Permission in order to use Speech Recognition</string>
+	<string	name="grant_storage">Please Grant Storage Permission in order to download files</string>
+	<string	name="no_pip">Unfortunately, PIP is not supported on your Android version</string>
+	<string	name="dl_started">Download started</string>
+	<string	name="dl">Download</string>
 </resources>
