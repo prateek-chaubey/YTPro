@@ -2,9 +2,10 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.google.android.youtube.pro">
 	<uses-permission android:name="android.permission.INTERNET"/>
+	<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 	<uses-permission android:name="android.permission.RECORD_AUDIO" />
 	<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="27" />
 	<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 	<application
 		android:allowBackup="true"
@@ -24,6 +25,39 @@
 			<intent-filter>
 				<action	android:name="android.intent.action.MAIN"/>
 				<category android:name="android.intent.category.LAUNCHER"/>
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:scheme="https" android:host="www.youtube.com" />
+				<data android:scheme="https" android:host="youtu.be" />
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.SEND" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<data android:mimeType="text/plain" />
+			</intent-filter>
+		</activity>
+		<activity
+			android:name=".DownloadFromIntentFilter"
+			android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
+			android:hardwareAccelerated="true"
+			android:supportsPictureInPicture="true"
+			android:theme="@style/NoActionBar"
+			android:exported="true"
+			android:screenOrientation="portrait">
+			<intent-filter android:label="@string/dl">
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:scheme="https" android:host="www.youtube.com" />
+				<data android:scheme="https" android:host="youtu.be" />
+			</intent-filter>
+			<intent-filter android:label="@string/dl">
+				<action android:name="android.intent.action.SEND" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<data android:mimeType="text/plain" />
 			</intent-filter>
 		</activity>
 		<service
