@@ -63,11 +63,9 @@ super.onPageStarted(p1, p2, p3);
 @Override
 public void onPageFinished(WebView p1, String url) {
 
-//web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://cdn.jsdelivr.net/npm/ytpro'; document.body.appendChild(script);  })();");
+web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://cdn.jsdelivr.net/npm/ytpro'; document.body.appendChild(script);  })();");
+web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://cdn.jsdelivr.net/npm/ytpro/bgplay.js'; document.body.appendChild(script);  })();");
 
-web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://7tb7g3gq-5500.inc1.devtunnels.ms/app.js'; document.body.appendChild(script);  })();");
-
-web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://7tb7g3gq-5500.inc1.devtunnels.ms/bgplay.js'; document.body.appendChild(script);  })();");
 
 
 
