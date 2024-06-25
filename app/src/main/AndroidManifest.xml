@@ -64,6 +64,7 @@
 			android:name=".ForegroundService"
 			android:enabled="true"
 			android:exported="true"
+			android:foregroundServiceType="mediaPlayback"
 			/>
 
 		<receiver android:name=".NotificationActionService"/>
