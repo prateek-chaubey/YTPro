@@ -26,7 +26,8 @@ public class MainActivity extends Activity {
     private String title = "";
     private String subtitle = "";
     private long duration;
-    boolean isPlaying = false;
+    private boolean isPlaying = false;
+    private boolean dL=false;
 
 
     @Override
@@ -37,7 +38,7 @@ public class MainActivity extends Activity {
         load(false);
     }
     public void load(boolean dl) {
-        boolean dL=dl;
+        dL=dl;
         if (Build.VERSION.SDK_INT > 22 && Build.VERSION.SDK_INT < 28 && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
             Toast.makeText(getApplicationContext(), getString(R.string.grant_storage), Toast.LENGTH_SHORT).show();
             requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
