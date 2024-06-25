@@ -37,6 +37,7 @@ public class MainActivity extends Activity {
         load(false);
     }
     public void load(boolean dl) {
+        boolean dL=dl;
         if (Build.VERSION.SDK_INT > 22 && Build.VERSION.SDK_INT < 28 && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
             Toast.makeText(getApplicationContext(), getString(R.string.grant_storage), Toast.LENGTH_SHORT).show();
             requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
@@ -80,9 +81,9 @@ public class MainActivity extends Activity {
 
                 web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://cdn.jsdelivr.net/npm/ytpro'; document.body.appendChild(script);  })();");
                 web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://cdn.jsdelivr.net/npm/ytpro/bgplay.js'; document.body.appendChild(script);  })();");
-                if(dl){
+                if(dL){
                     web.loadUrl("javascript:(function () {window.location.hash='download';})();");
-                    dl=false;                
+                    dL=false;                
                 }
                 if(!url.contains("#bgplay") && isPlaying){
                     isPlaying=false;
