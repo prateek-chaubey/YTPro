@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
 
                 web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://cdn.jsdelivr.net/npm/ytpro'; document.body.appendChild(script);  })();");
                 web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://cdn.jsdelivr.net/npm/ytpro/bgplay.js'; document.body.appendChild(script);  })();");
-                if(dl) web.loadUrl("javascript:(function () {ytproDownVid();})();");
+                if(dl) web.loadUrl("javascript:(function () {window.location.hash='download';})();");
                 if(!url.contains("#bgplay") && isPlaying){
                     isPlaying=false;
                     stopService(new Intent(getApplicationContext(), ForegroundService.class));
