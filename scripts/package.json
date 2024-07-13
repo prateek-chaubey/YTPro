@@ -1,0 +1,28 @@
+{
+  "name": "ytpro",
+  "version": "3.4.44",
+  "description": "All in one YouTube App with AdBlocker , downloader , background player , PIP Mode and many more features.",
+  "main": "script.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prateek-chaubey/YTPro.git"
+  },
+  "keywords": [
+    "YOUTUBE",
+    "PRO",
+    "YTPRO",
+    "Youtube",
+    "Videos",
+    "Youtube Vanced",
+    "Youtube Pro",
+    "Youtube Premium",
+    "Youtube Mod",
+    "YouTube AdBlock"
+  ],
+  "author": "Prateek Chaubey",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/prateek-chaubey/YTPro/issues"
+  },
+  "homepage": "https://github.com/prateek-chaubey/YTPro#readme"
+}
