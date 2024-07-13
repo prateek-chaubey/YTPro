@@ -1,7 +1,7 @@
 {
   "name": "ytpro",
   "version": "3.4.44",
-  "description": "All in one YouTube App with AdBlocker , downloader , background player , PIP Mode and many more features.",
+  "description": "All in one YouTube App with AdBlocker, Downloader , Background Player , PIP Mode and many more features.",
   "main": "script.js",
   "repository": {
     "type": "git",
