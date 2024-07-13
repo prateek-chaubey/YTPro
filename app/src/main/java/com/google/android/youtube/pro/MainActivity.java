@@ -39,11 +39,7 @@ public class MainActivity extends Activity {
     }
     public void load(boolean dl) {
         dL=dl;
-        if (Build.VERSION.SDK_INT > 22 && Build.VERSION.SDK_INT < 28 && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-            Toast.makeText(getApplicationContext(), getString(R.string.grant_storage), Toast.LENGTH_SHORT).show();
-            requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-        }
-
+        
         web = findViewById(R.id.web);
         web.getSettings().setJavaScriptEnabled(true);
         web.getSettings().setSupportZoom(true);
@@ -198,6 +194,11 @@ public class MainActivity extends Activity {
     }
 
     private void downloadFile(String filename, String url, String mtype) {
+        
+        if (Build.VERSION.SDK_INT > 22 && Build.VERSION.SDK_INT < 28 && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+            runOnUiThread(() -> Toast.makeText(getApplicationContext(), R.string.grant_storage, Toast.LENGTH_SHORT).show());
+            requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
         try {
             try {
                 String encodedFileName = URLEncoder.encode(filename, "UTF-8").replaceAll("\\+", "%20");
