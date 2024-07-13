@@ -28,7 +28,7 @@ var ytproNCode=[];
 var ytproDecipher=[];
 }
 var ytoldV="";
-var isF=false;   //what is this about?
+var isF=false;   //what is this for?
 var isAP=false; // oh it's for bg play 
 var isM=false; // no idea !!
 var sTime=[];
@@ -384,7 +384,7 @@ else if(Url.pathname.indexOf("watch") > -1){
 vID=Url.searchParams.get("v");
 }
 
-
+/*For those who dislike the video*/
 fetch("https://returnyoutubedislikeapi.com/votes?videoId="+vID)
 .then(response => {
 return response.json();
@@ -635,7 +635,7 @@ fetch('https://cdn.jsdelivr.net/npm/ytpro/bgplay.js', {cache: 'reload'});
 /*Set Configration*/
 function sttCnf(x,z,y){
 
-/*Way to complex to understand*/
+/*Way too complex to understand*/
 
 if(typeof y == "string"){
 
