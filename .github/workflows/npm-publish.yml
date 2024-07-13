@@ -1,5 +1,5 @@
 
-name: Publish on NPM
+name: Publish to NPM
 
 on:
  push:
