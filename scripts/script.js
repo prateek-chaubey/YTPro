@@ -1,6 +1,6 @@
 /*****YTPRO*******
 Author: Prateek Chaubey
-Version: 3.4.44
+Version: 3.4.5
 URI: https://github.com/prateek-chaubey/
 */
 
@@ -22,13 +22,13 @@ window.location.href=`javascript:(function () { var script = document.createElem
 
 
 /*Few Stupid Inits*/
-var YTProVer="3.4";
+var YTProVer="3.45";
 if(ytproNCode == undefined && ytproDecipher == undefined){
 var ytproNCode=[];
 var ytproDecipher=[];
 }
 var ytoldV="";
-var isF=false;   //what is this for?
+var isF=false;   //what is this about?
 var isAP=false; // oh it's for bg play 
 var isM=false; // no idea !!
 var sTime=[];
@@ -384,7 +384,7 @@ else if(Url.pathname.indexOf("watch") > -1){
 vID=Url.searchParams.get("v");
 }
 
-/*For those who dislike the video*/
+
 fetch("https://returnyoutubedislikeapi.com/votes?videoId="+vID)
 .then(response => {
 return response.json();
@@ -635,7 +635,7 @@ fetch('https://cdn.jsdelivr.net/npm/ytpro/bgplay.js', {cache: 'reload'});
 /*Set Configration*/
 function sttCnf(x,z,y){
 
-/*Way too complex to understand*/
+/*Way to complex to understand*/
 
 if(typeof y == "string"){
 
@@ -725,14 +725,27 @@ id=new URLSearchParams(window.location.search).get("v");
 
 ytproDownDiv.innerHTML="Loading...";
 
-var info=await fetch("https://youtube-downloader.deno.dev/video?id="+id);
-info=await info.json();
+var info=await fetch("https://m.youtube.com/watch?v="+id).then(r => r.text());
 
-var thumb=info.video.thumbnail?.thumbnails;
-var vids=info.stream.formats;
-var avids=info.stream.adaptiveFormats;
-var cap=info.captions?.playerCaptionsTracklistRenderer?.captionTracks;
-var t=info.video.title.replaceAll("|","").replaceAll("\\","").replaceAll("?","").replaceAll("*","").replaceAll("<","").replaceAll("/","").replaceAll(":","").replaceAll('"',"").replaceAll(">","");
+
+
+try{
+var sD=JSON.parse("{"+(info.substr(info.indexOf("streamingData")-1,((info.indexOf("playbackTracking")-1)-info.indexOf("streamingData"))))+"}");
+var vD=JSON.parse("{"+info.substr(info.indexOf("\"videoDetails"),((info.indexOf("\"trackingParams")-1)-info.indexOf("\"videoDetails")))+"}");
+var cD=JSON.parse("{"+info.substr(info.indexOf("\"captionTracks\""),(info.indexOf("\"audioTracks\"") -1 - info.indexOf("\"captionTracks\"")))+"}");
+}catch(e){
+history.back();
+return Android.showToast("Download Error , Please open and issue on Github if the error persists.\n\n"+e);
+}
+
+
+
+
+var thumb=vD?.videoDetails?.thumbnail?.thumbnails;
+var vids=sD?.streamingData?.formats;
+var avids=sD?.streamingData?.adaptiveFormats;
+var cap=cD?.captionTracks;
+var t=vD?.videoDetails?.title.replaceAll("|","").replaceAll("\\","").replaceAll("?","").replaceAll("*","").replaceAll("<","").replaceAll("/","").replaceAll(":","").replaceAll('"',"").replaceAll(">","");
 ytproDownDiv.innerHTML="<style>#downytprodiv a{text-decoration:none;color:white;} #downytprodiv li{list-style:none; display:flex;align-items:center;justify-content:center;color:#fff;border-radius:25px;padding:8px;background:rgb(10,0,0);margin:5px;box-shadow:0px 0px 2px rgb(236,84,232);margin-top:8px}</style>";
 
 
@@ -740,13 +753,34 @@ ytproDownDiv.innerHTML="<style>#downytprodiv a{text-decoration:none;color:white;
 ytproDownDiv.innerHTML+="Select Avilaible Formats<ul id='listurl'>";
 
 for(var x in vids){
-ytproDownDiv.innerHTML+=`<li data-ytprotit="${t}"  style="background:#001;box-shadow:0px 0px 2px rgb(70,84,232);"  onclick="YTDownVid(this,'.mp4')"  data-ytprourl="${vids[x].url}">
+
+var url="";
+if("signatureCipher" in vids[x]){
+url=ytproGetURL(vids[x].signatureCipher,"sig");
+}else{
+url=ytproGetURL(vids[x].url,"n");
+}
+
+ytproDownDiv.innerHTML+=`<li data-ytprotit="${t}"  style="background:#001;box-shadow:0px 0px 2px rgb(70,84,232);"  onclick="YTDownVid(this,'.mp4')"  data-ytprourl="${url}">
 ${downBtn}<span style="margin-left:10px;"  >${vids[x].qualityLabel} ${formatFileSize(((vids[x].bitrate*(vids[x].approxDurationMs/1000))/8))} </span></li>` ;
 }
 
+
+
+
 for(x in avids){
+
+
 if(avids[x].mimeType.indexOf("audio") > -1){
-ytproDownDiv.innerHTML+=`<li data-ytprotit="${t}"  onclick="YTDownVid(this,'.mp3')"  data-ytprourl="${avids[x].url}">
+
+var url="";
+if("signatureCipher" in avids[x]){
+url=ytproGetURL(avids[x].signatureCipher,"sig");
+}else{
+url=ytproGetURL(avids[x].url,"n");
+}
+
+ytproDownDiv.innerHTML+=`<li data-ytprotit="${t}"  onclick="YTDownVid(this,'.mp3')"  data-ytprourl="${url}">
 ${downBtn}<span style="margin-left:10px;"  >Audio | ${avids[x].audioQuality.replace("AUDIO_QUALITY_","")}${formatFileSize(avids[x].contentLength)} 
 </span></li>` ;
 }
@@ -765,7 +799,7 @@ ytproDownDiv.innerHTML+=`<li data-ytprotit="${t+Date.now()}"  onclick="YTDownVid
 if(cap && cap.length){
 ytproDownDiv.innerHTML+="<br>Captions<br><br><style>cp{display:flex;align-items:center;width:100%;height:30px}c{height:45px;width:50px;padding-top:5px;background:rgba(255,255,255,.1);border-radius:10px;margin-left:10px;display:block}</style>";
 for(var x in cap){
-ytproDownDiv.innerHTML+=`<cp><span style="width:100px;text-align:left">${cap[x].name.simpleText}</span> <div style="position:absolute;right:10px;display:flex"><c onclick="downCap('${cap[x].baseUrl}&fmt=xml','${t}.xml')" >${downBtn} <br>.xml</c><c onclick="downCap('${cap[x].baseUrl}&fmt=vtt','${t}.vtt')">${downBtn} <br>.vtt</c><c onclick="downCap('${cap[x].baseUrl}&fmt=srv1','${t}.srv1')">${downBtn} <br>.srv1</c><c onclick="downCap('${cap[x].baseUrl}&fmt=ttml','${t}.ttml')">${downBtn} <br>.ttml</c></div></cp><br><br>`; 
+ytproDownDiv.innerHTML+=`<cp><span style="width:100px;text-align:left">${cap[x]?.name?.runs[0]?.text}</span> <div style="position:absolute;right:10px;display:flex"><c onclick="downCap('${cap[x].baseUrl}&fmt=xml','${t}.xml')" >${downBtn} <br>.xml</c><c onclick="downCap('${cap[x].baseUrl}&fmt=vtt','${t}.vtt')">${downBtn} <br>.vtt</c><c onclick="downCap('${cap[x].baseUrl}&fmt=srv1','${t}.srv1')">${downBtn} <br>.srv1</c><c onclick="downCap('${cap[x].baseUrl}&fmt=ttml','${t}.ttml')">${downBtn} <br>.ttml</c></div></cp><br><br>`; 
 }
 }
 
@@ -777,7 +811,7 @@ ytproDownDiv.innerHTML+=`<cp><span style="width:100px;text-align:left">${cap[x].
 
 /*Add the meme type and extensions lol*/
 function downCap(x,t){
-Android.downvid(t,x,"plain/text");
+Android.downvid(t,`https://m.youtube.com${x}`,"plain/text");
 }
 function YTDownVid(o,ex){
 var mtype="";
@@ -789,6 +823,10 @@ mtype="video/mp4";
 else if(ex ==".mp3"){
 mtype="audio/mp3";
 }
+
+//console.log(o.getAttribute("data-ytprourl"))
+
+
 Android.downvid((o.getAttribute("data-ytprotit")+ex),o.getAttribute("data-ytprourl"),mtype);
 }
 
@@ -1406,7 +1444,7 @@ x.innerHTML=`
 <h2> Update Available</h2><br>
 Latest Version ${YTProVer} of YTPRO is available , update the YTPRO to get latest features.
 <br>- Improved Background Play<br>
-- Bug Fixes and updates
+- Bug fixes and updates
 <br>
 <br>
 <div style="display:flex;">
