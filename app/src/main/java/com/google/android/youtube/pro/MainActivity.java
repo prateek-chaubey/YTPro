@@ -76,6 +76,8 @@ public class MainActivity extends Activity {
             @Override
             public void onPageFinished(WebView p1, String url) {
 
+
+                web.loadUrl("javascript:if (window.trustedTypes && window.trustedTypes.createPolicy) {window.trustedTypes.createPolicy('default', {createHTML: (string) => string,createScriptURL: string => string, createScript: string => string, });}");
                 web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://cdn.jsdelivr.net/npm/ytpro'; document.body.appendChild(script);  })();");
                 web.loadUrl("javascript:(function () { var script = document.createElement('script'); script.src='https://cdn.jsdelivr.net/npm/ytpro/bgplay.js'; document.body.appendChild(script);  })();");
                 if(dl){
