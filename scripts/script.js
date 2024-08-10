@@ -1,6 +1,6 @@
 /*****YTPRO*******
 Author: Prateek Chaubey
-Version: 3.4.58
+Version: 3.4.60
 URI: https://github.com/prateek-chaubey/
 */
 
@@ -28,7 +28,7 @@ var ytproNCode=[];
 var ytproDecipher=[];
 }
 var ytoldV="";
-var isF=false;   //what is this about?
+var isF=false;   //what is this for?
 var isAP=false; // oh it's for bg play 
 var isM=false; // no idea !!
 var sTime=[];
@@ -59,12 +59,12 @@ var url=o;
 if(p == "sig"){
 var sig=(new URLSearchParams(o)).get('s');
 url=(new URLSearchParams(o)).get('url');
-sig=eval(ytproDecipher[1]+ytproDecipher[0]+"('"+decodeURIComponent(sig)+"');");
+sig=eval(ytproDecipher[0]+ytproDecipher[1]+"('"+decodeURIComponent(sig)+"');");
 url=decodeURIComponent(url);
 }
 const components = new URL(decodeURIComponent(url));
 const n = components.searchParams.get('n');
-var nc=eval(ytproNCode[1]+ytproNCode[0]+"('"+n+"');");
+var nc=eval(ytproNCode[0]+ytproNCode[1]+"('"+n+"');");
 components.searchParams.set('n',nc);
 if(p == "sig"){
 return  components.toString()+"&sig="+sig;
@@ -101,171 +101,228 @@ var downBtn=`<svg xmlns="http://www.w3.org/2000/svg" height="18" fill="${c}" vie
 
 
 
-
-
-/*Utils for Deciphers*/
-var utils={
-between:(haystack, left, right) => {
-let pos;
-if (left instanceof RegExp) {
-const match = haystack.match(left);
-if (!match) { return ''; }
-pos = match.index + match[0].length;
-} else {
-pos = haystack.indexOf(left);
-if (pos === -1) { return ''; }
-pos += left.length;
-}
-haystack = haystack.slice(pos);
-pos = haystack.indexOf(right);
-if (pos === -1) { return ''; }
-haystack = haystack.slice(0, pos);
-return haystack;
-},
-cutAfterJSON :( mixedJson )=> {
-let open, close;
-if (mixedJson[0] === '[') {
-open = '[';
-close = ']';
-} else if (mixedJson[0] === '{') {
-open = '{';
-close = '}';
-}
-if (!open) {
-throw new Error(`Can't cut unsupported JSON (need to begin with [ or { ) but got: ${mixedJson[0]}`);
-}
-let isString = false;
-let isEscaped = false;
-let counter = 0;
-let i;
-for (i = 0; i < mixedJson.length; i++) {
-if (mixedJson[i] === '"' && !isEscaped) {
-isString = !isString;
-continue;
-}
-isEscaped = mixedJson[i] === '\\' && !isEscaped;
-if (isString) continue;
-if (mixedJson[i] === open) {
-counter++;
-} else if (mixedJson[i] === close) {
-counter--;
-}
-if (counter === 0) {
-return mixedJson.substr(0, i + 1);
-}
-}
-throw Error("Can't cut unsupported JSON (no matching closing bracket found)");
-},
-cutAfterJS: (mixedJson) => {
-let open, close;
-const ESCAPING_SEQUENZES = [
-// Strings
-{ start: '"', end: '"' },
-{ start: "'", end: "'" },
-{ start: '`', end: '`' },
-// RegeEx
-{ start: '/', end: '/', startPrefix: /(^|[[{:;,/])\s?$/ },
-]; 
-///*}*/ lol
-
-
-if (mixedJson[0] === '[') {
-open = '[';
-close = ']';
-} else if (mixedJson[0] === '{') {
-open = '{';
-close = '}';
-}
-if (!open) {
-throw new Error(`Can't cut unsupported JSON (need to begin with [ or { ) but got: ${mixedJson[0]}`);
-}
-let isEscapedObject = null;
-let isEscaped = false;
-let counter = 0;
-let i;
-for (i = 0; i < mixedJson.length; i++) {
-if (!isEscaped && isEscapedObject !== null && mixedJson[i] === isEscapedObject.end) {
-isEscapedObject = null;
-continue;
-} else if (!isEscaped && isEscapedObject === null) {
-for (const escaped of ESCAPING_SEQUENZES) {
-if (mixedJson[i] !== escaped.start) continue;
-if (!escaped.startPrefix || mixedJson.substring(i - 10, i).match(escaped.startPrefix)) {
-isEscapedObject = escaped;
-break;
-}
-}
-if (isEscapedObject !== null) {
-continue;
-}
-}
-isEscaped = mixedJson[i] === '\\' && !isEscaped;
-if (isEscapedObject !== null) continue;
-if (mixedJson[i] === open) {
-counter++;
-} else if (mixedJson[i] === close) {
-counter--;
-}
-if (counter === 0) {
-return mixedJson.substring(0, i + 1);
-}
-}
-throw Error("Can't cut unsupported JSON (no matching closing bracket found)");
-}
-}
-
-
-
-/*Decipher Code , Credits:NODE-YTDL-CORE*/
+/*Extract Functions , Credits:node-ytdl-core && @distube/ytdl-core*/
 var extractFunctions = (body)=> {
-const functions = [];
-const extractManipulations = caller => {
-const functionName = utils.between(caller, `a=a.split("");`, `.`);
-if (!functionName) return '';
-const functionStart = `var ${functionName}={`;
-const ndx = body.indexOf(functionStart);
-if (ndx < 0) return '';
-const subBody = body.slice(ndx + functionStart.length - 1);
-return `var ${functionName}=${utils.cutAfterJSON(subBody)}`;
+
+/*Regex & Functions for Decipher & NCode*/
+
+const DECIPHER_NAME_REGEXPS = [
+  '\\bm=([a-zA-Z0-9$]{2,})\\(decodeURIComponent\\(h\\.s\\)\\)',
+  '\\bc&&\\(c=([a-zA-Z0-9$]{2,})\\(decodeURIComponent\\(c\\)\\)',
+  // eslint-disable-next-line max-len
+  '(?:\\b|[^a-zA-Z0-9$])([a-zA-Z0-9$]{2,})\\s*=\\s*function\\(\\s*a\\s*\\)\\s*\\{\\s*a\\s*=\\s*a\\.split\\(\\s*""\\s*\\)',
+  '([\\w$]+)\\s*=\\s*function\\((\\w+)\\)\\{\\s*\\2=\\s*\\2\\.split\\(""\\)\\s*;',
+];
+
+// LavaPlayer regexps
+const VARIABLE_PART = '[a-zA-Z_\\$][a-zA-Z_0-9]*';
+const VARIABLE_PART_DEFINE = `\\"?${VARIABLE_PART}\\"?`;
+const BEFORE_ACCESS = '(?:\\[\\"|\\.)';
+const AFTER_ACCESS = '(?:\\"\\]|)';
+const VARIABLE_PART_ACCESS = BEFORE_ACCESS + VARIABLE_PART + AFTER_ACCESS;
+const REVERSE_PART = ':function\\(a\\)\\{(?:return )?a\\.reverse\\(\\)\\}';
+const SLICE_PART = ':function\\(a,b\\)\\{return a\\.slice\\(b\\)\\}';
+const SPLICE_PART = ':function\\(a,b\\)\\{a\\.splice\\(0,b\\)\\}';
+const SWAP_PART = ':function\\(a,b\\)\\{' +
+      'var c=a\\[0\\];a\\[0\\]=a\\[b%a\\.length\\];a\\[b(?:%a.length|)\\]=c(?:;return a)?\\}';
+
+const DECIPHER_REGEXP = `function(?: ${VARIABLE_PART})?\\(a\\)\\{` +
+  `a=a\\.split\\(""\\);\\s*` +
+  `((?:(?:a=)?${VARIABLE_PART}${VARIABLE_PART_ACCESS}\\(a,\\d+\\);)+)` +
+  `return a\\.join\\(""\\)` +
+  `\\}`;
+
+const HELPER_REGEXP = `var (${VARIABLE_PART})=\\{((?:(?:${
+  VARIABLE_PART_DEFINE}${REVERSE_PART}|${
+  VARIABLE_PART_DEFINE}${SLICE_PART}|${
+  VARIABLE_PART_DEFINE}${SPLICE_PART}|${
+  VARIABLE_PART_DEFINE}${SWAP_PART}),?\\n?)+)\\};`;
+
+const SCVR = '[a-zA-Z0-9$_]';
+const FNR = `${SCVR}+`;
+const AAR = '\\[(\\d+)]';
+const N_TRANSFORM_NAME_REGEXPS = [
+  // NewPipeExtractor regexps
+  `${SCVR}+="nn"\\[\\+${
+    SCVR}+\\.${SCVR}+],${
+    SCVR}+=${SCVR
+  }+\\.get\\(${SCVR}+\\)\\)&&\\(${
+    SCVR}+=(${SCVR
+  }+)\\[(\\d+)]`,
+  `${SCVR}+="nn"\\[\\+${
+    SCVR}+\\.${SCVR}+],${
+    SCVR}+=${SCVR}+\\.get\\(${
+    SCVR}+\\)\\).+\\|\\|(${SCVR
+  }+)\\(""\\)`,
+  `\\(${SCVR}=String\\.fromCharCode\\(110\\),${
+    SCVR}=${SCVR}\\.get\\(${
+    SCVR}\\)\\)&&\\(${SCVR
+  }=(${FNR})(?:${AAR})?\\(${
+    SCVR}\\)`,
+  `\\.get\\("n"\\)\\)&&\\(${SCVR
+  }=(${FNR})(?:${AAR})?\\(${
+    SCVR}\\)`,
+  // Skick regexps
+  '(\\w+).length\\|\\|\\w+\\(""\\)',
+  '\\w+.length\\|\\|(\\w+)\\(""\\)',
+];
+
+// LavaPlayer regexps
+const N_TRANSFORM_REGEXP = 'function\\(\\s*(\\w+)\\s*\\)\\s*\\{' +
+  'var\\s*(\\w+)=(?:\\1\\.split\\(""\\)|String\\.prototype\\.split\\.call\\(\\1,""\\)),' +
+  '\\s*(\\w+)=(\\[.*?]);\\s*\\3\\[\\d+]' +
+  '(.*?try)(\\{.*?})catch\\(\\s*(\\w+)\\s*\\)\\s*\\' +
+  '{\\s*return"enhanced_except_([A-z0-9-]+)"\\s*\\+\\s*\\1\\s*}' +
+  '\\s*return\\s*(\\2\\.join\\(""\\)|Array\\.prototype\\.join\\.call\\(\\2,""\\))};';
+
+
+/*Matches the Regex*/
+
+const matchRegex = (regex, str) => {
+const match = str.match(new RegExp(regex, 's'));
+if (!match) throw new Error(`Could not match ${regex}`);
+return match;
 };
-const extractDecipher = () => {
-const functionName = utils.between(body, `a.set("alr","yes");c&&(c=`, `(decodeURIC`);
-if (functionName && functionName.length) {
-const functionStart = `${functionName}=function(a)`;
-const ndx = body.indexOf(functionStart);
-if (ndx >= 0) {
-const subBody = body.slice(ndx + functionStart.length);
-let functionBody = `var ${functionStart}${utils.cutAfterJSON(subBody)}`;
-functionBody = `${extractManipulations(functionBody)};${functionBody};`;
 
-ytproDecipher[0]=functionName;
-ytproDecipher[1]=functionBody;
+const matchFirst = (regex, str) => matchRegex(regex, str)[0];
+
+const matchGroup1 = (regex, str) => matchRegex(regex, str)[1];
+
+
+const getFuncName = (body, regexps) => {
+let fn;
+for (const regex of regexps) {
+try {
+fn = matchGroup1(regex, body);
+try {
+fn = matchGroup1(`${fn.replace(/\$/g, '\\$')}=\\[([a-zA-Z0-9$\\[\\]]{2,})\\]`, body);
+} catch (err) {
+// Function name is not inside an array
+}
+break;
+} catch (err) {
+continue;
 }
 }
-};
-/*This thing made me cry for 2 days*/
-const extractNCode = () => {
-
-let functionName = utils.between(body, 'b=a.j.n||null)&&(b=', '(b)');
-
-if (functionName.includes('[')) functionName = utils.between(body, `var ${functionName.split('[')[0]}=[`, `]`);
-if (functionName && functionName.length) {
-const functionStart = `${functionName}=function(a)`;
-const ndx = body.indexOf(functionStart);
-if (ndx >= 0) {
-const subBody = body.slice(ndx + functionStart.length);
-const functionBody = `var ${functionStart}${utils.cutAfterJS(subBody)};`;
-ytproNCode[0]=functionName;
-ytproNCode[1]=functionBody;
-
-
-
-}
-}
+if (!fn || fn.includes('[')) throw Error();
+return fn;
 };
 
-extractNCode();
-extractDecipher();
+
+
+
+
+
+const extractDecipherFunc = body => {
+try {
+const DECIPHER_FUNC_NAME = 'ytproDecipher';
+const helperObject = matchFirst(HELPER_REGEXP, body);
+const decipherFunc = matchFirst(DECIPHER_REGEXP, body);
+const resultFunc = `var ${DECIPHER_FUNC_NAME}=${decipherFunc};`;
+const callerFunc = `${decipherFuncName}`;
+return [helperObject + resultFunc , callerFunc];
+} catch (e) {
+return null;
+}
+};
+
+
+
+const extractDecipherWithName = body => {
+try {
+const decipherFuncName = getFuncName(body, DECIPHER_NAME_REGEXPS);
+const funcPattern = `(${decipherFuncName.replace(/\$/g, '\\$')}=function\\([a-zA-Z0-9_]+\\)\\{.+?\\})`;
+const decipherFunc = `var ${matchGroup1(funcPattern, body)};`;
+const helperObjectName = matchGroup1(';([A-Za-z0-9_\\$]{2,})\\.\\w+\\(', decipherFunc);
+const helperPattern = `(var ${helperObjectName.replace(/\$/g, '\\$')}=\\{[\\s\\S]+?\\}\\};)`;
+const helperObject = matchGroup1(helperPattern, body);
+const callerFunc = `${decipherFuncName}`;
+return [helperObject + decipherFunc , callerFunc];
+} catch (e) {
+return null;
+}
+};
+
+
+
+
+
+const getExtractFunctions = (extractFunctions, body) => {
+for (const extractFunction of extractFunctions) {
+try {
+const func = extractFunction(body);
+if (!func) continue;
+return func;
+} catch (err) {
+continue;
+}
+}
+return null;
+};
+
+
+
+
+
+
+const extractDecipher = body => {
+const decipherFunc = getExtractFunctions([extractDecipherWithName, extractDecipherFunc], body);
+if (!decipherFunc) {
+console.warn('WARNING: Could not parse decipher function.\n' );
+}
+return decipherFunc;
+};
+
+
+
+
+
+const extractNTransformFunc = body => {
+try {
+const N_TRANSFORM_FUNC_NAME = 'ytproNCode';
+const nFunc = matchFirst(N_TRANSFORM_REGEXP, body);
+const resultFunc = `var ${N_TRANSFORM_FUNC_NAME}=${nFunc}`;
+const callerFunc = `${N_TRANSFORM_FUNC_NAME}`;
+return [resultFunc , callerFunc];
+} catch (e) {
+return null;
+}
+};
+
+
+
+const extractNTransformWithName = body => {
+try {
+const nFuncName = getFuncName(body, N_TRANSFORM_NAME_REGEXPS);
+const funcPattern = `(${
+nFuncName.replace(/\$/g, '\\$')
+// eslint-disable-next-line max-len
+}=\\s*function([\\S\\s]*?\\}\\s*return (([\\w$]+?\\.join\\(""\\))|(Array\\.prototype\\.join\\.call\\([\\w$]+?,[\\n\\s]*(("")|(\\("",""\\)))\\)))\\s*\\}))`;
+const nTransformFunc = `var ${matchGroup1(funcPattern, body)};`;
+const callerFunc = `${nFuncName}`;
+return [nTransformFunc , callerFunc];
+} catch (e) {
+return null;
+}
+};
+
+
+
+const extractNTransform = body => {
+const nTransformFunc = getExtractFunctions([extractNTransformFunc,extractNTransformWithName], body);
+if (!nTransformFunc) {
+console.warn('WARNING: Could not parse nTransform function.\n');
+}
+return nTransformFunc;
+};
+
+
+ytproDecipher=extractDecipher(body);
+ytproNCode=extractNTransform(body);
+
+
+
+
 };
 
 
@@ -359,11 +416,12 @@ var s2=sTime[x];
 s1.setAttribute("style",`height:3px;width:${(100/dur) * (s2[1]-s2[0])}%;background:#0f8;position:fixed;z-index:99999999;left:${(100/dur) * s2[0]}%;`)
 sDiv.appendChild(s1);
 }
+
 if(document.getElementById("sDiv") == null){
-if(document.getElementsByClassName('YtmChapteredProgressBarHost')[0] != null){
-document.getElementsByClassName('YtmChapteredProgressBarHost')[0].appendChild(sDiv);
+if(document.getElementsByClassName('YtChapteredProgressBarHost')[0] != null){
+document.getElementsByClassName('YtChapteredProgressBarHost')[0].appendChild(sDiv);
 }else{
-try{document.getElementsByClassName('YtmProgressBarProgressBarLine')[0].appendChild(sDiv);}catch{}
+try{document.getElementsByClassName('YtProgressBarLineProgressBarLine')[0].appendChild(sDiv);}catch{}
 }
 }
 }
@@ -634,7 +692,7 @@ fetch('https://cdn.jsdelivr.net/npm/ytpro/bgplay.js', {cache: 'reload'});
 /*Set Configration*/
 function sttCnf(x,z,y){
 
-/*Way to complex to understand*/
+/*Way too complex to understand*/
 
 if(typeof y == "string"){
 
@@ -986,11 +1044,11 @@ return updateModel();
 window.location.hash="bgplay";
 });
 
-if(ytproNCode.length < 1 && ytproDecipher.length < 1 ){
+if(ytproNCode?.length < 1 && ytproDecipher?.length < 1 ){
 ytproAudElem.style.opacity=".5";
 ytproAudElem.style.pointerEvents="none";
 }
-else if(ytproNCode.length > 1 && ytproDecipher.length > 1 ){
+else if(ytproNCode?.length > 1 && ytproDecipher?.length > 1 ){
 ytproAudElem.style.opacity="1";
 ytproAudElem.style.pointerEvents="auto";
 }
@@ -1059,7 +1117,7 @@ ytProHeart(ysHeart);
 
 
 
-insertAfter(document.getElementsByClassName("carousel-wrapper")[0],ys);
+insertAfter(document.getElementsByClassName("reel-player-overlay-actions")[0],ys);
 ys.appendChild(ysDown);
 ys.appendChild(ysHeart);
 }
