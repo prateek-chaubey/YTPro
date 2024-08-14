@@ -81,6 +81,10 @@ var c="#000";
 var d="#f2f2f2";
 var dislikes="...";
 
+
+//Force Dark mode 
+
+/*
 if(document.cookie.indexOf("PREF") < 0 || document.cookie.indexOf("f6=") < 0){
 document.cookie.replace(
 /(?<=^|;).+?(?=\=|;|$)/g,
@@ -91,7 +95,7 @@ name => location.hostname
 );
 document.cookie="PREF=f6=400&f7=100;";
 window.location.href=window.location.href;
-}
+}*/
 if(document.cookie.indexOf("f6=400") > -1){
 c ="#fff";d="rgba(255,255,255,0.1)";
 }else{
