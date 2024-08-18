@@ -1,6 +1,6 @@
 /*****YTPRO*******
 Author: Prateek Chaubey
-Version: 3.4.60
+Version: 3.4.62
 URI: https://github.com/prateek-chaubey/
 */
 
@@ -367,7 +367,8 @@ window.location.hash="settings";
 var scripts = document.getElementsByTagName('script');
 for(var i=0;i<scripts.length;i++){
 if(scripts[i].src.indexOf("/base.js") > 0){
-fetch(scripts[i].src).then((res) => res.text()).then((r) => extractFunctions(r));
+var sUrl="https://www.youtube.com/s/player/"+scripts[i].src.match(`(?<=player\/).*(?=\/player)`)+"/player_ias.vflset/en_US/base.js";
+fetch(sUrl).then((res) => res.text()).then((r) => extractFunctions(r));
 }
 }
 
