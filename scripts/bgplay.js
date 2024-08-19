@@ -12,7 +12,7 @@ if (document.querySelector("#GTVideo") != null) return;
 var a=document.createElement("div");
 a.setAttribute("style",`height:40px;width:150px;border-radius:25px;background:rgba(255,255,255,.1);backdrop-filter:blur(10px);z-index:999999999;
 position:fixed;top:150px;left:calc(50% - 75px);border:1px solid silver;
-text-align:center;line-height:40px;`);
+text-align:center;line-height:40px;color:white;`);
 a.setAttribute("id","GTVideo")
 
 
@@ -197,13 +197,13 @@ getQueue(id);
 /*Pause event , updates the android notification*/
 ytproAud.addEventListener('pause', async (event) => {
 if(!isPlayingAud) return;
-document.querySelector("#playpause").innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M10.804 8 5 4.633v6.734zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696z"/></svg>`;
+document.querySelector("#playpause").innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${c}" viewBox="0 0 16 16"><path d="M10.804 8 5 4.633v6.734zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696z"/></svg>`;
 setTimeout(()=>{Android.bgPause(ytproAud.currentTime*1000);},100);
 });
 /*Play event , updates the android notification*/
 ytproAud.addEventListener('play', async (event) => {
 if(!isPlayingAud) return;
-document.querySelector("#playpause").innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M6 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5m4 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5"/></svg>`;
+document.querySelector("#playpause").innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${c}" viewBox="0 0 16 16"><path d="M6 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5m4 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5"/></svg>`;
 setTimeout(()=>{Android.bgPlay(ytproAud.currentTime*1000);},100);
 });
 
@@ -269,7 +269,7 @@ setTimeout(()=>{Android.bgBuffer(ytproAud.currentTime*1000);},50);
 /*Playing event , updates da bla bla bla*/
 ytproAud.addEventListener('playing', () => {
 //console.log("playing");
-document.querySelector("#playpause").innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M6 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5m4 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5"/></svg>`;
+document.querySelector("#playpause").innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${c}" viewBox="0 0 16 16"><path d="M6 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5m4 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5"/></svg>`;
 setTimeout(()=>{Android.bgPlay(ytproAud.currentTime*1000);},50);
 });
 
@@ -295,7 +295,7 @@ ytADivOuter.setAttribute("id","ytproAudDiv");
 ytADivOuter.setAttribute("style",`height:100%;width:100%;position:fixed;top:0;left:0;background:rgba(0,0,0,.8);z-index:999;`);
 
 ytADiv.setAttribute("style",`height:50%;width:98%;
-background:rgba(0,0,0,.5);border:1px solid #222;position:fixed;border-radius:10px;backdrop-filter:blur(10px);bottom:15px;left:calc(1%);z-index:999;`);
+background:${isD ? "rgba(0,0,0,.5)" : "rgba(255,255,255,.5)"};border:1px solid #222;position:fixed;border-radius:10px;backdrop-filter:blur(10px);bottom:15px;left:calc(1%);z-index:999;`);
 
 ytADiv.innerHTML=`
 <style>
@@ -582,7 +582,6 @@ queue=[];
 
 
 }
-
 
 
 
