@@ -1,8 +1,9 @@
 /*****YTPRO*******
 Author: Prateek Chaubey
-Version: 3.4.66
+Version: 3.4.70
 URI: https://github.com/prateek-chaubey/
 */
+
 
 //DEBUG
 /*var debug=false;
@@ -19,6 +20,7 @@ window.location.href=`javascript:(function () { var script = document.createElem
 }
 /**/
 
+if(!YTProVer){
 
 /*Few Stupid Inits*/
 var YTProVer="3.45";
@@ -31,6 +33,7 @@ var isF=false;   //what is this for?
 var isAP=false; // oh it's for bg play 
 var isM=false; // no idea !!
 var sTime=[];
+var webUrls=["m.youtube.com","youtube.com","yout.be","accounts.google.com"];
 
 if(localStorage.getItem("autoSpn") == null || localStorage.getItem("fitS") == null){
 localStorage.setItem("autoSpn","true");
@@ -909,14 +912,23 @@ if(window.location.href.indexOf("youtube.com/watch") > -1){
 
 
 try{
-var elm=document.getElementsByTagName("dislike-button-view-model")[0].children[0].children[0]; 
-elm.children[0].style.width="80px";
-elm.children[0].children[0].style.position="absolute";
-elm.children[0].children[0].style.left="15px";
-if(elm.children[0].children[2] == null){
-elm.children[0].innerHTML+=`<span style="margin-left:20px">${dislikes}<span>`;
-}else{elm.children[0].children[2].innerHTML=dislikes;}
-}catch{}
+var elm=document.getElementsByTagName("dislike-button-view-model")[0].children[0]; 
+elm.children[0].children[0].children[0].style.width="90px";
+elm.children[0].children[0].children[0].children[0].style.position="absolute";
+
+elm.children[0].children[0].children[0].children[0].style.left="15px";
+
+elm.parentElement.innerHTML=`<yt-button-shape class="yt-spec-button-shape-next__button-shape-wiz-class" nt="true">
+<button class="yt-spec-button-shape-next yt-spec-button-shape-next--tonal yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--segmented-end yt-spec-button-shape-next--enable-backdrop-filter-experiment" title="" aria-pressed="false" aria-label="Dislike this video" aria-disabled="false" nt="true" style="width: 80px;"><div class="yt-spec-button-shape-next__icon" aria-hidden="true" nt="true" style="position: absolute; left: 15px;"><c3-icon style="height: 24px; width: 24px;"><span class="yt-icon-shape yt-spec-icon-shape"><div style="width: 100%; height: 100%; display: block; fill: currentcolor;"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit; width: 100%; height: 100%;"><path d="M17,4h-1H6.57C5.5,4,4.59,4.67,4.38,5.61l-1.34,6C2.77,12.85,3.82,14,5.23,14h4.23l-1.52,4.94C7.62,19.97,8.46,21,9.62,21 c0.58,0,1.14-0.24,1.52-0.65L17,14h4V4H17z M10.4,19.67C10.21,19.88,9.92,20,9.62,20c-0.26,0-0.5-0.11-0.63-0.3 c-0.07-0.1-0.15-0.26-0.09-0.47l1.52-4.94l0.4-1.29H9.46H5.23c-0.41,0-0.8-0.17-1.03-0.46c-0.12-0.15-0.25-0.4-0.18-0.72l1.34-6 C5.46,5.35,5.97,5,6.57,5H16v8.61L10.4,19.67z M20,13h-3V5h3V13z"></path></svg></div></span></c3-icon></div><yt-touch-feedback-shape style="border-radius: inherit;"><div aria-hidden="true" class="yt-spec-touch-feedback-shape yt-spec-touch-feedback-shape--touch-response"><div class="yt-spec-touch-feedback-shape__stroke"></div><div class="yt-spec-touch-feedback-shape__fill"></div></div></yt-touch-feedback-shape>
+
+<span style="margin-left:20px;margin-bottom:3px;">${dislikes}</span>
+
+</button></yt-button-shape>
+`;
+
+}catch(e){
+
+}
 
 
 /*Check If Element Already Exists*/
@@ -1445,6 +1457,7 @@ try{document.getElementsByTagName("ytm-shorts-lockup-view-model")[x].remove();
 }
 }
 
+
 /****** I LOVE YOU <3 *****/
 
 
@@ -1487,6 +1500,9 @@ Vv.style.transform=`scale(${scale})`;
 });
 }
 */
+
+
+
 
 
 
@@ -1539,12 +1555,43 @@ document.body.appendChild(x);
 
 
 
-
-
-
-
 window.onload = function(){ 
 if(parseFloat(Android.getInfo()) < parseFloat(YTProVer) && (window.location.href == "https://m.youtube.com/" || window.location.href == "https://m.youtube.com") ){
 updateModel();
 }
+
+
+
+
+
 };
+
+
+
+
+
+document.addEventListener('click',(event) => {
+
+let anchor = event.target.closest('a');
+if (anchor) {
+
+
+if(anchor.href.includes("www.youtube.com/redirect")){
+
+const url=new URL(anchor.href).searchParams.get("q");
+
+Android.oplink(url);
+event.preventDefault();
+event.stopPropagation(); 
+
+}
+
+
+}
+},
+true);
+
+
+
+
+}
