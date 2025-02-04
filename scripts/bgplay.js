@@ -26,10 +26,11 @@ document.body.appendChild(a);
 }
 
 
+
+
+
 /*The main BG Play fun*/
 async function ytproAudPlayer(id){
-
-
 
 
 
@@ -38,13 +39,11 @@ queue.push(id);
 }
 
 
-
-
 if(document.getElementById("ytproAudDiv") == null ){
 createAudElements();
 }
 
-var ytproURL="";
+
 
 if(id != new URLSearchParams(window.location.search).get("v")){
 createGTVideo();
@@ -52,47 +51,44 @@ createGTVideo();
 if (document.querySelector("#GTVideo") != null) document.querySelector("#GTVideo").remove();
 }
 
+Android.fetchYouTubeData(id,true);
 
-
-
-
-var g=`https://m.youtube.com/watch?v=${id}`;
-var f=await fetch(g).then(r => r.text())
-
-
-
-
-try{
-var sD=JSON.parse("{"+(f.substr(f.indexOf("streamingData")-1,((f.indexOf("playbackTracking")-1)-f.indexOf("streamingData"))))+"}");
-var vD=JSON.parse("{"+f.substr(f.indexOf("\"videoDetails"),((f.indexOf("\"trackingParams")-1)-f.indexOf("\"videoDetails")))+"}");
-}catch(e){
-history.back();
-return Android.showToast("Playback Error , Please open and issue on Github if the error persists.\n\n"+e);
 }
 
 
-var af=sD?.streamingData?.adaptiveFormats;
 
-var author=vD?.videoDetails?.author; 
-var thumb =[...vD?.videoDetails?.thumbnail?.thumbnails].pop().url;
-var title=vD?.videoDetails?.title;
+
+async function backToBgplay(info){
+
+var ytproURL="";
+
+if(Object.keys(info).length === 0){
+history.back();
+return Android.showToast("Playback Error , Please open and issue on Github if the error persists.\n\n");
+}
+
+
+var af=info?.streamingData?.adaptiveFormats;
+
+var author=info?.videoDetails?.author; 
+var thumb =[...info?.videoDetails?.thumbnail?.thumbnails].pop().url;
+var title=info?.videoDetails?.title;
 
 
 
 for(var x in af){
 
 if(af[x]?.itag == "140"){
-if("signatureCipher" in af[x]){
-ytproURL=ytproGetURL(af[x].signatureCipher,"sig");
-}else{
-ytproURL=ytproGetURL(af[x].url,"n");
-}
+
+ytproURL=af[x].url;
+
 
 break;
 
 }
 }
 
+//console.log(ytproURL)
 
 
 /*UI is important as well*/
@@ -179,10 +175,10 @@ setTimeout(()=>{Android.bgStart(iconBase64.replace("data:image/png;base64,", "")
 ytproAud.play();
 
 
-
+/*
 if(songIndex >= (queue.length - 1)){
 getQueue(id);
-}
+}*/
 
 
 
@@ -582,6 +578,5 @@ queue=[];
 
 
 }
-
 
 
