@@ -1,6 +1,6 @@
 /*****YTPRO*******
 Author: Prateek Chaubey
-Version: 3.4.70
+Version: 3.5.0
 URI: https://github.com/prateek-chaubey/
 */
 
@@ -14,6 +14,9 @@ getInfo:()=>{},
 oplink:()=>{},
 downvid:()=>{}
 };
+s1: FoQR9rLpRy8
+s2: PN51tJhZscE
+
 if(window.eruda == null){
 //ERUDA
 window.location.href=`javascript:(function () { var script = document.createElement('script'); script.src="//cdn.jsdelivr.net/npm/eruda"; document.body.appendChild(script); script.onload = function () { eruda.init() } })();`;
@@ -23,17 +26,16 @@ window.location.href=`javascript:(function () { var script = document.createElem
 if(!YTProVer){
 
 /*Few Stupid Inits*/
-var YTProVer="3.45";
-if(ytproNCode == undefined && ytproDecipher == undefined){
-var ytproNCode=[];
-var ytproDecipher=[];
-}
+var YTProVer="3.5";
 var ytoldV="";
 var isF=false;   //what is this for?
 var isAP=false; // oh it's for bg play 
 var isM=false; // no idea !!
 var sTime=[];
 var webUrls=["m.youtube.com","youtube.com","yout.be","accounts.google.com"];
+
+let touchstartY = 0;
+let touchendY = 0;
 
 if(localStorage.getItem("autoSpn") == null || localStorage.getItem("fitS") == null){
 localStorage.setItem("autoSpn","true");
@@ -53,30 +55,6 @@ else{
 ytoldV=(new URLSearchParams(window.location.search)).get('v') ;
 }
 
-/*Cleans the URL for various functions of the YTPRO*/
-function ytproGetURL(o,p){
-try{
-var url=o;
-
-if(p == "sig"){
-var sig=(new URLSearchParams(o)).get('s');
-url=(new URLSearchParams(o)).get('url');
-sig=eval(ytproDecipher[0]+ytproDecipher[1]+"('"+decodeURIComponent(sig)+"');");
-url=decodeURIComponent(url);
-}
-const components = new URL(decodeURIComponent(url));
-const n = components.searchParams.get('n');
-var nc=eval(ytproNCode[0]+ytproNCode[1]+"('"+n+"');");
-components.searchParams.set('n',nc);
-if(p == "sig"){
-return components.toString()+"&sig="+sig;
-}
-else{
-return components.toString();
-}
-}catch{}
-}
-
 
 /*Dark and Light Mode*/
 var c="#000";
@@ -86,7 +64,7 @@ var dislikes="...";
 
 
 //Force Dark mode 
-/*
+/**
 if(document.cookie.indexOf("PREF") < 0 || document.cookie.indexOf("f6=") < 0){
 document.cookie.replace(
 /(?<=^|;).+?(?=\=|;|$)/g,
@@ -97,7 +75,8 @@ name => location.hostname
 );
 document.cookie="PREF=f6=400&f7=100;";
 window.location.href=window.location.href;
-}*/
+}
+/**/
 if(document.cookie.indexOf("f6=400") > -1){
 c ="#fff";d="rgba(255,255,255,0.1)";
 isD=true;
@@ -108,230 +87,6 @@ isD=false;
 var downBtn=`<svg xmlns="http://www.w3.org/2000/svg" height="18" fill="${c}" viewBox="0 0 24 24" width="18" focusable="false"><path d="M17 18v1H6v-1h11zm-.5-6.6-.7-.7-3.8 3.7V4h-1v10.4l-3.8-3.8-.7.7 5 5 5-4.9z"></path></svg>`;
 
 
-
-/*Extract Functions , Credits:node-ytdl-core && @distube/ytdl-core*/
-var extractFunctions = (body)=> {
-
-/*Regex & Functions for Decipher & NCode*/
-
-const DECIPHER_NAME_REGEXPS = [
-  '\\bm=([a-zA-Z0-9$]{2,})\\(decodeURIComponent\\(h\\.s\\)\\)',
-  '\\bc&&\\(c=([a-zA-Z0-9$]{2,})\\(decodeURIComponent\\(c\\)\\)',
-  // eslint-disable-next-line max-len
-  '(?:\\b|[^a-zA-Z0-9$])([a-zA-Z0-9$]{2,})\\s*=\\s*function\\(\\s*a\\s*\\)\\s*\\{\\s*a\\s*=\\s*a\\.split\\(\\s*""\\s*\\)',
-  '([\\w$]+)\\s*=\\s*function\\((\\w+)\\)\\{\\s*\\2=\\s*\\2\\.split\\(""\\)\\s*;',
-];
-
-// LavaPlayer regexps
-const VARIABLE_PART = '[a-zA-Z_\\$][a-zA-Z_0-9]*';
-const VARIABLE_PART_DEFINE = `\\"?${VARIABLE_PART}\\"?`;
-const BEFORE_ACCESS = '(?:\\[\\"|\\.)';
-const AFTER_ACCESS = '(?:\\"\\]|)';
-const VARIABLE_PART_ACCESS = BEFORE_ACCESS + VARIABLE_PART + AFTER_ACCESS;
-const REVERSE_PART = ':function\\(a\\)\\{(?:return )?a\\.reverse\\(\\)\\}';
-const SLICE_PART = ':function\\(a,b\\)\\{return a\\.slice\\(b\\)\\}';
-const SPLICE_PART = ':function\\(a,b\\)\\{a\\.splice\\(0,b\\)\\}';
-const SWAP_PART = ':function\\(a,b\\)\\{' +
-      'var c=a\\[0\\];a\\[0\\]=a\\[b%a\\.length\\];a\\[b(?:%a.length|)\\]=c(?:;return a)?\\}';
-
-const DECIPHER_REGEXP = `function(?: ${VARIABLE_PART})?\\(a\\)\\{` +
-  `a=a\\.split\\(""\\);\\s*` +
-  `((?:(?:a=)?${VARIABLE_PART}${VARIABLE_PART_ACCESS}\\(a,\\d+\\);)+)` +
-  `return a\\.join\\(""\\)` +
-  `\\}`;
-
-const HELPER_REGEXP = `var (${VARIABLE_PART})=\\{((?:(?:${
-  VARIABLE_PART_DEFINE}${REVERSE_PART}|${
-  VARIABLE_PART_DEFINE}${SLICE_PART}|${
-  VARIABLE_PART_DEFINE}${SPLICE_PART}|${
-  VARIABLE_PART_DEFINE}${SWAP_PART}),?\\n?)+)\\};`;
-
-const SCVR = '[a-zA-Z0-9$_]';
-const FNR = `${SCVR}+`;
-const AAR = '\\[(\\d+)]';
-const N_TRANSFORM_NAME_REGEXPS = [
-  // NewPipeExtractor regexps
-  `${SCVR}+="nn"\\[\\+${
-    SCVR}+\\.${SCVR}+],${
-    SCVR}+=${SCVR
-  }+\\.get\\(${SCVR}+\\)\\)&&\\(${
-    SCVR}+=(${SCVR
-  }+)\\[(\\d+)]`,
-  `${SCVR}+="nn"\\[\\+${
-    SCVR}+\\.${SCVR}+],${
-    SCVR}+=${SCVR}+\\.get\\(${
-    SCVR}+\\)\\).+\\|\\|(${SCVR
-  }+)\\(""\\)`,
-  `\\(${SCVR}=String\\.fromCharCode\\(110\\),${
-    SCVR}=${SCVR}\\.get\\(${
-    SCVR}\\)\\)&&\\(${SCVR
-  }=(${FNR})(?:${AAR})?\\(${
-    SCVR}\\)`,
-  `\\.get\\("n"\\)\\)&&\\(${SCVR
-  }=(${FNR})(?:${AAR})?\\(${
-    SCVR}\\)`,
-  // Skick regexps
-  '(\\w+).length\\|\\|\\w+\\(""\\)',
-  '\\w+.length\\|\\|(\\w+)\\(""\\)',
-];
-
-// LavaPlayer regexps
-const N_TRANSFORM_REGEXP = 'function\\(\\s*(\\w+)\\s*\\)\\s*\\{' +
-  'var\\s*(\\w+)=(?:\\1\\.split\\(.*?\\)|String\\.prototype\\.split\\.call\\(\\1,.*?\\)),' +
-  '\\s*(\\w+)=(\\[.*?]);\\s*\\3\\[\\d+]' +
-  '(.*?try)(\\{.*?})catch\\(\\s*(\\w+)\\s*\\)\\s*\\' +
-  '{\\s*return"enhanced_except_([A-z0-9-]+)"\\s*\\+\\s*\\1\\s*}' +
-  '\\s*return\\s*(\\2\\.join\\(""\\)|Array\\.prototype\\.join\\.call\\(\\2,""\\))};';
-
-
-/*Matches the Regex*/
-
-const matchRegex = (regex, str) => {
-const match = str.match(new RegExp(regex, 's'));
-if (!match) throw new Error(`Could not match ${regex}`);
-return match;
-};
-
-const matchFirst = (regex, str) => matchRegex(regex, str)[0];
-
-const matchGroup1 = (regex, str) => matchRegex(regex, str)[1];
-
-
-const getFuncName = (body, regexps) => {
-let fn;
-for (const regex of regexps) {
-try {
-fn = matchGroup1(regex, body);
-try {
-fn = matchGroup1(`${fn.replace(/\$/g, '\\$')}=\\[([a-zA-Z0-9$\\[\\]]{2,})\\]`, body);
-} catch (err) {
-// Function name is not inside an array
-}
-break;
-} catch (err) {
-continue;
-}
-}
-if (!fn || fn.includes('[')) throw Error();
-return fn;
-};
-
-
-
-
-
-
-const extractDecipherFunc = body => {
-try {
-const DECIPHER_FUNC_NAME = 'ytproDecipher';
-const helperObject = matchFirst(HELPER_REGEXP, body);
-const decipherFunc = matchFirst(DECIPHER_REGEXP, body);
-const resultFunc = `var ${DECIPHER_FUNC_NAME}=${decipherFunc};`;
-const callerFunc = `${decipherFuncName}`;
-return [helperObject + resultFunc , callerFunc];
-} catch (e) {
-return null;
-}
-};
-
-
-
-const extractDecipherWithName = body => {
-try {
-const decipherFuncName = getFuncName(body, DECIPHER_NAME_REGEXPS);
-const funcPattern = `(${decipherFuncName.replace(/\$/g, '\\$')}=function\\([a-zA-Z0-9_]+\\)\\{.+?\\})`;
-const decipherFunc = `var ${matchGroup1(funcPattern, body)};`;
-const helperObjectName = matchGroup1(';([A-Za-z0-9_\\$]{2,})\\.\\w+\\(', decipherFunc);
-const helperPattern = `(var ${helperObjectName.replace(/\$/g, '\\$')}=\\{[\\s\\S]+?\\}\\};)`;
-const helperObject = matchGroup1(helperPattern, body);
-const callerFunc = `${decipherFuncName}`;
-return [helperObject + decipherFunc , callerFunc];
-} catch (e) {
-return null;
-}
-};
-
-
-
-
-
-const getExtractFunctions = (extractFunctions, body) => {
-for (const extractFunction of extractFunctions) {
-try {
-const func = extractFunction(body);
-if (!func) continue;
-return func;
-} catch (err) {
-continue;
-}
-}
-return null;
-};
-
-
-
-
-
-
-const extractDecipher = body => {
-const decipherFunc = getExtractFunctions([extractDecipherWithName, extractDecipherFunc], body);
-if (!decipherFunc) {
-console.warn('WARNING: Could not parse decipher function.\n' );
-}
-return decipherFunc;
-};
-
-
-
-
-
-const extractNTransformFunc = body => {
-try {
-const N_TRANSFORM_FUNC_NAME = 'ytproNCode';
-const nFunc = matchFirst(N_TRANSFORM_REGEXP, body);
-const resultFunc = `var ${N_TRANSFORM_FUNC_NAME}=${nFunc}`;
-const callerFunc = `${N_TRANSFORM_FUNC_NAME}`;
-return [resultFunc , callerFunc];
-} catch (e) {
-return null;
-}
-};
-
-
-
-const extractNTransformWithName = body => {
-try {
-const nFuncName = getFuncName(body, N_TRANSFORM_NAME_REGEXPS);
-const funcPattern = `(${
-nFuncName.replace(/\$/g, '\\$')
-// eslint-disable-next-line max-len
-}=\\s*function([\\S\\s]*?\\}\\s*return (([\\w$]+?\\.join\\(""\\))|(Array\\.prototype\\.join\\.call\\([\\w$]+?,[\\n\\s]*(("")|(\\("",""\\)))\\)))\\s*\\}))`;
-const nTransformFunc = `var ${matchGroup1(funcPattern, body)};`;
-const callerFunc = `${nFuncName}`;
-return [nTransformFunc , callerFunc];
-} catch (e) {
-return null;
-}
-};
-
-
-
-const extractNTransform = body => {
-const nTransformFunc = getExtractFunctions([extractNTransformFunc,extractNTransformWithName], body);
-if (!nTransformFunc) {
-console.warn('WARNING: Could not parse nTransform function.\n');
-}
-return nTransformFunc;
-};
-
-
-ytproDecipher=extractDecipher(body);
-ytproNCode=extractNTransform(body);
-
-
-
-
-};
 
 
 
@@ -367,14 +122,6 @@ window.location.hash="settings";
 
 
 
-/*Fetches da base.js*/
-var scripts = document.getElementsByTagName('script');
-for(var i=0;i<scripts.length;i++){
-if(scripts[i].src.indexOf("/base.js") > 0){
-var sUrl="https://www.youtube.com/s/player/"+scripts[i].src.match(`(?<=player\/).*(?=\/player)`)+"/player_ias.vflset/en_US/base.js";
-fetch(sUrl).then((res) => res.text()).then((r) => extractFunctions(r));
-}
-}
 
 /*Dislikes To Locale, Credits: Return YT Dislikes*/
 function getDislikesInLocale(num){
@@ -427,10 +174,10 @@ sDiv.appendChild(s1);
 }
 
 if(document.getElementById("sDiv") == null){
-if(document.getElementsByClassName('YtChapteredProgressBarHost')[0] != null){
-document.getElementsByClassName('YtChapteredProgressBarHost')[0].appendChild(sDiv);
+if(document.getElementsByClassName('ytPlayerProgressBarHost')[0] != null){
+document.getElementsByClassName('ytPlayerProgressBarHost')[0].appendChild(sDiv);
 }else{
-try{document.getElementsByClassName('YtProgressBarLineProgressBarLine')[0].appendChild(sDiv);}catch{}
+try{document.getElementsByClassName('ytProgressBarLineProgressBarLine')[0].appendChild(sDiv);}catch{}
 }
 }
 }
@@ -440,9 +187,9 @@ try{document.getElementsByClassName('YtProgressBarLineProgressBarLine')[0].appen
 
 
 /*Fetch The Dislikes*/
-async function fDislikes(){ 
+async function fDislikes(url){ 
+var Url=new URL(url);
 var vID="";
-var Url=new URL(window.location.href);
 if(Url.pathname.indexOf("shorts") > -1){
 vID=Url.pathname.substr(8,Url.pathname.length);
 }
@@ -461,13 +208,18 @@ dislikes=getDislikesInLocale(parseInt(jsonObject.dislikes));
 }).catch(error => {});
 
 }
-fDislikes();
 
 
-if(window.location.pathname.indexOf("watch") > -1){
 
 /*Check For Sponsorships*/
-fetch("https://sponsor.ajay.app/api/skipSegments?videoID="+(new URLSearchParams(window.location.search)).get('v'))
+function checkSponsors(Url){
+
+
+if(Url.indexOf("watch") > -1){
+
+sTime=[];
+
+fetch("https://sponsor.ajay.app/api/skipSegments?videoID="+new URL(Url).searchParams.get("v"))
 .then(response => {
 return response.json();
 }).then(jsonObject => {
@@ -476,8 +228,6 @@ var time=jsonObject[x].segment;
 sTime.push(time);
 }
 }).catch(error => {});
-
-
 
 
 /*Skip the Sponsor*/
@@ -501,32 +251,7 @@ addSkipper(s2[0]);
 
 }
 
-
-
-
-if((window.location.pathname.indexOf("watch") > -1) || (window.location.pathname.indexOf("shorts") > -1)){
-var unV=setInterval(() => {
-/*Set Orientation*/
-
-var v=document.getElementsByClassName('video-stream')[0].getBoundingClientRect();
-if(v.height > v.width){
-Android.fullScreen(true);
 }
-else{
-Android.fullScreen(false);
-}
-
-/*Unmute The Video*/ 
-
-document.getElementsByClassName('video-stream')[0].muted=false;
-if(!document.getElementsByClassName('video-stream')[0].muted){
-clearInterval(unV);
-}
-
-}, 5);
-
-}
-
 
 /*Add Skip Sponsor Element*/
 function addSkipper(sT){
@@ -554,6 +279,35 @@ document.getElementById("player-control-container").appendChild(sSDiv);
 setTimeout(()=>{sSDiv.remove();},5000);
 }
 
+
+fDislikes(window.location.href);
+checkSponsors(window.location.href);
+
+
+if((window.location.pathname.indexOf("watch") > -1) || (window.location.pathname.indexOf("shorts") > -1)){
+var unV=setInterval(() => {
+/*Set Orientation*/
+
+var v=document.getElementsByClassName('video-stream')[0].getBoundingClientRect();
+if(v.height > v.width){
+Android.fullScreen(true);
+}
+else{
+Android.fullScreen(false);
+}
+
+/*Unmute The Video*/ 
+
+document.getElementsByClassName('video-stream')[0].muted=false;
+
+if(!document.getElementsByClassName('video-stream')[0].muted){
+clearInterval(unV);
+
+}
+
+}, 5);
+
+}
 
 /*Funtion to set Element Styles*/
 function sty(e,v){
@@ -655,7 +409,7 @@ ytpSetI.innerHTML+=`<b style='font-size:18px' >YT PRO Settings</b>
 <br><br>
 <div><input type="url" placeholder="Enter Youtube URL" onkeyup="searchUrl(this,event)"></div>
 <br>
-<div style="text-align:center" ><button onclick="showHearts();">Hearted Videos</button>
+<div style="text-align:center" ><button onclick="window.location.hash='#hearts';">Hearted Videos</button>
 <button style="margin-left:10px" onclick="checkUpdates();">Check for Updates</button>
 </div>
 <br>
@@ -667,8 +421,14 @@ ytpSetI.innerHTML+=`<b style='font-size:18px' >YT PRO Settings</b>
 <br>
 <div>Hide Shorts <span onclick="sttCnf(this,'shorts');" style="${sttCnf(0,0,"shorts")}" ><b style="${sttCnf(0,1,"shorts")}" ></b></span></div> 
 <br>
-<div style="display:flex;justify-content:center;font-family:cursive;text-align:center;font-size:2.25rem;font-weight:bolder;color:${isD ? "#0f8" : "#094"};">Made with 
-&#x2665; by Prateek Chaubey</div>
+<div style="display:flex;justify-content:center;align-items:center;font-family:cursive;text-align:center;font-size:2.25rem;font-weight:bolder;color:${isD ? "#0f8" : "#094"};">
+<z style="margin-right:6px">Made with </z>
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#f00" class="bi bi-heart-fill" viewBox="0 0 16 16">
+<path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
+</svg> 
+<z style="margin-left:6px">by Prateek Chaubey</z>
+
+</div>
 <br><br>
 <div style="font-size:1.25rem;"><b style="font-weight:bold">Disclaimer</b>: This is an unofficial OSS Youtube Mod , all the logos and brand names are property of Google LLC.<br>
 You can get the source code at <a href="#" onclick="Android.oplink('https://github.com/prateek-chaubey/YTPRO')" > https://github.com/prateek-chaubey/YTPRO</a>
@@ -772,7 +532,7 @@ z-index:99999999999999;
 `);
 ytproDown.addEventListener("click",
 function(ev){
-if(ev.target != ytproDownDiv ){
+if(ev.target != ytproDownDiv && !(ytproDownDiv.contains(ev.target)) ){
 history.back();
 }
 });
@@ -795,31 +555,39 @@ else{
 id=new URLSearchParams(window.location.search).get("v");
 }
 
-
-
 ytproDownDiv.innerHTML="Loading...";
 
-var info=await fetch("https://m.youtube.com/watch?v="+id).then(r => r.text());
-
-
-
-try{
-var sD=JSON.parse("{"+(info.substr(info.indexOf("streamingData")-1,((info.indexOf("playbackTracking")-1)-info.indexOf("streamingData"))))+"}");
-var vD=JSON.parse("{"+info.substr(info.indexOf("\"videoDetails"),((info.indexOf("\"trackingParams")-1)-info.indexOf("\"videoDetails")))+"}");
-var cD=JSON.parse("{"+info.substr(info.indexOf("\"captionTracks\""),(info.indexOf("\"audioTracks\"") -1 - info.indexOf("\"captionTracks\"")))+"}");
-}catch(e){
-history.back();
-return Android.showToast("Download Error , Please open and issue on Github if the error persists.\n\n"+e);
+Android.fetchYouTubeData(id,false);
 }
 
 
 
 
-var thumb=vD?.videoDetails?.thumbnail?.thumbnails;
-var vids=sD?.streamingData?.formats;
-var avids=sD?.streamingData?.adaptiveFormats;
-var cap=cD?.captionTracks;
-var t=vD?.videoDetails?.title.replaceAll("|","").replaceAll("\\","").replaceAll("?","").replaceAll("*","").replaceAll("<","").replaceAll("/","").replaceAll(":","").replaceAll('"',"").replaceAll(">","").replaceAll("'","");
+/*Callback funtion for the response recived by the java extractor*/
+
+
+
+function callbackVideoResponse(info,bgplay){
+
+console.log(info);
+
+if(bgplay){
+return backToBgplay(info);
+}
+
+
+if(Object.keys(info).length === 0){
+history.back();
+return Android.showToast("Download Error , Please open and issue on Github if the error persists.\n\n");
+}
+
+var ytproDownDiv=document.getElementById("downytprodiv");
+
+var thumb=info?.videoDetails?.thumbnail?.thumbnails;
+var vids=info?.streamingData?.formats;
+var avids=info?.streamingData?.adaptiveFormats;
+var cap=info?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
+var t=info?.videoDetails?.title.replaceAll("|","").replaceAll("\\","").replaceAll("?","").replaceAll("*","").replaceAll("<","").replaceAll("/","").replaceAll(":","").replaceAll('"',"").replaceAll(">","").replaceAll("'","");
 ytproDownDiv.innerHTML=`<style>#downytprodiv a{text-decoration:none;} #downytprodiv li{list-style:none; display:flex;align-items:center;justify-content:center;border-radius:25px;padding:8px;background:${isD ? "rgb(10,0,0)" : d };margin:5px;box-shadow:0px 0px 2px rgb(236,84,232);margin-top:8px}</style>`;
 
 
@@ -828,32 +596,36 @@ ytproDownDiv.innerHTML+="Select Avilaible Formats<ul id='listurl'>";
 
 for(var x in vids){
 
-var url="";
-if("signatureCipher" in vids[x]){
-url=ytproGetURL(vids[x].signatureCipher,"sig");
-}else{
-url=ytproGetURL(vids[x].url,"n");
-}
+var url=vids[x].url;
 
 ytproDownDiv.innerHTML+=`<li data-ytprotit="${t}"  style="box-shadow:0px 0px 2px rgb(70,84,232);"  onclick="YTDownVid(this,'.mp4')"  data-ytprourl="${url}">
 ${downBtn}<span style="margin-left:10px;"  >${vids[x].qualityLabel} ${formatFileSize(((vids[x].bitrate*(vids[x].approxDurationMs/1000))/8))} </span></li>` ;
 }
 
 
+ytproDownDiv.innerHTML+=`<li id="showAdaptives" onclick="showHideAdaptives()" style="box-shadow:0px 0px 2px rgb(320,84,22);min-height:20px;border-radius:5px">
+Show Adaptive Formats (No Audio) 
+<span style="margin-left:10px;"  >
+<svg style="margin-top:5px" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${c}"  viewBox="0 0 18 18">
+<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
+</svg>
+</span>
+</li>` ;
 
 
 for(x in avids){
-
-
-if(avids[x].mimeType.indexOf("audio") > -1){
-
-var url="";
-if("signatureCipher" in avids[x]){
-url=ytproGetURL(avids[x].signatureCipher,"sig");
-}else{
-url=ytproGetURL(avids[x].url,"n");
+if(!(avids[x].mimeType.indexOf("audio") > -1)){
+var url=avids[x].url;
+ytproDownDiv.innerHTML+=`<li data-ytprotit="${t}" class="adpFormats" style="box-shadow:0px 0px 2px rgb(320,84,22);display:none;"  onclick="YTDownVid(this,'.mp4')"  data-ytprourl="${url}">
+${downBtn}<span style="margin-left:10px;"  >${avids[x].qualityLabel} ${formatFileSize(avids[x].contentLength)} 
+</span></li>` ;
+}
 }
 
+
+for(x in avids){
+if(avids[x].mimeType.indexOf("audio") > -1){
+var url=avids[x].url;
 ytproDownDiv.innerHTML+=`<li data-ytprotit="${t}"  onclick="YTDownVid(this,'.mp3')"  data-ytprourl="${url}">
 ${downBtn}<span style="margin-left:10px;"  >Audio | ${avids[x].audioQuality.replace("AUDIO_QUALITY_","")}${formatFileSize(avids[x].contentLength)} 
 </span></li>` ;
@@ -882,11 +654,25 @@ ytproDownDiv.innerHTML+=`<cp><span style="width:100px;text-align:left">${cap[x]?
 
 }
 
+function showHideAdaptives(){
+var z=document.querySelectorAll(".adpFormats");
+z.forEach((x)=>{
+if(x.style.display=="none"){
+x.style.display="flex";
+}else{
+x.style.display="none";
+}
+
+});
+
+}
 
 /*Add the meme type and extensions lol*/
 function downCap(x,t){
 Android.downvid(t,`https://m.youtube.com${x}`,"plain/text");
 }
+
+/*Send to Download Manager*/
 function YTDownVid(o,ex){
 var mtype="";
 if(ex ==".png"){
@@ -903,6 +689,165 @@ mtype="audio/mp3";
 
 Android.downvid((o.getAttribute("data-ytprotit")+ex),o.getAttribute("data-ytprourl"),mtype);
 }
+
+
+
+
+
+
+
+
+/*Checks the Direction of the Swipe*/
+function checkDirection(e) {
+if ((touchendY > touchstartY) && (touchendY - touchstartY > 20)) {
+minimize(true);
+}else if ((touchendY < touchstartY) && (touchstartY - touchendY > 20)) {{
+minimize(false);
+}
+}
+}
+
+/*touch start*/
+document.body.addEventListener('touchstart', e => {
+
+touchstartY = e.changedTouches[0].screenY;
+}, { capture: true });
+
+/*touch end*/
+document.body.addEventListener('touchend', e => {
+//console.log(e.target.className)
+touchendY = e.changedTouches[0].screenY;
+
+if((e.target.className.toString().includes("video-stream") || e.target.className.toString().includes("player-controls-background")) && !document.fullscreenElement){
+checkDirection();
+}
+
+}, { capture: true });
+
+/*if coming back from fullscreen > the zIndex*/
+/*
+document.addEventListener("fullscreenchange", ()=>{
+if(document.fullscreenElement == null){
+try{
+document.getElementById("miniIframe").style.display="none";
+}catch{}
+}
+});
+*/
+
+navigation.addEventListener("navigate", e => {
+if(e.destination.url.indexOf("watch") > -1 || e.destination.url.indexOf("shorts") > -1){
+
+fDislikes(e.destination.url);
+checkSponsors(e.destination.url);
+}
+});
+
+
+/*minimize function to mini the video*/
+function minimize(yes){
+
+
+
+const createIframe=()=>{
+
+var iframe=document.createElement("iframe");
+iframe.setAttribute("id",`miniIframe`);
+iframe.setAttribute("style",`
+height:99.999%;width:100%;
+background:${c};
+top:0px;
+line-height:50px;
+position:fixed;
+left:0;
+z-index:999;
+border:0;
+`);
+
+
+iframe.src="https://m.youtube.com/";
+document.body.appendChild(iframe);
+
+
+var iwindow = iframe.contentWindow || iframe.contentDocument.defaultView;
+var doc = iwindow.document;
+
+if (doc.readyState  == 'complete' ) {
+if (iwindow.trustedTypes && iwindow.trustedTypes.createPolicy && !iwindow.trustedTypes.defaultPolicy) {
+iwindow.trustedTypes.createPolicy('default', {createHTML: (string) => string,createScriptURL: string => string, createScript: string => string, });
+}
+}
+
+iwindow.navigation.addEventListener("navigate", e => {
+if(e.destination.url.indexOf("youtube.com") > -1){
+if(e.destination.url.indexOf("/watch") > -1 || e.destination.url.indexOf("/shorts") > -1){
+window.location.href=e.destination.url;
+}
+}
+else{
+window.location.href=e.destination.url;
+}
+
+
+});
+
+var script = doc.createElement("script");
+var scriptSource=`window.addEventListener('DOMContentLoaded', function() {
+var script = document.createElement('script'); 
+script.src="//cdn.jsdelivr.net/npm/eruda"; 
+document.body.appendChild(script);
+script.onload = function () { eruda.init() } ;
+var script2 = document.createElement('script');
+script2.src="//cdn.jsdelivr.net/npm/ytpro";
+document.body.appendChild(script2);
+});
+`;
+
+var source = doc.createTextNode(scriptSource);
+script.appendChild(source);
+doc.body.appendChild(script);
+
+return iframe;
+
+}
+
+
+
+var iframe = document.getElementById("miniIframe") || createIframe();
+var player=document.getElementById("player-container-id");
+
+
+
+
+//var ogCss=getComputedStyle(player);
+
+if(yes){
+
+iframe.style.display="block";
+
+player.setAttribute("ogTop",getComputedStyle(player).top)
+console.log(player.getAttribute("ogTop"))
+
+player.style.transform="scale(0.65)";
+player.style.top=(window.screen.height-(player.getBoundingClientRect().height*2))+"px";
+player.style.zIndex="9999";
+
+
+}else{
+
+iframe.style.display="none";
+
+
+
+player.style.transform="scale(1)";
+player.style.top=player.getAttribute("ogTop");
+
+}
+}
+
+
+
+
 
 
 /*THE 0NE AND 0NLY FUNCTION*/
@@ -933,6 +878,9 @@ elm.parentElement.innerHTML=`<yt-button-shape class="yt-spec-button-shape-next__
 
 /*Check If Element Already Exists*/
 if(document.getElementById("ytproMainDivE") == null){
+
+
+
 var ytproMainDivA=document.createElement("div");
 ytproMainDivA.setAttribute("id","ytproMainDivE");
 ytproMainDivA.setAttribute("style",`
@@ -943,7 +891,7 @@ insertAfter(document.getElementsByClassName('slim-video-action-bar-actions')[0],
 
 var ytproMainDiv=document.createElement("div");
 ytproMainDiv.setAttribute("style",`
-height:50px;width:130%;display:flex;overflow:auto;
+height:50px;width:100%;display:flex;overflow:auto;
 align-items:center;justify-content:center;padding-left:20px;padding-right:20px;
 `);
 ytproMainDivA.appendChild(ytproMainDiv);
@@ -994,7 +942,7 @@ PIPlayer2();
 
 
 
-/*Minimize Button*/
+/*Minimize Button*
 var ytproMinVidElem=document.createElement("div");
 sty(ytproMinVidElem);
 ytproMinVidElem.style.width="110px";
@@ -1007,48 +955,13 @@ ytproMainDiv.appendChild(ytproMinVidElem);
 ytproMinVidElem.addEventListener("click",
 function(){
 
-var d=document.createElement("div");
-d.setAttribute("style",`
-height:118px;width:182px;background:rgba(130,130,130,.3);
-backdrop-filter:blur(6px);
-position:absolute;bottom:40px;
-line-height:50px;position:fixed;
-bottom:50px;
-left:calc(5% / 2);padding-right:20px;
-z-index:99999999999999;text-align:center;border-radius:5px;
-color:white;text-align:center;
-`);
-d.innerHTML=`<span style="height:30px;position:absolute;right:-10px;top:-15px;display:block;z-index:999999999999999999;">
-<svg onclick="this.parentElement.parentElement.remove();" xmlns="http://www.w3.org/2000/svg" width="20" height="20" style="margin-left:30px;" fill="#f24" viewBox="0 0 16 16">
-<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
-</svg>
-</span>`;
-
-
-var v=document.createElement("video");
-
-v.setAttribute("style",`position:fixed;top:5px;left:5px;height:108px;width:192px;z-index:999;`);
-v.setAttribute("controls",``);
-var f=ytplayer.config.args.raw_player_response.streamingData.formats;
-if("signatureCipher" in f[0]){
-v.src=ytproGetURL(f[0].signatureCipher,"sig");
-}else{
-v.src=ytproGetURL(f[0].url,"n");
-}
-
-
-v.currentTime=document.getElementsByClassName('video-stream')[0].currentTime;
-d.appendChild(v);
-v.play();
-document.body.appendChild(d);
 
 
 
-history.pushState({},"","https://m.youtube.com/");
-history.pushState({},"","https://m.youtube.com/");
-history.back();
 
-});
+
+
+});*/
 
 /*Music Button*/
 var ytproAudElem=document.createElement("div");
@@ -1070,24 +983,20 @@ return updateModel();
 window.location.hash="bgplay";
 });
 
-if(ytproNCode?.length < 1 && ytproDecipher?.length < 1 ){
-ytproAudElem.style.opacity=".5";
-ytproAudElem.style.pointerEvents="none";
-}
-else if(ytproNCode?.length > 1 && ytproDecipher?.length > 1 ){
-ytproAudElem.style.opacity="1";
-ytproAudElem.style.pointerEvents="auto";
-}
+
 
 
 }
+
+
+
 
 /*Watch The old and New URL*/
 if(ytoldV != (new URLSearchParams(window.location.search)).get('v')){
 try{document.getElementById("ytproMainAudDivE").remove();}catch{console.log("No Element Found");}
 isAPlaying=false;
 ytoldV=(new URLSearchParams(window.location.search)).get('v');
-window.location.href=window.location.href;
+//window.location.href=window.location.href;
 }
 
 
@@ -1159,11 +1068,11 @@ if(document.getElementById("ytproMainSDivE") != null) document.getElementById("y
 }
 
 
-/*Watch The old and New URL*/
+/*Watch The old and New URL*
 if(ytoldV != window.location.pathname){
 fDislikes();
 ytoldV=window.location.pathname;
-}
+}*/
 
 
 }
@@ -1213,6 +1122,10 @@ ytproHh.innerHTML+="No Videos Found";
 
 var v=JSON.parse(localStorage.getItem("hearts"));
 
+if(Object.keys(v).length === 0){
+return ytproHh.innerHTML+="No Videos Found";
+}
+
 for(var n=Object.keys(v).length - 1; n >  -1 ; n--){
 var x=Object.keys(v)[n];
 ytproHh.innerHTML+=`<li class="thum" >
@@ -1255,34 +1168,40 @@ function ytProHeart(x){
 
 var vid=(new URLSearchParams(window.location.search)).get('v') || window.location.pathname.replace("/shorts/","");
 
-
-
-if(window.location.pathname.indexOf("shorts") > -1){
-
 var video=document.getElementsByClassName('video-stream')[0];
 var canvas = document.createElement('canvas');
 canvas.style.width = "1600px"; 
 canvas.style.height = "900px";
 canvas.style.background="black";
 var context = canvas.getContext('2d');
-context.drawImage(video,105, 0, 90,160);
+
+(window.location.pathname.indexOf("shorts") > -1) ? context.drawImage(video,105, 0, 90,160) :  context.drawImage(video,0, 0, 320,180);
+
 var dataURI = canvas.toDataURL('image/jpeg');
 
 
+if(window.location.pathname.indexOf("shorts") > -1){
 
 var vDetails={
 thumb:dataURI,
-title:document.getElementsByClassName('ReelPlayerHeaderRendererReelTitle')[0].textContent.replaceAll("|","").replaceAll("\\","").replaceAll("?","").replaceAll("*","").replaceAll("<","").replaceAll("/","").replaceAll(":","").replaceAll('"',"").replaceAll(">","")
+title:document.getElementsByClassName('ytShortsVideoTitleViewModelShortsVideoTitle')[0].textContent.replaceAll("|","").replaceAll("\\","").replaceAll("?","").replaceAll("*","").replaceAll("<","").replaceAll("/","").replaceAll(":","").replaceAll('"',"").replaceAll(">","")
 };
 
 }else{
 
 var vDetails={
+thumb:dataURI,
+title:document.getElementsByClassName('slim-video-metadata-header')[0].textContent.replaceAll("|","").replaceAll("\\","").replaceAll("?","").replaceAll("*","").replaceAll("<","").replaceAll("/","").replaceAll(":","").replaceAll('"',"").replaceAll(">","")
+}
+
+/*
+var vDetails={
 thumb:[...ytplayer.config.args.raw_player_response?.videoDetails?.thumbnail?.thumbnails].pop().url,
 title:ytplayer.config.args.raw_player_response?.videoDetails?.title.replaceAll("|","").replaceAll("\\","").replaceAll("?","").replaceAll("*","").replaceAll("<","").replaceAll("/","").replaceAll(":","").replaceAll('"',"").replaceAll(">","")
-};
+};*/
 
 }
+
 
 
 var g="16";
@@ -1323,7 +1242,7 @@ return false;
 
 
 
-/*Factoring the code after months , i really don't know what miracle this piece does*/
+/*Refactoring the code after months , i really don't know what miracle this piece does*/
 function removePIP(){
 if(!isF){
 document.getElementsByClassName("fullscreen-icon")[0].click();
@@ -1380,15 +1299,16 @@ document.getElementsByClassName('video-stream')[0].play();
 
 
 
-/*YTPRO Audio Player*/
-/*hehe i removed this lmao*/
-
 
 setInterval(pkc,0);
 
 
 /*Check The Hash Change*/
 window.onhashchange=()=>{
+try{stopPlayback();}catch{}
+try{document.getElementById("outerdownytprodiv").remove();}catch{}
+try{document.getElementById("outerheartsdiv").remove();}catch{}
+try{document.getElementById("settingsprodiv").remove();}catch{}
 if(window.location.hash == "#download"){
 ytproDownVid();
 }else if(window.location.hash == "#settings"){
@@ -1400,12 +1320,7 @@ showHearts();
 else if(window.location.hash == "#bgplay"){
 ytproAudPlayer(new URLSearchParams(window.location.search).get("v"));
 }
-else{
-try{stopPlayback();}catch{}
-try{document.getElementById("outerdownytprodiv").remove();}catch{}
-try{document.getElementById("outerheartsdiv").remove();}catch{}
-try{document.getElementById("settingsprodiv").remove();}catch{}
-}
+
 }
 
 
@@ -1530,14 +1445,17 @@ function updateModel(){
 
 var x=document.createElement("div");
 
-x.setAttribute("style",`height:100%;width:100%;position:fixed;display:grid;align-items:center;top:0;left:0;background:rgba(0,0,0,.2);z-index:99999;`);
+x.setAttribute("style",`height:100%;width:100%;position:fixed;display:grid;align-items:center;top:0;left:0;background:rgba(0,0,0,.6);z-index:99999;`);
 
 x.innerHTML=`
-<div style="height:140px;width:70%;padding:20px;background:rgba(0,0,0,.1);border:1px solid #888;box-shadow:0px 0px 5px black;backdrop-filter:blur(10px);border-radius:15px;margin:auto">
+<div style="height:auto;width:70%;padding:20px;background:rgba(0,0,0,.6);border:1px solid #888;box-shadow:0px 0px 5px black;color:white;backdrop-filter:blur(10px);border-radius:15px;margin:auto">
 <h2> Update Available</h2><br>
 Latest Version ${YTProVer} of YTPRO is available , update the YTPRO to get latest features.
 <br>- Improved Background Play<br>
-- Bug fixes and updates
+- Improved Download feature<br>
+- Improved Minimize feature<br>
+- Fixed bugs and improved functionality<br>
+- for the full list <u onclick="Android.oplink('https://github.com/prateek-chaubey/YTPRO/releases');" >click here</u>
 <br>
 <br>
 <div style="display:flex;">
@@ -1561,11 +1479,7 @@ updateModel();
 }
 
 
-
-
-
 };
-
 
 
 
@@ -1578,9 +1492,14 @@ if (anchor) {
 
 if(anchor.href.includes("www.youtube.com/redirect")){
 
+try{
+document.getElementsByClassName('video-stream')[0].pause;
+}catch{}
+
 const url=new URL(anchor.href).searchParams.get("q");
 
-Android.oplink(url);
+setTimeout(()=>{Android.oplink(url)},50);
+
 event.preventDefault();
 event.stopPropagation(); 
 
