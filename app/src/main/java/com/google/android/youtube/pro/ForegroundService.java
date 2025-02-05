@@ -189,7 +189,7 @@ public class ForegroundService extends Service {
         };
 
         IntentFilter filter = new IntentFilter(ACTION_UPDATE_NOTIFICATION);
-        registerReceiver(updateReceiver, filter);
+        registerReceiver(updateReceiver, filter,RECEIVER_EXPORTED);
     }
 
     @Override
