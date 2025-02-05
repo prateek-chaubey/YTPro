@@ -435,9 +435,12 @@ public class MainActivity extends Activity {
             }
         };
 
-
+        if (Build.VERSION.SDK_INT >= 34 && getApplicationInfo().targetSdkVersion >= 34) {
         registerReceiver(broadcastReceiver, new IntentFilter("TRACKS_TRACKS"),RECEIVER_EXPORTED);
-
+        }
+        else{
+        registerReceiver(broadcastReceiver, new IntentFilter("TRACKS_TRACKS"));
+        }
     }
 
     @Override
