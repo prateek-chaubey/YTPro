@@ -436,7 +436,7 @@ public class MainActivity extends Activity {
         };
 
 
-        registerReceiver(broadcastReceiver, new IntentFilter("TRACKS_TRACKS"));
+        registerReceiver(broadcastReceiver, new IntentFilter("TRACKS_TRACKS"),RECEIVER_EXPORTED);
 
     }
 
