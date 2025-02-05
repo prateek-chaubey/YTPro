@@ -189,7 +189,13 @@ public class ForegroundService extends Service {
         };
 
         IntentFilter filter = new IntentFilter(ACTION_UPDATE_NOTIFICATION);
-        registerReceiver(updateReceiver, filter,RECEIVER_EXPORTED);
+
+          if (Build.VERSION.SDK_INT >= 34 && getApplicationInfo().targetSdkVersion >= 34) {
+           registerReceiver(updateReceiver, filter,RECEIVER_EXPORTED);
+          }
+          else{
+           registerReceiver(updateReceiver, filter);
+          }
     }
 
     @Override
