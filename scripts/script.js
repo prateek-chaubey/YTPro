@@ -1,6 +1,6 @@
 /*****YTPRO*******
 Author: Prateek Chaubey
-Version: 3.5.0
+Version: 3.5.1
 URI: https://github.com/prateek-chaubey/
 */
 
@@ -793,16 +793,21 @@ window.location.href=e.destination.url;
 
 var script = doc.createElement("script");
 var scriptSource=`window.addEventListener('DOMContentLoaded', function() {
-var script = document.createElement('script'); 
-script.src="//cdn.jsdelivr.net/npm/eruda"; 
-document.body.appendChild(script);
-script.onload = function () { eruda.init() } ;
 var script2 = document.createElement('script');
 script2.src="//cdn.jsdelivr.net/npm/ytpro";
 document.body.appendChild(script2);
 });
 `;
 
+/*
+var script = document.createElement('script'); 
+script.src="//cdn.jsdelivr.net/npm/eruda"; 
+document.body.appendChild(script);
+script.onload = function () { eruda.init() } ;
+*/
+
+
+  
 var source = doc.createTextNode(scriptSource);
 script.appendChild(source);
 doc.body.appendChild(script);
