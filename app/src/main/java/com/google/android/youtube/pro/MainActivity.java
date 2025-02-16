@@ -201,7 +201,7 @@ public class MainActivity extends Activity {
 
     private void downloadFile(String filename, String url, String mtype) {
         
-        if (Build.VERSION.SDK_INT > 22 && Build.VERSION.SDK_INT < 28 && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+        if (Build.VERSION.SDK_INT > 22 && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
             runOnUiThread(() -> Toast.makeText(getApplicationContext(), R.string.grant_storage, Toast.LENGTH_SHORT).show());
             requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
