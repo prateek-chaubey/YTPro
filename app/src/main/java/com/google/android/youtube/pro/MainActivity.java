@@ -164,6 +164,14 @@ public class MainActivity extends Activity {
                     android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT :
                     android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
 
+             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+             getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        
+             WindowManager.LayoutParams params = MainActivity.this.getWindow().getAttributes();
+             params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+             MainActivity.this.getWindow().setAttributes(params); 
+             }
+
             if (this.mCustomView != null) {
                 onHideCustomView();
                 return;
@@ -174,6 +182,18 @@ public class MainActivity extends Activity {
             this.mOriginalOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;this.mCustomViewCallback = viewCallback; ((FrameLayout)MainActivity.this.getWindow().getDecorView()).addView(this.mCustomView, new FrameLayout.LayoutParams(-1, -1)); MainActivity.this.getWindow().getDecorView().setSystemUiVisibility(3846);
         }
         public void onHideCustomView() {
+
+
+              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+    
+              getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+
+              WindowManager.LayoutParams params = getWindow().getAttributes();
+              params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER;
+              getWindow().setAttributes(params);
+                  
+              }
+            
 
             ((FrameLayout)MainActivity.this.getWindow().getDecorView()).removeView(this.mCustomView);
             this.mCustomView = null;
