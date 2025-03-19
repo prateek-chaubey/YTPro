@@ -15,6 +15,7 @@ import java.io.*;
 import org.json.*;
 import android.content.pm.*;
 import java.net.URLEncoder;
+import android.webkit.CookieManager;
 
 public class MainActivity extends Activity {
 
@@ -400,7 +401,7 @@ public class MainActivity extends Activity {
             }).start();
         }
         @JavascriptInterface
-        public void getSNlM0e(String cookies) {
+         public void getSNlM0e(String cookies) {
             
             new Thread(() -> {
             String response = GeminiWrapper.getSNlM0e(cookies);
@@ -419,6 +420,11 @@ public class MainActivity extends Activity {
             }).start();
 
 
+        }
+        @JavascriptInterface
+        public String getAllCookies(String url) {	
+        String cookies = CookieManager.getInstance().getCookie(url);
+        return cookies;
         }
         @JavascriptInterface
         public void pipvid(String x) {
