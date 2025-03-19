@@ -400,6 +400,27 @@ public class MainActivity extends Activity {
             }).start();
         }
         @JavascriptInterface
+        public void getSNlM0e(String cookies) {
+            
+            new Thread(() -> {
+            String response = GeminiWrapper.getSNlM0e(cookies);
+            runOnUiThread(() -> web.evaluateJavascript("callbackSNlM0e.resolve(`" + response +"`)", null));    
+            }).start();
+
+
+        }
+        @JavascriptInterface
+         public void GeminiClient(String url,String headers,String body) {
+        
+                
+            new Thread(() -> {
+            JSONObject response = GeminiWrapper.getStream(url,headers,body);
+            runOnUiThread(() -> web.evaluateJavascript("callbackGeminiClient.resolve(" + response +")", null));   
+            }).start();
+
+
+        }
+        @JavascriptInterface
         public void pipvid(String x) {
             if (android.os.Build.VERSION.SDK_INT >= 26) {
                 try {
