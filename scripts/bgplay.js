@@ -193,13 +193,13 @@ getQueue(id);
 /*Pause event , updates the android notification*/
 ytproAud.addEventListener('pause', async (event) => {
 if(!isPlayingAud) return;
-document.querySelector("#playpause").innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${c}" viewBox="0 0 16 16"><path d="M10.804 8 5 4.633v6.734zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696z"/></svg>`;
+document.querySelector("#playpause").innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"  fill="white"  viewBox="0 0 16 16"><path d="M10.804 8 5 4.633v6.734zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696z"/></svg>`;
 setTimeout(()=>{Android.bgPause(ytproAud.currentTime*1000);},100);
 });
 /*Play event , updates the android notification*/
 ytproAud.addEventListener('play', async (event) => {
 if(!isPlayingAud) return;
-document.querySelector("#playpause").innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${c}" viewBox="0 0 16 16"><path d="M6 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5m4 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5"/></svg>`;
+document.querySelector("#playpause").innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"  fill="white"  viewBox="0 0 16 16"><path d="M6 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5m4 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5"/></svg>`;
 setTimeout(()=>{Android.bgPlay(ytproAud.currentTime*1000);},100);
 });
 
@@ -265,7 +265,7 @@ setTimeout(()=>{Android.bgBuffer(ytproAud.currentTime*1000);},50);
 /*Playing event , updates da bla bla bla*/
 ytproAud.addEventListener('playing', () => {
 //console.log("playing");
-document.querySelector("#playpause").innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${c}" viewBox="0 0 16 16"><path d="M6 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5m4 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5"/></svg>`;
+document.querySelector("#playpause").innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"  fill="white"  viewBox="0 0 16 16"><path d="M6 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5m4 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5"/></svg>`;
 setTimeout(()=>{Android.bgPlay(ytproAud.currentTime*1000);},50);
 });
 
@@ -291,7 +291,7 @@ ytADivOuter.setAttribute("id","ytproAudDiv");
 ytADivOuter.setAttribute("style",`height:100%;width:100%;position:fixed;top:0;left:0;background:rgba(0,0,0,.8);z-index:999;`);
 
 ytADiv.setAttribute("style",`height:50%;width:98%;
-background:${isD ? "rgba(0,0,0,.5)" : "rgba(255,255,255,.5)"};border:1px solid #222;position:fixed;border-radius:10px;backdrop-filter:blur(10px);bottom:15px;left:calc(1%);z-index:999;`);
+background:${isD ? "rgba(0,0,0,.5)" : "rgba(255,255,255,.1)"};border:1px solid #222;position:fixed;border-radius:10px;backdrop-filter:blur(10px);bottom:15px;left:calc(1%);z-index:999;`);
 
 ytADiv.innerHTML=`
 <style>
@@ -374,6 +374,7 @@ width:50px;
 margin-left:8%;
 font-size:12px;
 width:85%;
+color:white;
 }
 #ytproAudDiv .load{
 height:50px;
@@ -405,13 +406,13 @@ opacity:0;
 <div id="prog"></div>
 </div>
 <div class="ytAudControls">
-<svg style="float:left;margin-left:30px" onclick="playPrev()" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+<svg style="float:left;margin-left:30px" fill="white"  onclick="playPrev()" xmlns="http://www.w3.org/2000/svg" width="16" height="16"  viewBox="0 0 16 16">
 <path d="M4 4a.5.5 0 0 1 1 0v3.248l6.267-3.636c.52-.302 1.233.043 1.233.696v7.384c0 .653-.713.998-1.233.696L5 8.752V12a.5.5 0 0 1-1 0zm7.5.633L5.696 8l5.804 3.367z"/>
 </svg>
 <span id="playpause" style="position:relative" onclick="playPause()">
 <span class="load"></span>
 </span>
-<svg style="float:right;margin-right:30px" onclick="playNext()" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+<svg style="float:right;margin-right:30px" fill="white" onclick="playNext()" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
 <path d="M12.5 4a.5.5 0 0 0-1 0v3.248L5.233 3.612C4.713 3.31 4 3.655 4 4.308v7.384c0 .653.713.998 1.233.696L11.5 8.752V12a.5.5 0 0 0 1 0zM5 4.633 10.804 8 5 11.367z"/>
 </svg>
 </div>
@@ -578,5 +579,4 @@ queue=[];
 
 
 }
-
 
