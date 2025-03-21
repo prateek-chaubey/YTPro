@@ -191,7 +191,7 @@ public class MainActivity extends Activity {
 
               WindowManager.LayoutParams params = getWindow().getAttributes();
               params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER;
-              getWindow().setAttributes(params);
+              MainActivity.this.getWindow().setAttributes(params);
                   
               }
             
