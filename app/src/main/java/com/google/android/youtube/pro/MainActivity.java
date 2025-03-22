@@ -38,6 +38,8 @@ public class MainActivity extends Activity {
         setContentView(R.layout.main);
 
         load(false);
+
+        MainActivity.this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
     public void load(boolean dl) {
         dL=dl;
