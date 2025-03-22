@@ -190,7 +190,7 @@ public class MainActivity extends Activity {
               getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
               WindowManager.LayoutParams params = getWindow().getAttributes();
-              params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER;
+              params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT;
               MainActivity.this.getWindow().setAttributes(params);
                   
               }
