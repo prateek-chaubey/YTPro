@@ -27,6 +27,12 @@
 [![Download zip](https://custom-icon-badges.herokuapp.com/badge/-Download-ff0000?style=for-the-badge&logo=download&logoColor=white "Download Apk")](https://nightly.link/prateek-chaubey/YTPro/workflows/gradle/main/Apk.zip)
 
 ## Features
+ 
+ * <img src='.github/img/gemini-logo-13486188-10900314-unscreen-ezgif.com-crop.gif' height=15 width=15 > Google Gemini
+     
+   * Summarise Vidoes
+   * Customisable prompts and models
+  
  * Video Downloader
  * Shorts Downloader 
  * Thumbnails Downloader
@@ -46,9 +52,14 @@
  * Auto Updation of App
 
 
+## Gemini Prompt
+The available varibles for Gemini Prompts are
+* `{url}` : The URL of the video
+* `{title}` : Title of the video
+* `{videoId}` : Video Id of the video
+
 ## ToDo
  * Add basic features to the video player
- * Video Summariser
  * Enhance Audio
  * Merging Adaptive Formats
 
