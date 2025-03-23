@@ -1,7 +1,7 @@
 {
   "name": "ytpro",
   "version": "3.8.1",
-  "description": "All in one YouTube App with AdBlocker, Downloader , Background Player , PIP Mode and many more features.",
+  "description": "All in one YouTube App with AdBlocker, Downloader , Background Player , PIP Mode , Google Gemini ✨ and many more features.",
   "main": "script.js",
   "repository": {
     "type": "git",
@@ -17,7 +17,9 @@
     "Youtube Pro",
     "Youtube Premium",
     "Youtube Mod",
-    "YouTube AdBlock"
+    "YouTube AdBlock",
+    "Generative AI",
+    "Google Gemini"
   ],
   "author": "Prateek Chaubey",
   "license": "MIT",
