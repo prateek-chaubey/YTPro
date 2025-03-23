@@ -1,6 +1,6 @@
 /*****YTPRO*******
 Author: Prateek Chaubey
-Version: 3.8.0
+Version: 3.8.1
 URI: https://github.com/prateek-chaubey/
 */
 
@@ -1842,7 +1842,11 @@ document.getElementsByTagName("ytm-companion-ad-renderer")[0].remove();
 
 /*Remove Open App*/
 try{
-document.querySelectorAll('[aria-label="Open App"]')[0].remove(); 
+document.querySelectorAll('a').forEach(a => {
+if (a.href.indexOf("intent://") > -1) {
+a.style.display = 'none';
+}
+});
 }catch{}
 /*Remove Promotion Element*/
 try{document.getElementsByTagName("ytm-paid-content-overlay-renderer")[0].style.display="none";}catch{}
