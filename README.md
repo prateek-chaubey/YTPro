@@ -53,7 +53,7 @@
 
 
 ## Gemini Prompt
-The available varibles for Gemini Prompts are
+The available variables for gemini prompt are
 * `{url}` : The URL of the video
 * `{title}` : Title of the video
 * `{videoId}` : Video Id of the video
