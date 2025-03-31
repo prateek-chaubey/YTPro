@@ -27,12 +27,9 @@
 [![Download zip](https://custom-icon-badges.herokuapp.com/badge/-Download-ff0000?style=for-the-badge&logo=download&logoColor=white "Download Apk")](https://nightly.link/prateek-chaubey/YTPro/workflows/gradle/main/Apk.zip)
 
 ## Features
- 
  * <img src='.github/img/gemini-logo-13486188-10900314-unscreen-ezgif.com-crop.gif' height=15 width=15 > Google Gemini
-     
    * Summarise Vidoes
    * Customisable prompts and models
-  
  * Video Downloader
  * Shorts Downloader 
  * Thumbnails Downloader
@@ -64,7 +61,7 @@ The available variables for gemini prompt are
  * Merging Adaptive Formats
 
 ### Credits
-* [node-ytdl](https://github.com/fent/node-ytdl) , [Sponsor Block](https://github.com/ajayyy/SponsorBlock) , [return-youtube-dislike](https://github.com/Anarios/return-youtube-dislike) , [ytdl](https://github.com/prateek-chaubey/ytdl)
+[Sponsor Block](https://github.com/ajayyy/SponsorBlock) [return-youtube-dislike](https://github.com/Anarios/return-youtube-dislike)
 
 ### ❤️Supporters❤️
 [![Stargazers repo roster for @prateek-chaubey/YTPro](http://reporoster.com/stars/dark/prateek-chaubey/YTPro)](https://github.com/prateek-chaubey/YTPro/stargazers)
