@@ -61,7 +61,8 @@ The available variables for gemini prompt are
  * Merging Adaptive Formats
 
 ### Credits
-[Sponsor Block](https://github.com/ajayyy/SponsorBlock) [return-youtube-dislike](https://github.com/Anarios/return-youtube-dislike)
+ * [Sponsor Block](https://github.com/ajayyy/SponsorBlock)
+ * [return-youtube-dislike](https://github.com/Anarios/return-youtube-dislike)
 
 ### ❤️Supporters❤️
 [![Stargazers repo roster for @prateek-chaubey/YTPro](http://reporoster.com/stars/dark/prateek-chaubey/YTPro)](https://github.com/prateek-chaubey/YTPro/stargazers)
