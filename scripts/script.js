@@ -1,6 +1,6 @@
 /*****YTPRO*******
 Author: Prateek Chaubey
-Version: 3.8.1
+Version: 3.8.2
 URI: https://github.com/prateek-chaubey/
 */
 
@@ -776,9 +776,23 @@ ytproDownDiv.innerHTML+=`<li data-ytprotit="${t+Date.now()}"  onclick="YTDownVid
 }
 
 if(cap && cap.length){
-ytproDownDiv.innerHTML+=`<br>Captions<br><br><style>cp{display:flex;align-items:center;width:100%;height:30px}c{height:45px;width:50px;padding-top:5px;background:${d};border-radius:10px;margin-left:10px;display:block}</style>`;
+ytproDownDiv.innerHTML+=`<br>Captions<br><br><style>cp{width:100%;height:auto;padding-bottom:8px;}c{height:45px;width:50px;padding-top:5px;background:${d};border-radius:10px;margin-left:10px;display:block}</style>`;
 for(var x in cap){
-ytproDownDiv.innerHTML+=`<cp><span style="width:100px;text-align:left">${cap[x]?.name?.runs[0]?.text}</span> <div style="position:absolute;right:10px;display:flex"><c onclick="downCap('${cap[x].baseUrl}','${t}.xml')" >${downBtn} <br>.xml</c><c onclick="downCap('${cap[x].baseUrl}&fmt=vtt','${t}.vtt')">${downBtn} <br>.vtt</c><c onclick="downCap('${cap[x].baseUrl}&fmt=srv1','${t}.srv1')">${downBtn} <br>.srv1</c><c onclick="downCap('${cap[x].baseUrl}&fmt=ttml','${t}.ttml')">${downBtn} <br>.ttml</c></div></cp><br><br>`; 
+cap[x].baseUrl = cap[x].baseUrl.replace("&fmt=srv3","");
+ytproDownDiv.innerHTML+=`<cp>
+<br><br>
+<span style="width:100px;text-align:left">${cap[x]?.name?.runs[0]?.text}</span> 
+<br><br>
+<div style="position:absolute;right:10px;display:flex">
+<c onclick="downCap('${cap[x].baseUrl}&fmt=sbv','${t}.txt')">${downBtn} <br>.txt</c>
+<c onclick="downCap('${cap[x].baseUrl}&fmt=srt','${t}.srt')">${downBtn} <br>.srt</c>
+<c onclick="downCap('${cap[x].baseUrl}','${t}.xml')" >${downBtn} <br>.xml</c>
+<c onclick="downCap('${cap[x].baseUrl}&fmt=vtt','${t}.vtt')">${downBtn} <br>.vtt</c>
+<c onclick="downCap('${cap[x].baseUrl}&fmt=srv1','${t}.srv1')">${downBtn} <br>.srv1</c><c onclick="downCap('${cap[x].baseUrl}&fmt=ttml','${t}.ttml')">${downBtn} <br>.ttml</c></div>
+<br>
+</cp>
+<br><br>
+`;
 }
 }
 
