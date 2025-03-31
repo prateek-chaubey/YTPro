@@ -14,7 +14,7 @@
 
 ---
 > [!TIP]
-> If you like this project , consider [sponsoring](https://github.com/sponsors/prateek-chaubey) to support the author 🌸
+> If you like this project, consider [sponsoring](https://github.com/sponsors/prateek-chaubey) to support the author 🌸
 ---
 
 #### Screenshots
