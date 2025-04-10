@@ -1,5 +1,5 @@
 <resources>
-	<style name="AppTheme"	parent="@android:style/Theme.Material.NoActionBar">
+         <style name="AppTheme"	parent="@android:style/Theme.Material.NoActionBar">
 		<item name="android:colorPrimary">@color/colorPrimary</item>
 		<item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
 		<item name="android:colorAccent">@color/colorAccent</item>
@@ -8,24 +8,6 @@
 		<item name="android:statusBarColor">@color/colorPrimary</item>
                 <item name="android:windowTranslucentStatus">false</item>
 		<item name="android:windowLightStatusBar">false</item>
-	</style>
-	<style name="FullScreen" parent="@android:style/Theme.Material.Light.NoActionBar.Fullscreen">
-		<item name="android:colorPrimary">@color/colorPrimary</item>
-		<item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
-		<item name="android:colorAccent">@color/colorAccent</item>
-		<item name="android:colorControlHighlight">@color/colorControlHighlight</item>
-		<item name="android:colorControlNormal">@color/colorControlNormal</item>
-	</style>
-	<style name="NoActionBar" parent="@android:style/Theme.Material.Light.NoActionBar">
-		<item name="android:colorPrimary">@color/colorPrimary</item>
-		<item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
-		<item name="android:colorAccent">@color/colorAccent</item>
-		<item name="android:colorControlHighlight">@color/colorControlHighlight</item>
-		<item name="android:colorControlNormal">@color/colorControlNormal</item>
-		<item name="android:statusBarColor">@color/colorPrimary</item>
-                <item name="android:windowTranslucentStatus">false</item>
-		<item name="android:windowLightStatusBar">false</item>
-
 	</style>
 	<style name="NoStatusBar" parent="AppTheme">
 		<item name="android:windowFullscreen">true</item>
