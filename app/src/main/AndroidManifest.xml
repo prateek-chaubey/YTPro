@@ -20,7 +20,7 @@
 			android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
 			android:hardwareAccelerated="true"
 			android:supportsPictureInPicture="true"
-		        android:theme="@style/NoActionBar"
+		        android:theme="@style/AppTheme"
                         android:exported="true"
 			android:screenOrientation="portrait">
 			<intent-filter>
@@ -48,7 +48,7 @@
 			android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
 			android:hardwareAccelerated="true"
 			android:supportsPictureInPicture="true"
-			android:theme="@style/NoActionBar"
+			android:theme="@style/AppTheme"
 			android:exported="true"
 			android:screenOrientation="portrait">
 			<intent-filter android:label="@string/dl">
