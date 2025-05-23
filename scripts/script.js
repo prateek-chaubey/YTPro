@@ -1,7 +1,7 @@
 /*****YTPRO*******
 Author: Prateek Chaubey
-Version: 3.8.2
-URI: https://github.com/prateek-chaubey/
+Version: 3.8.7
+URI: https://github.com/prateek-chaubey/YTPRO
 */
 
 
@@ -16,21 +16,23 @@ downvid:()=>{}
 };
 s1: FoQR9rLpRy8
 s2: PN51tJhZscE
-*
-if(window.eruda == null){
+*/
+if(window.eruda == null && localStorage.getItem("devMode") == "true"){
 //ERUDA
-window.location.href=`javascript:(function () { var script = document.createElement('script'); script.src="//cdn.jsdelivr.net/npm/eruda"; document.body.appendChild(script); script.onload = function () { eruda.init() } })();`;
+window.location.href=`javascript:(function () { var script = document.createElement('script'); script.src="//cdn.jsdelivr.net/npm/eruda"; document.body.appendChild(script); script.onload = function () { eruda.init();} })();`;
 }
 /**/
 
 if(!YTProVer){
 
 /*Few Stupid Inits*/
-var YTProVer="3.8";
+var YTProVer="3.87";
 var ytoldV="";
 var isF=false;   //what is this for?
-var isAP=false; // oh it's for bg play 
-var isM=false; // no idea !!
+var isAp=false; // oh it's for bg play 
+const originalPause = HTMLMediaElement.prototype.pause; // well long story short , save the original pause function
+window.PIPause = false; // for pausing video when in PIP
+window.pauseAllowed = true; // allow pause by default
 var sTime=[];
 var webUrls=["m.youtube.com","youtube.com","yout.be","accounts.google.com"];
 var GeminiAT="";
@@ -38,21 +40,39 @@ var GeminiModels={
 "2.0 Flash":'[null,null,null,null,"f299729663a2343f"]',   //g2.0 FLASH
 "2.0 Flash Thinking": '[null,null,null,null,"9c17b1863f581b8a"]', //g2.0 flash thinking
 "2.0 Flash Thinking with apps": '[null,null,null,null,"f8f8f5ea629f5d37"]', //g2.0 flash thinking with apps
-"Deep Research": "[1,null,null,null,\"cd472a54d2abba7e\"]",  // deep research
-"1.5 Flash": '[null,null,null,null,"418ab5ea040b5c43"]', //g1.5 flash
-"1.5 Pro Research": '[null,null,null,null,"e5a44cb1dae2b489"]' //g1.5 pro research
+'2.0 Experimental Advanced':'[null,null,null,null,"b1e46a6037e6aa9f"]',
+'2.5 Flash':'[1,null,null,null,"35609594dbe934d8"]',
+'2.5 Pro':'[1,null,null,null,"2525e3954d185b3c"]',
+'2.5 Experimental Advanced':'[null,null,null,null,"203e6bb81620bcfe"]',
 };
+var YTPROCodecs={
+video:["AV1","VP8","VP9","H264"],
+audio:["Opus","Mp4a"]
+}
 
 let touchstartY = 0;
 let touchendY = 0;
 
-if(localStorage.getItem("saveCInfo") == null || localStorage.getItem("fitS") == null){
+if(localStorage.getItem("saveCInfo") == null || localStorage.getItem("fitS") == null || localStorage.getItem("bgplay") == null){
 localStorage.setItem("autoSpn","true");
 localStorage.setItem("fitS","true");
+localStorage.setItem("bgplay","true");
 localStorage.setItem("fzoom","false");
 localStorage.setItem("saveCInfo","true");
-localStorage.setItem("geminiModel","2.0 Flash Thinking with apps");
+localStorage.setItem("geminiModel","2.5 Flash");
 localStorage.setItem("prompt","Give me details about this YouTube video Id: {videoId} , a detailed summary of timestamps with facts , resources and reviews of the main content ");
+localStorage.setItem("devMode","false");
+
+localStorage.setItem("block_60fps","false");
+
+YTPROCodecs.video.forEach((x)=>{
+localStorage.setItem(x,"true");
+});
+
+YTPROCodecs.audio.forEach((x)=>{
+localStorage.setItem(x,"true");
+});
+
 }
 if(localStorage.getItem("fzoom") == "true"){
 document.getElementsByName("viewport")[0].setAttribute("content","");
@@ -97,16 +117,110 @@ isD=true;
 dc ="#fff";c="#000";d="rgba(0,0,0,0.05)";
 isD=false;
 }
+
 var downBtn=`<svg xmlns="http://www.w3.org/2000/svg" height="18" fill="${c}" viewBox="0 0 24 24" width="18" focusable="false"><path d="M17 18v1H6v-1h11zm-.5-6.6-.7-.7-3.8 3.7V4h-1v10.4l-3.8-3.8-.7.7 5 5 5-4.9z"></path></svg>`;
 
 
 
 
 
-function insertAfter(referenceNode, newNode) {try{referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);}catch{}}
+
+
+
+
+
+function override() {
+
+var videoElem = document.createElement('video');
+var origCanPlayType = videoElem.canPlayType.bind(videoElem);
+videoElem.__proto__.canPlayType = makeModifiedTypeChecker(origCanPlayType);
+
+var mse = window.MediaSource;
+
+if (mse === undefined) return;
+var origIsTypeSupported = mse.isTypeSupported.bind(mse);
+mse.isTypeSupported = makeModifiedTypeChecker(origIsTypeSupported);
+}
+
+
+function makeModifiedTypeChecker(origChecker) {
+
+
+return function (type) {
+if (type === undefined) return '';
+var disallowed_types = [];
+if (localStorage['H264'] === 'false') {
+disallowed_types.push('avc');
+}
+if (localStorage['VP8'] === 'false') {
+disallowed_types.push('vp8');
+}
+if (localStorage['VP9'] === 'false') {
+disallowed_types.push('vp9', 'vp09');
+}
+if (localStorage['AV1'] === 'true') {
+disallowed_types.push('av01', 'av99');
+}
+if (localStorage['Opus'] === 'false') {
+disallowed_types.push('opus');
+}
+if (localStorage['Mp4a'] === 'false') {
+disallowed_types.push('mp4a');
+}
+
+// If video type is in disallowed_types, say we don't support them
+for (var i = 0; i < disallowed_types.length; i++) {
+if (type.indexOf(disallowed_types[i]) !== -1) return '';
+}
+
+if (localStorage['block_60fps'] === 'true') {
+var match = /framerate=(\d+)/.exec(type);
+if (match && match[1] > 30) return '';
+}
+
+return origChecker(type);
+};
+}
+
+override();
+
+
+
+
+
+function insertAfter(referenceNode, newNode) {
+try{
+referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+}catch{}
+}
+
+
+/*wait for the element , using observer*/
+async function waitForElement(selector,vid) {
+return new Promise((resolve) => {
+const element = document.querySelector(selector);
+if(element){
+if(vid && element.src != "") return resolve(element);
+if(!vid) return resolve(element);
+}
+const observer = new MutationObserver(() => {
+const el = document.querySelector(selector);
+if (el){
+
+if(vid && el.src) resolve(el),observer.disconnect();;
+if(!vid) resolve(el),observer.disconnect();;
+}
+});
+observer.observe(document.body, {
+childList: true,
+subtree: true
+});
+});
+}
+
 
 /*Add Settings Tab*/
-setInterval(()=>{
+var addSettingsTab=()=>{
 if(document.getElementById("setDiv") == null){
 var setDiv=document.createElement("div");
 setDiv.setAttribute("style",`
@@ -131,7 +245,7 @@ window.location.hash="settings";
 }
 
 
-},50);
+};
 
 
 
@@ -173,11 +287,14 @@ compactDisplay: "short",
 
 
 /*Skips the bad part :)*/
-function skipSponsor(){
+async function skipSponsor(){
 var sDiv=document.createElement("div");
 sDiv.setAttribute("style",`height:3px;pointer-events:none;width:100%;position:absolute;z-index:99;`)
 sDiv.setAttribute("id","sDiv");
-var dur=document.getElementsByClassName('video-stream')[0].duration;
+var player = document.getElementsByClassName("video-stream")[0];
+var dur=player.duration;
+
+if(isNaN(dur)) return;
 
 for(var x in sTime){
 var s1=document.createElement("div");
@@ -186,6 +303,12 @@ s1.setAttribute("style",`height:3px;width:${(100/dur) * (s2[1]-s2[0])}%;backgrou
 sDiv.appendChild(s1);
 }
 
+
+
+
+var e=await waitForElement("yt-progress-bar",false);
+
+
 if(document.getElementById("sDiv") == null){
 if(document.getElementsByClassName('ytPlayerProgressBarHost')[0] != null){
 document.getElementsByClassName('ytPlayerProgressBarHost')[0].appendChild(sDiv);
@@ -193,6 +316,10 @@ document.getElementsByClassName('ytPlayerProgressBarHost')[0].appendChild(sDiv);
 try{document.getElementsByClassName('ytProgressBarLineProgressBarLine')[0].appendChild(sDiv);}catch{}
 }
 }
+
+
+
+
 }
 
 
@@ -225,14 +352,14 @@ dislikes=getDislikesInLocale(parseInt(jsonObject.dislikes));
 
 
 /*Check For Sponsorships*/
-function checkSponsors(Url){
+async function checkSponsors(Url){
 
 
 if(Url.indexOf("watch") > -1){
 
 sTime=[];
 
-fetch("https://sponsor.ajay.app/api/skipSegments?videoID="+new URL(Url).searchParams.get("v"))
+await fetch("https://sponsor.ajay.app/api/skipSegments?videoID="+new URL(Url).searchParams.get("v"))
 .then(response => {
 return response.json();
 }).then(jsonObject => {
@@ -243,15 +370,19 @@ sTime.push(time);
 }).catch(error => {});
 
 
+
 /*Skip the Sponsor*/
-document.getElementsByClassName('video-stream')[0].ontimeupdate=()=>{
+var player = await waitForElement(".video-stream",true);
+
+
+player.ontimeupdate=()=>{
 skipSponsor();
-var cur=document.getElementsByClassName('video-stream')[0].currentTime;
+var cur=player.currentTime;
 for(var x in sTime){
 var s2=sTime[x];
 if(Math.floor(cur) == Math.floor(s2[0])){
 if(localStorage.getItem("autoSpn") == "true"){
-document.getElementsByClassName('video-stream')[0].currentTime=s2[1];
+player.currentTime=s2[1];
 addSkipper(s2[0]);
 }
 }
@@ -299,19 +430,11 @@ checkSponsors(window.location.href);
 
 if((window.location.pathname.indexOf("watch") > -1) || (window.location.pathname.indexOf("shorts") > -1)){
 var unV=setInterval(() => {
-/*Set Orientation*/
 
-var v=document.getElementsByClassName('video-stream')[0].getBoundingClientRect();
-if(v.height > v.width){
-Android.fullScreen(true);
-}
-else{
-Android.fullScreen(false);
-}
 
 /*Unmute The Video*/ 
 
-//document.getElementsByClassName('video-stream')[0].muted=false;
+document.getElementsByClassName('video-stream')[0].muted=false;
 
 if(!document.getElementsByClassName('video-stream')[0].muted){
 clearInterval(unV);
@@ -363,6 +486,65 @@ return t;
 }
 
 
+/*Get Codecs*/
+function getYTPROCodecs(){
+var t=`<p style="text-align:center;font-size:14px;">This feature is experimental , this may break YouTube Pro if not configured correctly. By default all the codecs are enabled , tap on the buttons below to switch them.</p><br> <vc  style="font-size:14px;">Video Codecs</vc><br>`;
+
+for(var y in YTPROCodecs.video){
+
+var x=YTPROCodecs.video[y];
+
+t+=`<button onclick="setRemoveCodec('${x}',this)" ${("true" == localStorage.getItem(x)) ? `style="background:${c};color:${dc};"` : "" } >${x}
+<svg  ${("true" != localStorage.getItem(x)) ? `style="display:none"` : "" } xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${dc}"  viewBox="0 0 16 16">
+<path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/>
+</svg>
+</button>`;
+}
+
+t+=`<br><br><vc  style="font-size:14px">Audio Codecs</vc><br>`
+for(var y in YTPROCodecs.audio){
+
+var x=YTPROCodecs.audio[y];
+
+t+=`<button onclick="setRemoveCodec('${x}',this)" ${("true" == localStorage.getItem(x)) ? `style="background:${c};color:${dc};"` : "" } >${x}
+<svg ${("true" != localStorage.getItem(x)) ? `style="display:none"` : "" } xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${dc}"  viewBox="0 0 16 16">
+<path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/>
+</svg>
+</button>`;
+}
+
+t+=`<br><br>
+<div>Block 60FPS <span onclick="sttCnf(this,'block_60fps');" style="${sttCnf(0,0,"fzoom")}" ><b style="${sttCnf(0,1,"fzoom")}" ></b></span></div> `;
+
+t+=`<br><br><button onclick="this.parentElement.style.display='none';" style="margin-top:10px;width:25%;float:right;text-align:center;background:${c};color:${dc};" >Done</button>`;
+
+
+return t;
+
+}
+
+
+function setRemoveCodec(x,y){
+
+
+if(localStorage[x] == "true"){
+localStorage.setItem(x,"false");
+y.style.background=isD ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.1)";
+y.style.color=c;
+y.children[0].style.display="none";
+}else{
+localStorage.setItem(x,"true");
+y.style.background=c;
+y.style.color=dc;
+y.children[0].style.display="block";
+}
+
+
+
+
+}
+
+
 /*The settings tab*/
 async function ytproSettings(){
 var ytpSet=document.createElement("div");
@@ -372,11 +554,12 @@ ytpSetI.setAttribute("id","ssprodivI");
 ytpSet.setAttribute("style",`
 height:100%;width:100%;position:fixed;top:0;left:0;
 display:flex;justify-content:center;
-background:rgba(0,0,0,0.4);
+background:rgba(0,0,0,0.7);
 z-index:9999;
 `);
 ytpSet.addEventListener("click",
 function(ev){
+
 if(!(ev.target == ytpSetI  || ytpSetI.contains(ev.target))){
 
 history.back();
@@ -465,7 +648,7 @@ border-radius:0 0 25px 25px;
 backdrop-filter:blur(10px);
 height:15px;
 }
-#ssprodivI .geminiModels,#ssprodivI .geminiPrompt{
+#ssprodivI .geminiModels,#ssprodivI .disableCodecs,#ssprodivI .geminiPrompt{
 height:auto;
 min-height:100px;
 padding-bottom:12px;
@@ -480,12 +663,30 @@ box-shadow:0px 0px 5px black;
 border-radius:25px;
 display:none;
 }
+#ssprodivI .geminiModels:before,#ssprodivI .disableCodecs:before,#ssprodivI .geminiPrompt:before{
+height:100%;
+width:100%;
+background:rgba(0,0,0,.6);
+position:fixed;
+top:0;
+left:0;
+z-index:-999;
+}
 #ssprodivI .geminiPrompt textarea{
 height:300px;
 width:95%;
 border-radius:20px;
 padding:15px;
 background:${d};
+}
+#ssprodivI .disableCodecs{
+column:50%;
+}
+#ssprodivI .disableCodecs button{
+width:48%;
+column:50%;
+margin-right:2%;
+color:${c};
 }
 </style>`;
 ytpSetI.innerHTML+=`<br><b style='font-size:18px' >YT PRO Settings</b>
@@ -511,6 +712,8 @@ ytpSetI.innerHTML+=`<br><b style='font-size:18px' >YT PRO Settings</b>
 <br>
 <div>Force Zoom <span onclick="sttCnf(this,'fzoom');" style="${sttCnf(0,0,"fzoom")}" ><b style="${sttCnf(0,1,"fzoom")}" ></b></span></div> 
 <br>
+<div>Background Play <span onclick="sttCnf(this,'bgplay');" style="${sttCnf(0,0,"bgplay")}" ><b style="${sttCnf(0,1,"bgplay")}" ></b></span></div> 
+<br>
 <div>Hide Shorts <span onclick="sttCnf(this,'shorts');" style="${sttCnf(0,0,"shorts")}" ><b style="${sttCnf(0,1,"shorts")}" ></b></span></div> 
 <br>
 <div>Use single Gemini chat <span onclick="sttCnf(this,'saveCInfo');" style="${sttCnf(0,0,"saveCInfo")}" ><b style="${sttCnf(0,1,"saveCInfo")}"></b></span></div>
@@ -527,11 +730,19 @@ ytpSetI.innerHTML+=`<br><b style='font-size:18px' >YT PRO Settings</b>
 </svg>
 </button>
 <br>
+<button onclick="document.getElementsByClassName('disableCodecs')[0].style.display='block';document.getElementsByClassName('disableCodecs')[0].innerHTML=getYTPROCodecs();">Disable Codecs
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${isD ? "#ccc" : "#444"}" viewBox="0 0 16 16">
+<path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
+</svg>
+</button>
+<br>
 <button onclick="Android.oplink('https://github.com/prateek-chaubey/YTPRO/issues')">Report Bugs
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${isD ? "#ccc" : "#444"}" viewBox="0 0 16 16">
 <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
 </svg>
 </button>
+<br>
+<div>Developer Mode <span onclick="sttCnf(this,'devMode');" style="${sttCnf(0,0,"devMode")}" ><b style="${sttCnf(0,1,"devMode")}"></b></span></div>
 <br><br>
 <p style="font-size:1.25rem;width:calc(100% - 20px);margin:auto;text-align:left"><b style="font-weight:bold">Disclaimer</b>: This is an unofficial OSS Youtube Mod, all the logos and brand names are property of Google LLC.<br>
 You can find the source code at <a href="#" style="font-family:monospace;" onclick="Android.oplink('https://github.com/prateek-chaubey/YTPRO')" > https://github.com/prateek-chaubey/YTPRO</a>
@@ -553,6 +764,11 @@ ${localStorage.getItem("prompt")}
 </div>
 
 
+<div class="disableCodecs">
+
+</div>
+
+
 <div class="credit" >
 <z style="margin-right:6px">Made with </z>
 
@@ -567,8 +783,12 @@ stroke="black" ${ !isD ? "stroke-width='1'" : "" } stroke-linejoin="round" strok
 </div>
 `;
 
+
+
 document.body.appendChild(ytpSet);
 ytpSet.appendChild(ytpSetI);
+
+
 
 }
 
@@ -576,7 +796,32 @@ ytpSet.appendChild(ytpSetI);
 
 function searchUrl(x,e){
 if(e.keyCode === 13 || e === "Enter"){
-window.location.href=x.value;
+//window.location.href=x.value;
+var url="",id="";
+var u=x.value;
+try{
+url=new URL(u);
+}catch{
+Android.showToast("Enter a valid URL");
+return;
+}
+if((url.hostname.indexOf("youtube.com") > -1) || (url.hostname.indexOf("youtu.be") > -1) ){
+if(url.pathname.indexOf("shorts") > -1){
+id=url.pathname.substr(8,url.pathname.length);
+}
+else if(url.pathname.indexOf("watch") > -1){
+id=url.searchParams.get("v");
+}else if(url.hostname.indexOf("youtu.be") > -1){
+id=id=url.pathname.substr(1,url.pathname.length);
+}
+}
+
+var a=document.createElement("a");
+a.href=`/watch?v=${id}`;
+document.body.appendChild(a);
+try{document.getElementById("settingsprodiv").remove();}catch{}
+a.click();
+
 }
 }
 
@@ -584,11 +829,12 @@ function checkUpdates(){
 if(parseFloat(Android.getInfo()) < parseFloat(YTProVer) ){
 updateModel();
 }else{
-alert("Your app is up to date");
+Android.showToast("Your app is up to date");
 }
 
 fetch('https://cdn.jsdelivr.net/npm/ytpro', {cache: 'reload'});
 fetch('https://cdn.jsdelivr.net/npm/ytpro/bgplay.js', {cache: 'reload'});
+fetch('https://cdn.jsdelivr.net/npm/ytpro/innertube.js', {cache: 'reload'});
 }
 
 
@@ -640,7 +886,25 @@ document.getElementsByName("viewport")[0].setAttribute("content","width=device-w
 document.getElementsByName("viewport")[0].setAttribute("content","");
 }
 
+
+
+if(localStorage.getItem("bgplay") == "true"){
+Android.setBgPlay(true);
+}else{
+Android.setBgPlay(false);
 }
+
+if(localStorage.getItem("devMode") == "false"){
+try{eruda.destroy();}catch{}
+}else{
+window.location.href=`javascript:(function () { var script = document.createElement('script'); script.src="//cdn.jsdelivr.net/npm/eruda"; document.body.appendChild(script); script.onload = function () { eruda.init();} })();`;
+}
+
+
+
+}
+
+
 
 
 /*Format File Size*/
@@ -671,7 +935,7 @@ history.back();
 });
 
 ytproDownDiv.setAttribute("style",`
-height:50%;width:85%;overflow:auto;background:${isD ? "#0f0f0f" : "#fff"};
+height:50%;width:85%;overflow:auto;background:${isD ? "#212121" : "#f1f1f1"};
 position:absolute;bottom:20px;
 z-index:99999999999999;padding:20px;text-align:center;border-radius:25px;text-align:center;
 `);
@@ -690,116 +954,13 @@ id=new URLSearchParams(window.location.search).get("v");
 
 ytproDownDiv.innerHTML="Loading...";
 
-Android.fetchYouTubeData(id,false);
-}
-
-
-
-
-/*Callback funtion for the response recived by the java extractor*/
-
-
-
-function callbackVideoResponse(info,bgplay){
-
-console.log(info);
-
-if(bgplay){
-return backToBgplay(info);
-}
-
-
-if(Object.keys(info).length === 0){
-history.back();
-return Android.showToast("Download Error , Please open and issue on Github if the error persists.\n\n");
-}
-
-var ytproDownDiv=document.getElementById("downytprodiv");
-
-var thumb=info?.videoDetails?.thumbnail?.thumbnails;
-var vids=info?.streamingData?.formats;
-var avids=info?.streamingData?.adaptiveFormats;
-var cap=info?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
-var t=info?.videoDetails?.title.replaceAll("|","").replaceAll("\\","").replaceAll("?","").replaceAll("*","").replaceAll("<","").replaceAll("/","").replaceAll(":","").replaceAll('"',"").replaceAll(">","").replaceAll("'","");
-ytproDownDiv.innerHTML=`<style>#downytprodiv a{text-decoration:none;} #downytprodiv li{list-style:none; display:flex;align-items:center;justify-content:center;border-radius:25px;padding:8px;background:${isD ? "rgb(10,0,0)" : d };margin:5px;margin-top:8px}</style>`;
-
-
-
-ytproDownDiv.innerHTML+="Select Avilaible Formats<ul id='listurl'>";
-
-for(var x in vids){
-
-var url=vids[x].url;
-
-ytproDownDiv.innerHTML+=`<li data-ytprotit="${t}"  onclick="YTDownVid(this,'.mp4')"  data-ytprourl="${url}">
-${downBtn}<span style="margin-left:10px;"  >${vids[x].qualityLabel} ${formatFileSize(((vids[x].bitrate*(vids[x].approxDurationMs/1000))/8))} </span></li>` ;
-}
-
-
-ytproDownDiv.innerHTML+=`<li id="showAdaptives" onclick="showHideAdaptives()" style="min-height:20px;border-radius:5px">
-Show Adaptive Formats (No Audio) 
-<span style="margin-left:10px;"  >
-<svg style="margin-top:5px" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${c}"  viewBox="0 0 18 18">
-<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
-</svg>
-</span>
-</li>` ;
-
-
-for(x in avids){
-if(!(avids[x].mimeType.indexOf("audio") > -1)){
-var url=avids[x].url;
-ytproDownDiv.innerHTML+=`<li data-ytprotit="${t}" class="adpFormats" style="display:none;"  onclick="YTDownVid(this,'.mp4')"  data-ytprourl="${url}">
-${downBtn}<span style="margin-left:10px;"  >${avids[x].qualityLabel} ${formatFileSize(avids[x].contentLength)} 
-</span></li>` ;
-}
-}
-
-
-for(x in avids){
-if(avids[x].mimeType.indexOf("audio") > -1){
-var url=avids[x].url;
-ytproDownDiv.innerHTML+=`<li data-ytprotit="${t}"  onclick="YTDownVid(this,'.mp3')"  data-ytprourl="${url}">
-${downBtn}<span style="margin-left:10px;"  >Audio | ${avids[x].audioQuality.replace("AUDIO_QUALITY_","")}${formatFileSize(avids[x].contentLength)} 
-</span></li>` ;
-}
-}
-
-
-
-ytproDownDiv.innerHTML+="<br>Thumbnails<br><br><style>.thu{height:80px;border-radius:5px;}.thu img{max-height:97%;max-width:70%;border-radius:10px;border:1px solid silver;}</style>";
-for(x in thumb){
-ytproDownDiv.innerHTML+=`<li data-ytprotit="${t+Date.now()}"  onclick="YTDownVid(this,'.png')" class="thu" data-ytprourl="${thumb[x].url}">
-<img src="${thumb[x].url}"><br>
-<span style="margin-left:30px;display:flex;align-items:center;justify-content:center;"  >${downBtn}<span style="margin-left:10px;"  >${thumb[x].height} &#x2715; ${thumb[x].width}
-</span></span></li>` ;
-}
-
-if(cap && cap.length){
-ytproDownDiv.innerHTML+=`<br>Captions<br><br><style>cp{width:100%;height:auto;padding-bottom:8px;}c{height:45px;width:50px;padding-top:5px;background:${d};border-radius:10px;margin-left:10px;display:block}</style>`;
-for(var x in cap){
-cap[x].baseUrl = cap[x].baseUrl.replace("&fmt=srv3","");
-ytproDownDiv.innerHTML+=`<cp>
-<br><br>
-<span style="width:100px;text-align:left">${cap[x]?.name?.runs[0]?.text}</span> 
-<br><br>
-<div style="position:absolute;right:10px;display:flex">
-<c onclick="downCap('${cap[x].baseUrl}&fmt=sbv','${t}.txt')">${downBtn} <br>.txt</c>
-<c onclick="downCap('${cap[x].baseUrl}&fmt=srt','${t}.srt')">${downBtn} <br>.srt</c>
-<c onclick="downCap('${cap[x].baseUrl}','${t}.xml')" >${downBtn} <br>.xml</c>
-<c onclick="downCap('${cap[x].baseUrl}&fmt=vtt','${t}.vtt')">${downBtn} <br>.vtt</c>
-<c onclick="downCap('${cap[x].baseUrl}&fmt=srv1','${t}.srv1')">${downBtn} <br>.srv1</c><c onclick="downCap('${cap[x].baseUrl}&fmt=ttml','${t}.ttml')">${downBtn} <br>.ttml</c></div>
-<br>
-</cp>
-<br><br>
-`;
-}
-}
-
-
-
+window.getDownloadStreams();
 
 }
+
+
+
+
 
 function showHideAdaptives(){
 var z=document.querySelectorAll(".adpFormats");
@@ -832,7 +993,6 @@ mtype="audio/mp3";
 }
 
 //console.log(o.getAttribute("data-ytprourl"))
-
 
 Android.downvid((o.getAttribute("data-ytprotit")+ex),o.getAttribute("data-ytprourl"),mtype);
 }
@@ -871,34 +1031,18 @@ checkDirection();
 
 }, { capture: true });
 
-/*if coming back from fullscreen > the zIndex*/
-/*
-document.addEventListener("fullscreenchange", ()=>{
-if(document.fullscreenElement == null){
-try{
-document.getElementById("miniIframe").style.display="none";
-}catch{}
-}
-});
-*/
+
 
 navigation.addEventListener("navigate", e => {
 if(e.destination.url.indexOf("watch") > -1 || e.destination.url.indexOf("shorts") > -1){
 
 
-var v=document.getElementsByClassName('video-stream')[0];
-v.onloadeddata=()=>{
-if(v.getBoundingClientRect().height > v.getBoundingClientRect().width){
-Android.fullScreen(true);
-}
-else{
-Android.fullScreen(false);
-}
-}
-
 
 fDislikes(e.destination.url);
 checkSponsors(e.destination.url);
+
+
+
 }
 });
 
@@ -995,8 +1139,9 @@ if(yes){
 
 iframe.style.display="block";
 
+
 player.setAttribute("ogTop",getComputedStyle(player).top)
-//console.log(player.getAttribute("ogTop"))
+
 
 player.style.transform="scale(0.65)";
 player.style.top=(window.screen.height-(player.getBoundingClientRect().height*2))+"px";
@@ -1011,6 +1156,10 @@ iframe.style.display="none";
 
 player.style.transform="scale(1)";
 player.style.top=player.getAttribute("ogTop");
+player.style.zIndex="normal";
+
+player.removeAttribute("ogTop");
+
 
 }
 }
@@ -1038,6 +1187,7 @@ callbackGeminiClient.resolve = resolve;
 /*Handles the reponse*/
 function handleGeminiResponse(res){
 
+
 /*Extract the body from the response*/
 const getBody=(x)=>{
 for(var i in x){
@@ -1057,7 +1207,7 @@ var time=new URL(urls[i]).searchParams.get("t");
 if(time != null){
 html=html.replace(x,`href="javascript:void(0);" onclick="document.getElementsByClassName('video-stream')[0].currentTime='${time}'"`)
 }else if(urls[i].indexOf("youtube.com") < 0 && urls[i].indexOf("youtu.be") < 0){
-html=html.replace(x,`href="javascript:void(0);" onclick="Android.oplink('${urls[i]}')"`)
+html=html.replace(x,`href="javascript:void(0);" onclick="try{document.getElementsByClassName('video-stream')[0].pause();}catch{}Android.oplink('${urls[i]}')"`)
 }
 })
 return html;
@@ -1079,6 +1229,7 @@ var responseJson=JSON.parse(lines[2])
 
 var body=getBody(responseJson) || [];
 
+//console.log(body)
 
 var chat=[];
 
@@ -1105,12 +1256,11 @@ alt:img[0][4],
 title:img[7][0]
 });
 
-text=text.replace(img[7][0],`<img src="${img[0][0][0]}">`);
+text+=`<center><img alt="${img[0][4]}" src="${img[0][0][0]}"></center>`;
 }
 
 //console.log(text,"\n\n\n-------- \n\n"+thoughts)
 
-//console.log(images)
 
 
 
@@ -1255,7 +1405,7 @@ handleGeminiResponse(response);
 
 
 /*THE 0NE AND 0NLY FUNCTION*/
-function pkc(){
+async function pkc(){
 
 if(window.location.href.indexOf("youtube.com/watch") > -1){
 
@@ -1295,7 +1445,7 @@ insertAfter(document.getElementsByClassName('slim-video-action-bar-actions')[0],
 
 var ytproMainDiv=document.createElement("div");
 ytproMainDiv.setAttribute("style",`
-height:50px;width:120%;display:flex;overflow:auto;
+height:50px;width:100%;display:flex;overflow:auto;
 align-items:center;justify-content:center;padding-left:20px;padding-right:10px;
 `);
 ytproMainDivA.appendChild(ytproMainDiv);
@@ -1457,49 +1607,17 @@ ytproPIPVidElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" he
 ytproMainDiv.appendChild(ytproPIPVidElem);
 ytproPIPVidElem.addEventListener("click",
 function(){
-isAP=false;
-PIPlayer2();
-});
-
-
-
-/*Music Button*/
-var ytproAudElem=document.createElement("div");
-sty(ytproAudElem);
-ytproAudElem.style.width="110px";
-ytproAudElem.innerHTML=`
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${c}" viewBox="0 0 16 16">
-<path fill-rule="evenodd" d="M8.5 2a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-1 0v-11a.5.5 0 0 1 .5-.5zm-2 2a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zm4 0a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zm-6 1.5A.5.5 0 0 1 5 6v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm8 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm-10 1A.5.5 0 0 1 3 7v2a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5zm12 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5z"/>
-</svg>
-<span style="margin-left:8px">BG Play<span>`;
-ytproMainDiv.appendChild(ytproAudElem);
-ytproAudElem.addEventListener("click",
-function(){
-
-
-
-if(parseFloat(Android.getInfo()) < parseFloat(YTProVer)){
-return updateModel();
-}
-
-window.location.hash="bgplay";
+PIPlayer(true);
 });
 
 
 
 
+
 }
 
 
 
-
-/*Watch The old and New URL*/
-if(ytoldV != (new URLSearchParams(window.location.search)).get('v')){
-try{document.getElementById("ytproMainAudDivE").remove();}catch{console.log("No Element Found");}
-isAPlaying=false;
-ytoldV=(new URLSearchParams(window.location.search)).get('v');
-//window.location.href=window.location.href;
-}
 
 
 }else if(window.location.href.indexOf("youtube.com/shorts") > -1){
@@ -1509,17 +1627,18 @@ ytoldV=(new URLSearchParams(window.location.search)).get('v');
 if(document.getElementById("ytproMainSDivE") == null){
 var ys=document.createElement("div");
 ys.setAttribute("id","ytproMainSDivE");
-ys.setAttribute("style",`width:50px;height:100px;position:absolute;display:block;right:10px;bottom:500px;`);
+ys.setAttribute("style",`width:50px;height:auto;position:relative;display:block;`);
 
 
 /*Download Button*/
 ysDown=document.createElement("div");
 ysDown.setAttribute("style",`
-height:50px;width:50px;text-align:center;line-height:65px;display:block;overflow:auto;
-background:rgba(0,0,0,.4);border-radius:50%;margin-bottom:25px;
+height:48px;width:48px;display:flex;align-items:center;justify-content:center;
+background:rgba(0,0,0,.3);border-radius:50%;margin-bottom:20px;
 `);
-ysDown.innerHTML=downBtn.replace(`width="18"`,`width="26"`).replace(`height="18"`,`height="26"`)+
-`<span style="position:absolute;bottom:5px;color:white;font-size:14px;left:-10px">Download<span>`;
+ysDown.innerHTML=downBtn.replace(`fill="${c}"`,`fill="#fff"`).replace(`width="18"`,`width="30"`).replace(`height="18"`,`height="30"`);
+
+
 ysDown.addEventListener("click",
 function(){
 window.location.hash="download";
@@ -1529,19 +1648,20 @@ window.location.hash="download";
 /*Heart Button*/
 ysHeart=document.createElement("div");
 ysHeart.setAttribute("style",`
-height:50px;width:50px;text-align:center;line-height:65px;display:block;overflow:auto;
-background:rgba(0,0,0,.4);border-radius:50%;margin-top:8px;margin-bottom:0px;
+height:48px;width:48px;
+display:flex;align-items:center;justify-content:center;
+background:rgba(0,0,0,.3);border-radius:50%;margin-top:8px;margin-bottom:0px;
 `);
 
 
 if(!isHeart()){
-ysHeart.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="${c}" viewBox="0 0 16 16">
+ysHeart.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#fff" viewBox="0 0 16 16">
 <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-</svg><span style="position:absolute;bottom:-70px;color:white;font-size:14px;left:7px">Heart<span>`;
+</svg>`;
 }else{
 ysHeart.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#f00" viewBox="0 0 16 16">
 <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-</svg><span style="position:absolute;bottom:-70px;color:white;font-size:14px;left:7px">Heart<span>`;
+</svg>`;
 }
 
 
@@ -1554,20 +1674,18 @@ ytProHeart(ysHeart);
 
 
 
-insertAfter(document.getElementsByClassName("reel-player-overlay-actions")[0],ys);
+try{
+document.getElementsByClassName("reel-player-overlay-actions")[0].insertBefore(ys,document.getElementsByClassName("reel-player-overlay-actions")[0].children[0]);
 ys.appendChild(ysDown);
 ys.appendChild(ysHeart);
+}catch{}
+
 }
 
 try{document.querySelectorAll('[aria-label="Dislike this video"]')[0].nextElementSibling.children[0].innerHTML=dislikes;}catch{}
 
 
 
-if(document.getElementsByClassName('video-stream')[0].paused){
-if(document.getElementById("ytproMainSDivE") != null) document.getElementById("ytproMainSDivE").style.bottom="510px";
-}else{
-if(document.getElementById("ytproMainSDivE") != null) document.getElementById("ytproMainSDivE").style.bottom="470px";
-}
 
 
 /*Watch The old and New URL*
@@ -1580,6 +1698,12 @@ ytoldV=window.location.pathname;
 }
 
 }
+
+
+setInterval(pkc,0);
+
+
+
 
 
 /*SHOW HEARTS*/
@@ -1708,14 +1832,16 @@ title:ytplayer.config.args.raw_player_response?.videoDetails?.title.replaceAll("
 
 var g="16";
 var h=`<span style="margin-left:8px">Heart<span>`;
-(window.location.href.indexOf('youtube.com/shorts') > -1) ? h=`<span style="position:absolute;bottom:-70px;color:white;font-size:14px;left:7px">Heart<span>`:h=`<span style="margin-left:8px">Heart<span>`;
+(window.location.href.indexOf('youtube.com/shorts') > -1) ? h=``:h=`<span style="margin-left:8px">Heart<span>`;
 (window.location.href.indexOf('youtube.com/shorts') > -1) ? g="23" : g="16" ;
+
+
 
 if(localStorage.getItem("hearts")?.indexOf(vid) > -1){
 var j=JSON.parse(localStorage.getItem("hearts") || "{}");
 delete j[vid];
 localStorage.setItem("hearts",JSON.stringify(j));
-x.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="${g}" height="${g}" fill="${c}" viewBox="0 0 16 16">
+x.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="${g}" height="${g}" fill="${(window.location.href.indexOf('youtube.com/shorts') > -1) ? "#fff" : c }" viewBox="0 0 16 16">
 <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
 </svg>${h}`;
 }else{
@@ -1745,55 +1871,165 @@ return false;
 
 
 /*Refactoring the code after months , i really don't know what miracle this piece does*/
+//Refactoring again and now ik what it does lmao
+
 function removePIP(){
-if(!isF){
-document.exitFullscreen();
-}
-isAP=false;
-}
 
 
+pauseAllowed = true;
+
+pipSize();
 
 
-function PIPlayer(){
-if(isAP == false) PIPlayer1();
-}
-
-function PIPlayer1(){
-
-try{stopPlayback();}catch{console.log("Audio Not Playing");}
-if(document.getElementById('player-container-id') === document.fullscreenElement){
-isF=true;
-}
-else{
-isF=false;
-}
-if(!document.getElementsByClassName('video-stream')[0].paused){
-if(!isF){
-document.getElementsByClassName("fullscreen-icon")[0].click();
-}
-Android.pipvid("pip");
-var o=0;
-var h=setInterval(()=>{o+=1;if(o==10){clearInterval(h);}document.getElementsByClassName('video-stream')[0].play(); },10);
-}
-}
-
-
-
-function PIPlayer2(){
-try{stopPlayback();}catch{console.log("No Audio Playing");}
-if(document.getElementById('player-container-id') === document.fullscreenElement){
-isF=true;
-}
-else{
-isF=false;
-}
-isHPIP=false;
-Android.pipvid("pip");
-if(!isF){
-document.getElementsByClassName("fullscreen-icon")[0].click();
-}
+document.getElementsByClassName('video-stream')[0].pause();
+setTimeout(()=>{
 document.getElementsByClassName('video-stream')[0].play();
+
+// was about to fix the bug , but realised i can fix it later
+/*
+if(isF){
+document.getElementById("player-container-id").requestFullscreen();
+}*/
+
+},5);
+
+//console.log("pauseAllowed: ",pauseAllowed)
+
+
+}
+
+
+
+
+function PIPlayer(pip = false){
+
+
+
+var v=document.getElementsByClassName('video-stream')[0];
+
+
+
+if(!( (pip || (!pip && !v.paused)) && (window.location.pathname.indexOf("watch") > 0))) return; 
+
+
+
+
+//there's a bug , i will fix it later
+if(document.getElementById('player-container-id') === document.fullscreenElement) return;
+
+
+
+
+v.play();
+
+pauseAllowed = false;
+
+
+
+if(v.getBoundingClientRect().height > v.getBoundingClientRect().width){
+Android.pipvid("portrait");
+}
+else{
+Android.pipvid("landscape");
+}
+
+//setTimeout(()=>{Android.bgPlay(v.currentTime*1000);},100);
+
+
+
+var player=document.getElementById("player-container-id");
+var video = document.getElementsByClassName('video-stream')[0];
+
+player.setAttribute("ogTop",getComputedStyle(player).top)
+player.setAttribute("zI",getComputedStyle(player).zIndex)
+player.setAttribute("ogHeight",player.getBoundingClientRect().height)
+player.setAttribute("ogWidth",player.getBoundingClientRect().width)
+
+video.setAttribute("ogHeight",video.getBoundingClientRect().height)
+video.setAttribute("ogWidth",video.getBoundingClientRect().width);
+video.setAttribute("ogTop",getComputedStyle(video).top);
+
+
+
+}
+
+
+
+
+
+function pipSize(){
+
+
+var player=document.getElementById("player-container-id");
+var video = document.getElementsByClassName('video-stream')[0];
+
+if(video == null || player == null) return;
+
+if(!pauseAllowed){
+
+
+
+
+Object.assign(player.style,{
+"z-index":9999999,
+top:0
+})
+
+
+Object.assign(video.style,{
+height:window.innerHeight+"px",
+width:window.innerWidth+"px",
+top:0,
+left:0,
+position:"fixed"
+});
+
+video.style.zIndex="999999999999999";
+
+
+
+document.getElementById("player-control-container").style.display="none";
+
+document.getElementById("movie_player").removeAttribute("style");
+
+
+//console.log("window",window.innerHeight,window.innerWidth)
+//console.log("video",document.getElementsByClassName('video-stream')[0].getBoundingClientRect().height,document.getElementsByClassName('video-stream')[0].getBoundingClientRect().width)
+
+}else{
+
+
+if(document.getElementsByClassName('video-stream')[0].getAttribute("ogTop") == null) return;
+
+
+Object.assign(player.style,{
+top:player.getAttribute("ogTop"),
+"z-index":player.getAttribute("zI"),
+});
+
+
+Object.assign(video.style,{
+height:video.getAttribute("ogHeight")+"px",
+width:video.getAttribute("ogWidth")+"px",
+top:video.getAttribute("ogTop"),
+"z-index":"auto",
+position:"absolute"
+});
+
+player.removeAttribute("ogTop");
+player.removeAttribute("zI");
+player.removeAttribute("ogHeight");
+player.removeAttribute("ogWidth");
+
+video.removeAttribute("ogTop");
+video.removeAttribute("ogHeight");
+video.removeAttribute("ogWidth");
+
+
+document.getElementById("player-control-container").style.display="block";
+
+}
+
 }
 
 
@@ -1802,12 +2038,66 @@ document.getElementsByClassName('video-stream')[0].play();
 
 
 
-setInterval(pkc,0);
+
+
+
+
+
+
+
+// well this is for bypassing the pause function of Youtube when video is in
+// PIP mode , its a workaround for now , until i find a proper method
+// to allow the pip mode for the video element , like chromium browsers
+
+HTMLMediaElement.prototype.pause = function() {
+
+//console.log("PIP: "+PIPause,"Pauseallowed: " + pauseAllowed,"All: "+pauseAllowed || PIPause)
+
+if (pauseAllowed || PIPause) {
+return originalPause.apply(this, arguments);
+}
+
+if (this.paused) {
+this.play().catch(() => {});
+}
+};
+
+
+
+
+
+
+
+
+
+
+
+
+const originalRequestFullscreen = Element.prototype.requestFullscreen;
+Element.prototype.requestFullscreen = function (...args) {
+
+
+var video = document.getElementsByClassName('video-stream')[0];
+
+
+
+if(video.getBoundingClientRect().height > video.getBoundingClientRect().width){
+Android.fullScreen(true);
+}
+else{
+Android.fullScreen(false);
+}
+
+return originalRequestFullscreen.apply(this, args);
+};
+
+
+
+
 
 
 /*Check The Hash Change*/
 window.onhashchange=()=>{
-try{stopPlayback();}catch{}
 try{document.getElementById("outerdownytprodiv").remove();}catch{}
 try{document.getElementById("outerheartsdiv").remove();}catch{}
 try{document.getElementById("settingsprodiv").remove();}catch{}
@@ -1819,9 +2109,7 @@ ytproSettings();
 else if(window.location.hash == "#hearts"){
 showHearts();
 }
-else if(window.location.hash == "#bgplay"){
-ytproAudPlayer(new URLSearchParams(window.location.search).get("v"));
-}
+
 
 }
 
@@ -1831,6 +2119,12 @@ ytproAudPlayer(new URLSearchParams(window.location.search).get("v"));
 /****** I LOVE YOU <3 *****/
 /*YT ADS BLOCKER*/
 function adsBlock(){
+
+
+try{
+document.getElementsByClassName('video-stream')[0].removeAttribute('disablepictureinpicture');
+}catch{}
+
 
 /*Block Ads*/
 var ads=document.getElementsByTagName("ad-slot-renderer");
@@ -1868,6 +2162,12 @@ try{document.getElementsByTagName("ytm-paid-content-overlay-renderer")[0].style.
 /*Hide Shorts*/
 if(localStorage.getItem("shorts") == "true"){
 
+
+for( x in document.getElementsByClassName("big-shorts-singleton")){
+try{document.getElementsByClassName("big-shorts-singleton")[x].remove();
+}catch{}
+}
+
 for( x in document.getElementsByTagName("ytm-reel-shelf-renderer")){
 try{document.getElementsByTagName("ytm-reel-shelf-renderer")[x].remove();
 }catch{}
@@ -1896,46 +2196,55 @@ function addMaxButton(){
 
 
 var pElem=document.getElementById('player-container-id');
-if(pElem === document.fullscreenElement && localStorage.getItem("fitS") == "true"){
+if(pElem === document.fullscreenElement){
 
 
-//console.log("Full Screen")
+//console.log(screen.height , window.innerHeight,((screen.height - window.innerHeight ) > 5))
+
+if((screen.height - window.innerHeight) > 5) return;
+
+
+
 
 var Vv=document.getElementsByClassName('video-stream')[0];
 
 var mE=document.createElement("div");
+mE.setAttribute("id","mE");
+mE.setAttribute("style",`position:absolute;right:60px;padding:15px;`);
+
+
+
 
 if(localStorage.getItem("fitS") == "true"){
-mE.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${c}" viewBox="0 0 16 16">
+var scale = Math.max((screen.height / Vv.getBoundingClientRect().height) , (screen.width / Vv.getBoundingClientRect().width)); /// 2;
+mE.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#fff" viewBox="0 0 16 16">
 <path fill-rule="evenodd" d="M.172 15.828a.5.5 0 0 0 .707 0l4.096-4.096V14.5a.5.5 0 1 0 1 0v-3.975a.5.5 0 0 0-.5-.5H1.5a.5.5 0 0 0 0 1h2.768L.172 15.121a.5.5 0 0 0 0 .707zM15.828.172a.5.5 0 0 0-.707 0l-4.096 4.096V1.5a.5.5 0 1 0-1 0v3.975a.5.5 0 0 0 .5.5H14.5a.5.5 0 0 0 0-1h-2.768L15.828.879a.5.5 0 0 0 0-.707z"/>
 </svg>`;
 }else{
-mE.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${c}" viewBox="0 0 16 16">
+var scale = 1;
+mE.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#fff" viewBox="0 0 16 16">
 <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707z"/>
 </svg>`;
 }
 
 
-mE.setAttribute("id","mE");
-mE.setAttribute("style",`position:absolute;right:60px;padding:15px;`);
+console.log(scale)
 
-if(document.getElementById("mE") == null) {
-document.getElementsByClassName("player-controls-bottom")[0].appendChild(mE);
-}
+
 
 mE.addEventListener("click",()=>{
 var scale= Math.max((screen.height / Vv.getBoundingClientRect().height) , (screen.width / Vv.getBoundingClientRect().width)); 
 
 if (scale < 1) scale = 1;
 if((Vv.getBoundingClientRect().width / Vv.offsetWidth) > 1){
-Vv.style.transform=`scale(1)`;
+mE.setAttribute("scale",scale);
 
-mE.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-angle-expand" viewBox="0 0 16 16">
+mE.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#fff" viewBox="0 0 16 16">
 <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707z"/>
 </svg>`;
 }else{
-Vv.style.transform=`scale(${scale})`;
-mE.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-angle-contract" viewBox="0 0 16 16">
+mE.setAttribute("scale",scale);
+mE.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#fff" viewBox="0 0 16 16">
 <path fill-rule="evenodd" d="M.172 15.828a.5.5 0 0 0 .707 0l4.096-4.096V14.5a.5.5 0 1 0 1 0v-3.975a.5.5 0 0 0-.5-.5H1.5a.5.5 0 0 0 0 1h2.768L.172 15.121a.5.5 0 0 0 0 .707zM15.828.172a.5.5 0 0 0-.707 0l-4.096 4.096V1.5a.5.5 0 1 0-1 0v3.975a.5.5 0 0 0 .5.5H14.5a.5.5 0 0 0 0-1h-2.768L15.828.879a.5.5 0 0 0 0-.707z"/>
 </svg>`;
 }
@@ -1945,12 +2254,23 @@ mE.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fil
 //https://youtube.com/watch?v=SInH_fP0deQ
 // <3
 
+if(document.getElementById("mE") == null) {
+document.getElementsByClassName("player-controls-bottom")[0].appendChild(mE);
+mE.setAttribute("scale",scale);
+}
+
+
+Vv.style.transform=`scale(${document.getElementById("mE").getAttribute("scale")})`;
+
+
 }else{
 try{
 document.getElementsByClassName('video-stream')[0].style.transform="scale(1)";
 document.getElementById("mE").remove();
 }catch{}
 }
+
+
 
 }
 
@@ -1976,45 +2296,21 @@ const observer = new MutationObserver(() => {
 //ads Block
 adsBlock();
 
+//when video is in PIP
+pipSize();
 
 //mE button
 addMaxButton();
+
+
+//settingsTab
+addSettingsTab();
+
 
 });
 
 // Start observing changes in the body
 observer.observe(targetNode, config);
-
-
-
-
-
-
-
-
-
-
-
-//Add FitScreen Button
-document.getElementById('player-container-id').addEventListener("fullscreenchange",(ev)=>{
-if(document.fullscreenElement != null){
-setTimeout(()=>{
-var Vv=document.getElementsByClassName('video-stream')[0];
-
-var scale= Math.max((screen.height / Vv.getBoundingClientRect().height) , (screen.width / Vv.getBoundingClientRect().width)); /// 2;
-
-//console.log(scale, screen.height,screen.width,Vv.getBoundingClientRect().height,Vv.getBoundingClientRect().width)
-
-
-if (scale < 1) scale = 1;
-if(localStorage.getItem("fitS") == "true"){
-Vv.style.transform=`scale(${scale})`;
-}
-},10)
-}
-});
-
-
 
 
 
@@ -2028,12 +2324,12 @@ x.setAttribute("style",`height:100%;width:100%;position:fixed;display:grid;align
 
 x.innerHTML=`
 <div style="height:auto;width:70%;padding:20px;background:rgba(0,0,0,.6);border:1px solid #888;box-shadow:0px 0px 5px black;color:white;backdrop-filter:blur(10px);border-radius:15px;margin:auto">
-<h2> Update Available</h2><br>
+<h2> Mandatory Update </h2><br>
 Latest Version ${YTProVer} of YTPRO is available , update the YTPRO to get latest features.
-<br>- Added Gemini Support<br>
-- Summrize , analyze using Gemini<br>
-- Customizable prompts and models in Gemini<br>
-- Fixed and imporved the FitScreen feature<br>
+<br>- This update is mandatory as it fixes a ton of bugs and improves functionality <br>
+- Fixed PIP mode , BG Player , Downloads<br>
+- Now you can disable / enable codecs as per your choice<br>
+- Added media session in PIP Mode as well<br>
 - Optimized the UI of both Download and Settings menu<br>
 - Fixed the full screen bug<br>
 - Fixed bugs and improved functionality<br>
@@ -2041,7 +2337,7 @@ Latest Version ${YTProVer} of YTPRO is available , update the YTPRO to get lates
 <br>
 <br>
 <div style="display:flex;">
-<button style="border:0;border-radius:10px;height:30px;width:150px;background:;" onclick="this.parentElement.parentElement.parentElement.remove();">Cancel</button>
+<!--<button style="border:0;border-radius:10px;height:30px;width:150px;background:;" onclick="this.parentElement.parentElement.parentElement.remove();">Cancel</button>-->
 <button style="border:0;border-radius:10px;height:30px;width:150px;background:rgba(255,50,50,.7);float:right;" onclick="Android.downvid('YTPRO.zip','https://nightly.link/prateek-chaubey/YTPro/workflows/gradle/main/Apk.zip','application/zip');">Download</button>
 </div>
 
@@ -2060,7 +2356,6 @@ if(parseFloat(Android.getInfo()) < parseFloat(YTProVer) && (window.location.href
 updateModel();
 }
 
-
 };
 
 
@@ -2069,13 +2364,13 @@ updateModel();
 document.addEventListener('click',(event) => {
 
 let anchor = event.target.closest('a');
-if (anchor) {
+if (anchor){
 
 
 if(anchor.href.includes("www.youtube.com/redirect")){
 
 try{
-document.getElementsByClassName('video-stream')[0].pause;
+document.getElementsByClassName('video-stream')[0].pause();
 }catch{}
 
 const url=new URL(anchor.href).searchParams.get("q");
