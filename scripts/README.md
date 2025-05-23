@@ -20,7 +20,7 @@
 #### Screenshots
 | | | |
 |:--:|:--:|:--:| 
-|<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/01103.png'  > | <img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/01102.png'  > |<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/01101.png'  > |
+|<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/com.google.android.youtube.pro.jpg'  > | <img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/01102.png'  > |<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/01101.png'  > |
 
 ## Download YT PRO
 
