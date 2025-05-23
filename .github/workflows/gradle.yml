@@ -28,5 +28,5 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
-          name: Apk
+          name: YTPRO
           path: "app/build/outputs/apk/release/youtube_pro_signed.apk"
