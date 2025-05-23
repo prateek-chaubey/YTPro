@@ -17,6 +17,7 @@ import android.media.session.PlaybackState;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Base64;
+import android.util.Log;
 
 public class ForegroundService extends Service {
 
@@ -36,7 +37,7 @@ public class ForegroundService extends Service {
 
 
     private void initMediaSession() {
-        mediaSession = new MediaSession(getApplicationContext(), "YourMediaSessionTag");
+        mediaSession = new MediaSession(getApplicationContext(), "YTPROMediaSession");
         mediaSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
         mediaSession.setCallback(new MediaSession.Callback() {
@@ -45,6 +46,7 @@ public class ForegroundService extends Service {
                 super.onPlay();
                 getApplicationContext().sendBroadcast(new Intent("TRACKS_TRACKS")
                         .putExtra("actionname", "PLAY_ACTION"));
+                        Log.e("pause","play session called");
 
             }
 
@@ -53,6 +55,8 @@ public class ForegroundService extends Service {
                 super.onPause();
                 getApplicationContext().sendBroadcast(new Intent("TRACKS_TRACKS")
                         .putExtra("actionname", "PAUSE_ACTION"));
+                        
+                        Log.e("pause","pause session called");
             }
 
             @Override
@@ -118,8 +122,8 @@ public class ForegroundService extends Service {
             playbackState= PlaybackState.STATE_BUFFERING;
         }
 
-        updateMediaSessionMetadata(title, subtitle, largeIcon, duration); // Example usage
-        updatePlaybackState(currentPosition, playbackState); // Example usage
+        updateMediaSessionMetadata(title, subtitle, largeIcon, duration); 
+        updatePlaybackState(currentPosition, playbackState); 
 
         Intent openAppIntent = new Intent(cont, MainActivity.class);
         openAppIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -210,7 +214,19 @@ public class ForegroundService extends Service {
     private void setupNotification(Intent intent) {
         long duration = intent.getLongExtra("duration", 0);
         long currentPosition = intent.getLongExtra("currentPosition", 0);
-        int playbackState = intent.getIntExtra("playbackState", PlaybackState.STATE_NONE);
+        String action = intent.getStringExtra("action");
+        
+        int playbackState;
+        if("pause".equals(action)){
+            playbackState= PlaybackState.STATE_PAUSED;
+        }
+        else if("play".equals(action)){
+            playbackState= PlaybackState.STATE_PLAYING;
+        }else{
+            playbackState= PlaybackState.STATE_BUFFERING;
+        }
+        
+        
         String title = intent.getStringExtra("title");
         String subtitle = intent.getStringExtra("subtitle");
         String icon = intent.getStringExtra("icon");
@@ -244,25 +260,15 @@ public class ForegroundService extends Service {
                 .setContentTitle(title)
                 .setContentText(subtitle)
                 .setLargeIcon(largeIcon)
+                .setStyle(new Notification.MediaStyle().setMediaSession(mediaSession.getSessionToken()))
                 .setContentIntent(openAppPendingIntent);
 
-        // Set appropriate actions based on playback state
-        switch (playbackState) {
-            case PlaybackState.STATE_PLAYING:
-                builder.addAction(R.drawable.ic_pause_white, "Pause", pausePendingIntent);
-                break;
-            case PlaybackState.STATE_PAUSED:
-                builder.addAction(R.drawable.ic_play_arrow_white, "Play", playPendingIntent);
-                break;
-            case PlaybackState.STATE_BUFFERING:
-                // Add buffering related actions if needed
-                break;
-            default:
-                break;
-        }
 
-        builder.addAction(R.drawable.ic_skip_previous_white, "Previous", prevPendingIntent)
-                .addAction(R.drawable.ic_skip_next_white, "Next", nextPendingIntent);
+        builder.addAction(R.drawable.ic_skip_previous_white, "Previous", prevPendingIntent);
+        
+                    builder.addAction(R.drawable.ic_pause_white, "Pause", pausePendingIntent);
+                    
+                builder.addAction(R.drawable.ic_skip_next_white, "Next", nextPendingIntent);
 
         Notification notification = builder.build();
 
@@ -272,6 +278,12 @@ public class ForegroundService extends Service {
 
         startForeground(1, notification);
     }
+    
+    
+    
+    
+    
+    
     private void updateMediaSessionMetadata(String title, String artist, Bitmap albumArt, long duration) {
         MediaMetadata metadata = new MediaMetadata.Builder()
                 .putString(MediaMetadata.METADATA_KEY_TITLE, title)
@@ -292,12 +304,15 @@ public class ForegroundService extends Service {
 
     private void updatePlaybackState(long currentPosition, int state) {
         PlaybackState playbackState = new PlaybackState.Builder()
-                .setActions(PlaybackState.ACTION_PLAY_PAUSE
+                .setActions(PlaybackState.ACTION_PLAY
                         | PlaybackState.ACTION_SKIP_TO_NEXT
                         | PlaybackState.ACTION_PAUSE
                         | PlaybackState.ACTION_SKIP_TO_PREVIOUS | PlaybackState.ACTION_SEEK_TO)
                 .setState(state, currentPosition, 1.0f) // 1.0f for playback speed
                 .build();
+                
+                
+                // rn it doesn't have a function to increase the playback speed if someone increases it from the youtube player , cuz people don't usually use that , and i am too lazy to implement it here
 
         mediaSession.setPlaybackState(playbackState);
     }
