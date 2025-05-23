@@ -40,6 +40,7 @@
  * Shows Number of Dislikes
  * Background Audio Player
  * Custom Heart feature to save videos without logging into your account
+ * Enable / disable media codecs
  * Skip Sponsers
  * Force Zoom
  * Hide Shorts
@@ -63,6 +64,7 @@ The available variables for gemini prompt are
 ### Credits
  * [Sponsor Block](https://github.com/ajayyy/SponsorBlock)
  * [return-youtube-dislike](https://github.com/Anarios/return-youtube-dislike)
+ * [YouTube.js](https://github.com/LuanRT/YouTube.js/)
 
 ### ❤️Supporters❤️
 [![Stargazers repo roster for @prateek-chaubey/YTPro](http://reporoster.com/stars/dark/prateek-chaubey/YTPro)](https://github.com/prateek-chaubey/YTPro/stargazers)
