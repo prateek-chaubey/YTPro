@@ -22,7 +22,7 @@
 			android:supportsPictureInPicture="true"
 		        android:theme="@style/AppTheme"
                         android:exported="true"
-			android:screenOrientation="portrait">
+			android:screenOrientation="unspecified">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
 				<category android:name="android.intent.category.LAUNCHER"/>
@@ -50,7 +50,7 @@
 			android:supportsPictureInPicture="true"
 			android:theme="@style/AppTheme"
 			android:exported="true"
-			android:screenOrientation="portrait">
+			android:screenOrientation="unspecified">
 			<intent-filter android:label="@string/dl">
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />
