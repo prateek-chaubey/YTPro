@@ -489,6 +489,10 @@ public class MainActivity extends Activity {
   public void onDestroy() {
     super.onDestroy();
 
+      Intent intent = new Intent(getApplicationContext(), ForegroundService.class);
+
+      stopService(intent);
+
     unregisterReceiver(broadcastReceiver);
   }
 
