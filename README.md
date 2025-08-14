@@ -9,6 +9,7 @@
 
 [![Gradle](https://github.com/prateek-chaubey/YTPro/actions/workflows/gradle.yml/badge.svg)](https://github.com/prateek-chaubey/YTPro/actions/workflows/gradle.yml)
 <a href="https://www.jsdelivr.com/package/npm/ytpro?tab=stats" ><img alt="jsDelivr monthly hits badge" src="https://data.jsdelivr.com/v1/package/npm/ytpro/badge"></a>
+<img src=https://img.shields.io/github/downloads/prateek-chaubey/YTPro/total >
 
 </div>
 
