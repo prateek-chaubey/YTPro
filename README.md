@@ -18,14 +18,15 @@
 > If you like this project, consider [sponsoring](https://github.com/sponsors/prateek-chaubey) to support the author 🌸
 ---
 
+## Download YT PRO
+
+[![Download zip](https://custom-icon-badges.herokuapp.com/badge/-Download-ff0000?style=for-the-badge&logo=download&logoColor=white "Download Apk")](https://nightly.link/prateek-chaubey/YTPro/workflows/gradle/main/YTPRO.zip)
+
 #### Screenshots
 | | | |
 |:--:|:--:|:--:| 
 |<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/com.google.android.youtube.pro.jpg'  > | <img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/01102.png'  > |<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/01101.png'  > |
 
-## Download YT PRO
-
-[![Download zip](https://custom-icon-badges.herokuapp.com/badge/-Download-ff0000?style=for-the-badge&logo=download&logoColor=white "Download Apk")](https://nightly.link/prateek-chaubey/YTPro/workflows/gradle/main/YTPRO.zip)
 
 ## Features
  * <img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/gemini-logo-13486188-10900314-unscreen-ezgif.com-crop.gif' height=15 width=15 > Google Gemini
