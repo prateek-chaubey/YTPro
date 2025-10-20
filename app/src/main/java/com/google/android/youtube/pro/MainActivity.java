@@ -78,6 +78,12 @@ public class MainActivity extends Activity {
     web.getSettings().setMediaPlaybackRequiresUserGesture(false); // Allow autoplay
     web.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
+    CookieManager cookieManager = CookieManager.getInstance();
+    cookieManager.setAcceptCookie(true);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        cookieManager.setAcceptThirdPartyCookies(webView, true); // 3rd party cookies
+    }
+
     web.setWebViewClient(new WebViewClient() {
       @Override
       public void onPageStarted(WebView p1, String p2, Bitmap p3) {
@@ -486,6 +492,12 @@ public class MainActivity extends Activity {
   }
 
   @Override
+  protected void onPause() {
+    super.onPause();
+    CookieManager.getInstance().flush();
+  }
+
+  @Override
   public void onDestroy() {
     super.onDestroy();
 
@@ -497,3 +509,4 @@ public class MainActivity extends Activity {
   }
 
 }
+
