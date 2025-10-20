@@ -81,7 +81,7 @@ public class MainActivity extends Activity {
     CookieManager cookieManager = CookieManager.getInstance();
     cookieManager.setAcceptCookie(true);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        cookieManager.setAcceptThirdPartyCookies(webView, true); // 3rd party cookies
+        cookieManager.setAcceptThirdPartyCookies(web, true); // 3rd party cookies 🍪 
     }
 
     web.setWebViewClient(new WebViewClient() {
@@ -505,8 +505,10 @@ public class MainActivity extends Activity {
 
       stopService(intent);
 
-    unregisterReceiver(broadcastReceiver);
+    if (broadcastReceiver != null) unregisterReceiver(broadcastReceiver);
+    
   }
 
 }
+
 
