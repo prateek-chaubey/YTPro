@@ -147,7 +147,7 @@ public class ForegroundService extends Service {
 
         Notification.Builder builder = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) ? new Notification.Builder(this, CHANNEL_ID) : new Notification.Builder(this);
 
-        builder.setSmallIcon((Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ? R.drawable.monochrome : R.drawable.foreground)
+        builder.setSmallIcon((Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ? R.drawable.notification : R.mipmap.app_icon)
                 .setContentTitle(title)
                 .setContentText(subtitle)
                 .setLargeIcon(largeIcon)
@@ -256,7 +256,7 @@ public class ForegroundService extends Service {
 
         Notification.Builder builder = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) ? new Notification.Builder(this, CHANNEL_ID) : new Notification.Builder(this);
 
-                builder.setSmallIcon((Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ? R.drawable.monochrome : R.drawable.foreground)
+                builder.setSmallIcon((Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ? R.drawable.notification : R.mipmap.app_icon)
                 .setContentTitle(title)
                 .setContentText(subtitle)
                 .setLargeIcon(largeIcon)
