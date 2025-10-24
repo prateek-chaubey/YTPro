@@ -39,6 +39,7 @@
  * Ads Blocker
  * Minimize Video
  * Picture in Picture Mode
+ * Gesture control for Volume and Brightness 
  * Shows Number of Dislikes
  * Background Audio Player
  * Custom Heart feature to save videos without logging into your account
@@ -47,6 +48,7 @@
  * Force Zoom
  * Hide Shorts
  * APK size under 50KB
+ * Adaptive UI icons
  * Minimal
  * Almost 0 Internal Dependencies
  * Auto Updation of App
