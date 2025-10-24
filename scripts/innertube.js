@@ -1,6 +1,6 @@
 /*****YTPRO*******
 Author: Prateek Chaubey
-Version: 3.8.7
+Version: 3.9.2
 URI: https://github.com/prateek-chaubey/YTPRO
 */
 
@@ -239,32 +239,32 @@ var body={
 "gl": "US",
 "remoteHost": "",
 "screenDensityFloat": 1,
-"screenHeightPoints": 1440,
+"screenHeightPoints": 7680,
 "screenPixelDensity": 1,
-"screenWidthPoints": 2560,
+"screenWidthPoints": 4320,
 "visitorData": visitorData,
 "clientName": "ANDROID",
 "clientVersion": cver,
 "osName": "Android",
 "osVersion": "12",
 "userAgent": "com.google.android.youtube/19.35.36(Linux; U; Android 13; en_US; SM-S908E Build/TP1A.220624.014) gzip",
-"platform": "DESKTOP",
+//"platform": "DESKTOP",
 "clientFormFactor": "UNKNOWN_FORM_FACTOR",
 "userInterfaceTheme": "USER_INTERFACE_THEME_LIGHT",
 "timeZone": "Asia/Calcutta",
 "originalUrl": "https://www.youtube.com",
 "deviceMake": "",
 "deviceModel": "",
-"browserName": "Chrome",
-"browserVersion": "125.0.0.0",
+//"browserName": "Chrome",
+//"browserVersion": "125.0.0.0",
 "utcOffsetMinutes": 330,
 "memoryTotalKbytes": "8000000",
-"mainAppWebInfo": {
+/*"mainAppWebInfo": {
 "graftUrl": "https://www.youtube.com",
 "pwaInstallabilityStatus": "PWA_INSTALLABILITY_STATUS_UNKNOWN",
 "webDisplayMode": "WEB_DISPLAY_MODE_BROWSER",
 "isWebNativeShareAvailable": true
-}
+}*/
 },
 "user": {
 "enableSafetyMode": false,
@@ -299,7 +299,7 @@ handleDownloadStreams(info);
 
 
 function handleDownloadStreams(info){
-console.log(info?.streamingData);
+console.log(info);
 
 
 
@@ -372,7 +372,6 @@ cap[x].baseUrl = cap[x].baseUrl.replace("&fmt=srv3","");
 
 
 ytproDownDiv.innerHTML+=`<cp>
-<br><br>
 <span style="width:100px;text-align:left">${cap[x]?.name?.runs[0]?.text}</span> 
 <br><br>
 <div style="position:absolute;right:10px;display:flex">
@@ -383,6 +382,7 @@ ytproDownDiv.innerHTML+=`<cp>
 <c onclick="downCap('${cap[x].baseUrl}&fmt=srv1','${t}.srv1')">${downBtn} <br>.srv1</c><c onclick="downCap('${cap[x].baseUrl}&fmt=ttml','${t}.ttml')">${downBtn} <br>.ttml</c></div>
 <br>
 </cp>
+<br><br>
 <br><br>
 `;
 }
