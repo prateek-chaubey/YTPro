@@ -903,7 +903,7 @@ Android.setBgPlay(false);
 }
 
 
-if(localStorage.getItem("gesS") != "true"){
+if(localStorage.getItem("gesC") != "true"){
 try{
 document.getElementById("brtS").remove();
 document.getElementById("volS").remove();
