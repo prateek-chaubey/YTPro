@@ -1,7 +1,8 @@
 /*****YTPRO*******
 Author: Prateek Chaubey
-Version: 3.8.7
+Version: 3.9.2
 URI: https://github.com/prateek-chaubey/YTPRO
+Last Updated On: 25 Oct , 2025 , 12:01 IST
 */
 
 
@@ -26,24 +27,22 @@ window.location.href=`javascript:(function () { var script = document.createElem
 if(!YTProVer){
 
 /*Few Stupid Inits*/
-var YTProVer="3.87";
+var YTProVer="3.92";
 var ytoldV="";
 var isF=false;   //what is this for?
 var isAp=false; // oh it's for bg play 
 const originalPause = HTMLMediaElement.prototype.pause; // well long story short , save the original pause function
 window.PIPause = false; // for pausing video when in PIP
+window.isPIP=false;
 window.pauseAllowed = true; // allow pause by default
 var sTime=[];
 var webUrls=["m.youtube.com","youtube.com","yout.be","accounts.google.com"];
 var GeminiAT="";
 var GeminiModels={
 "2.0 Flash":'[null,null,null,null,"f299729663a2343f"]',   //g2.0 FLASH
-"2.0 Flash Thinking": '[null,null,null,null,"9c17b1863f581b8a"]', //g2.0 flash thinking
-"2.0 Flash Thinking with apps": '[null,null,null,null,"f8f8f5ea629f5d37"]', //g2.0 flash thinking with apps
-'2.0 Experimental Advanced':'[null,null,null,null,"b1e46a6037e6aa9f"]',
-'2.5 Flash':'[1,null,null,null,"35609594dbe934d8"]',
-'2.5 Pro':'[1,null,null,null,"2525e3954d185b3c"]',
-'2.5 Experimental Advanced':'[null,null,null,null,"203e6bb81620bcfe"]',
+"2.0 Flash Thinking": '[null,null,null,null,"7ca48d02d802f20a"]', //g2.0 flash thinking
+'2.5 Flash':'[1,null,null,null,"71c2d248d3b102ff",null,null,0,[4]]',
+'2.5 Pro':'[1,null,null,null,"4af6c7f5da75d65d",null,null,0,[4]]',
 };
 var YTPROCodecs={
 video:["AV1","VP8","VP9","H264"],
@@ -52,15 +51,21 @@ audio:["Opus","Mp4a"]
 
 let touchstartY = 0;
 let touchendY = 0;
+let initialDistance=null;
 
-if(localStorage.getItem("saveCInfo") == null || localStorage.getItem("fitS") == null || localStorage.getItem("bgplay") == null){
+//swipe controls
+var sens=0.005;
+var vol=Android.getVolume();
+var brt = Android.getBrightness()/100;
+
+if(localStorage.getItem("saveCInfo") == null  || localStorage.getItem("gesC") == null || localStorage.getItem("bgplay") == null){
 localStorage.setItem("autoSpn","true");
-localStorage.setItem("fitS","true");
 localStorage.setItem("bgplay","true");
+localStorage.setItem("gesC","true");
 localStorage.setItem("fzoom","false");
 localStorage.setItem("saveCInfo","true");
 localStorage.setItem("geminiModel","2.5 Flash");
-localStorage.setItem("prompt","Give me details about this YouTube video Id: {videoId} , a detailed summary of timestamps with facts , resources and reviews of the main content ");
+localStorage.setItem("prompt","Give me details about this YouTube video Id: {videoId} , a detailed summary of timestamps with facts , resources and reviews of the main content");
 localStorage.setItem("devMode","false");
 
 localStorage.setItem("block_60fps","false");
@@ -96,21 +101,7 @@ var isD=false;
 var dislikes="...";
 
 
-//Force Dark mode 
-/**
-if(document.cookie.indexOf("PREF") < 0 || document.cookie.indexOf("f6=") < 0){
-document.cookie.replace(
-/(?<=^|;).+?(?=\=|;|$)/g,
-name => location.hostname
-.split(/\.(?=[^\.]+\.)/)
-.reduceRight((acc, val, i, arr) => i ? arr[i]='.'+val+acc : (arr[i]='', arr), '')
-.map(domain => document.cookie=`${name}=;max-age=0;path=/;domain=${domain}`)
-);
-document.cookie="PREF=f6=400&f7=100;";
-window.location.href=window.location.href;
-}
-/**/
-if(document.cookie.indexOf("f6=400") > -1){
+if(document.cookie.indexOf("f6=40000") > -1){
 dc ="#000";c ="#fff";d="rgba(255,255,255,0.1)";
 isD=true;
 }else{
@@ -118,7 +109,17 @@ dc ="#fff";c="#000";d="rgba(0,0,0,0.05)";
 isD=false;
 }
 
-var downBtn=`<svg xmlns="http://www.w3.org/2000/svg" height="18" fill="${c}" viewBox="0 0 24 24" width="18" focusable="false"><path d="M17 18v1H6v-1h11zm-.5-6.6-.7-.7-3.8 3.7V4h-1v10.4l-3.8-3.8-.7.7 5 5 5-4.9z"></path></svg>`;
+var downBtn=`<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24" fill="none">
+<path
+d="M16.59 9H15V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5H7.41a1 1 0 0 0-.7 1.7l4.59 4.59a1 1 0 0 0 1.42 0l4.59-4.59a1 1 0 0 0-.72-1.7Z"
+stroke="${c}"
+stroke-width="1.8"
+stroke-linecap="round"
+stroke-linejoin="round"
+/>
+<rect x="5" y="17.2" width="14" height="1.8" rx="0.9" fill="${c}" />
+</svg>
+`;
 
 
 
@@ -231,7 +232,7 @@ text-align:center;line-height:35px;
 `);
 setDiv.setAttribute("id","setDiv");
 var svg=document.createElement("div");
-svg.innerHTML=`<svg fill="${ window.location.href.indexOf("watch") < 0 ? c : "#fff" }" xmlns="http://www.w3.org/2000/svg" height="22" viewBox="0 0 22 22" width="22"  id="hSett"><path d="M12 9.5c1.38 0 2.5 1.12 2.5 2.5s-1.12 2.5-2.5 2.5-2.5-1.12-2.5-2.5 1.12-2.5 2.5-2.5m0-1c-1.93 0-3.5 1.57-3.5 3.5s1.57 3.5 3.5 3.5 3.5-1.57 3.5-3.5-1.57-3.5-3.5-3.5zM13.22 3l.55 2.2.13.51.5.18c.61.23 1.19.56 1.72.98l.4.32.5-.14 2.17-.62 1.22 2.11-1.63 1.59-.37.36.08.51c.05.32.08.64.08.98s-.03.66-.08.98l-.08.51.37.36 1.63 1.59-1.22 2.11-2.17-.62-.5-.14-.4.32c-.53.43-1.11.76-1.72.98l-.5.18-.13.51-.55 2.24h-2.44l-.55-2.2-.13-.51-.5-.18c-.6-.23-1.18-.56-1.72-.99l-.4-.32-.5.14-2.17.62-1.21-2.12 1.63-1.59.37-.36-.08-.51c-.05-.32-.08-.65-.08-.98s.03-.66.08-.98l.08-.51-.37-.36L3.6 8.56l1.22-2.11 2.17.62.5.14.4-.32c.53-.44 1.11-.77 1.72-.99l.5-.18.13-.51.54-2.21h2.44M14 2h-4l-.74 2.96c-.73.27-1.4.66-2 1.14l-2.92-.83-2 3.46 2.19 2.13c-.06.37-.09.75-.09 1.14s.03.77.09 1.14l-2.19 2.13 2 3.46 2.92-.83c.6.48 1.27.87 2 1.14L10 22h4l.74-2.96c.73-.27 1.4-.66 2-1.14l2.92.83 2-3.46-2.19-2.13c.06-.37.09-.75.09-1.14s-.03-.77-.09-1.14l2.19-2.13-2-3.46-2.92.83c-.6-.48-1.27-.87-2-1.14L14 2z"></path></svg>
+svg.innerHTML=`<svg fill="${ window.location.href.indexOf("watch") < 0 ? c : "#fff" }" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"  id="hSett"><path d="M12.844 1h-1.687a2 2 0 00-1.962 1.616 3 3 0 01-3.92 2.263 2 2 0 00-2.38.891l-.842 1.46a2 2 0 00.417 2.507 3 3 0 010 4.525 2 2 0 00-.417 2.507l.843 1.46a2 2 0 002.38.892 3.001 3.001 0 013.918 2.263A2 2 0 0011.157 23h1.686a2 2 0 001.963-1.615 3.002 3.002 0 013.92-2.263 2 2 0 002.38-.892l.842-1.46a2 2 0 00-.418-2.507 3 3 0 010-4.526 2 2 0 00.418-2.508l-.843-1.46a2 2 0 00-2.38-.891 3 3 0 01-3.919-2.263A2 2 0 0012.844 1Zm-1.767 2.347a6 6 0 00.08-.347h1.687a4.98 4.98 0 002.407 3.37 4.98 4.98 0 004.122.4l.843 1.46A4.98 4.98 0 0018.5 12a4.98 4.98 0 001.716 3.77l-.843 1.46a4.98 4.98 0 00-4.123.4A4.979 4.979 0 0012.843 21h-1.686a4.98 4.98 0 00-2.408-3.371 4.999 4.999 0 00-4.12-.399l-.844-1.46A4.979 4.979 0 005.5 12a4.98 4.98 0 00-1.715-3.77l.842-1.459a4.98 4.98 0 004.123-.399 4.981 4.981 0 002.327-3.025ZM16 12a4 4 0 11-7.999 0 4 4 0 018 0Zm-4 2a2 2 0 100-4 2 2 0 000 4Z"></path></svg>
 `;
 setDiv.appendChild(svg);
 insertAfter(document.getElementsByTagName("ytm-home-logo")[0],setDiv);
@@ -488,7 +489,7 @@ return t;
 
 /*Get Codecs*/
 function getYTPROCodecs(){
-var t=`<p style="text-align:center;font-size:14px;">This feature is experimental , this may break YouTube Pro if not configured correctly. By default all the codecs are enabled , tap on the buttons below to switch them.</p><br> <vc  style="font-size:14px;">Video Codecs</vc><br>`;
+var t=`<p style="text-align:center;font-size:14px;">This feature is experimental , this may break YTPro if not configured correctly. By default all the codecs are enabled , tap on the buttons below to switch them.</p><br> <vc  style="font-size:14px;">Video Codecs</vc><br>`;
 
 for(var y in YTPROCodecs.video){
 
@@ -514,7 +515,7 @@ t+=`<button onclick="setRemoveCodec('${x}',this)" ${("true" == localStorage.getI
 }
 
 t+=`<br><br>
-<div>Block 60FPS <span onclick="sttCnf(this,'block_60fps');" style="${sttCnf(0,0,"fzoom")}" ><b style="${sttCnf(0,1,"fzoom")}" ></b></span></div> `;
+<div>Block 60FPS <span onclick="sttCnf(this,'block_60fps');" style="${sttCnf(0,0,"block_60fps")}" ><b style="${sttCnf(0,1,"block_60fps")}" ></b></span></div> `;
 
 t+=`<br><br><button onclick="this.parentElement.style.display='none';" style="margin-top:10px;width:25%;float:right;text-align:center;background:${c};color:${dc};" >Done</button>`;
 
@@ -708,7 +709,7 @@ ytpSetI.innerHTML+=`<br><b style='font-size:18px' >YT PRO Settings</b>
 <br>
 <div>Autoskip Sponsors <span onclick="sttCnf(this,'autoSpn');" style="${sttCnf(0,0,"autoSpn")}" ><b style="${sttCnf(0,1,"autoSpn")}"></b></span></div>
 <br>
-<div>Auto FitScreen <span onclick="sttCnf(this,'fitS');" style="${sttCnf(0,0,"fitS")}" ><b style="${sttCnf(0,1,"fitS")}" ></b></span></div> 
+<div>Gesture Controls <span onclick="sttCnf(this,'gesC');" style="${sttCnf(0,0,"gesC")}" ><b style="${sttCnf(0,1,"gesC")}"></b></span></div>
 <br>
 <div>Force Zoom <span onclick="sttCnf(this,'fzoom');" style="${sttCnf(0,0,"fzoom")}" ><b style="${sttCnf(0,1,"fzoom")}" ></b></span></div> 
 <br>
@@ -740,6 +741,13 @@ ytpSetI.innerHTML+=`<br><b style='font-size:18px' >YT PRO Settings</b>
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${isD ? "#ccc" : "#444"}" viewBox="0 0 16 16">
 <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
 </svg>
+</button>
+<br>
+<button style="font-weight:bolder;" onclick="Android.oplink('https://github.com/sponsors/prateek-chaubey');">Become a Sponsor
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="${isD ? "#ccc" : "#444"}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M5 2l6 6-6 6"/>
+</svg>
+
 </button>
 <br>
 <div>Developer Mode <span onclick="sttCnf(this,'devMode');" style="${sttCnf(0,0,"devMode")}" ><b style="${sttCnf(0,1,"devMode")}"></b></span></div>
@@ -817,7 +825,7 @@ id=id=url.pathname.substr(1,url.pathname.length);
 }
 
 var a=document.createElement("a");
-a.href=`/watch?v=${id}`;
+a.href=url;
 document.body.appendChild(a);
 try{document.getElementById("settingsprodiv").remove();}catch{}
 a.click();
@@ -892,6 +900,15 @@ if(localStorage.getItem("bgplay") == "true"){
 Android.setBgPlay(true);
 }else{
 Android.setBgPlay(false);
+}
+
+
+if(localStorage.getItem("gesS") != "true"){
+try{
+document.getElementById("brtS").remove();
+document.getElementById("volS").remove();
+}catch{}
+  
 }
 
 if(localStorage.getItem("devMode") == "false"){
@@ -977,7 +994,7 @@ x.style.display="none";
 
 /*Add the meme type and extensions lol*/
 function downCap(x,t){
-Android.downvid(t,`https://m.youtube.com${x}`,"plain/text");
+Android.downvid(t,x,"plain/text");
 }
 
 /*Send to Download Manager*/
@@ -1004,45 +1021,109 @@ Android.downvid((o.getAttribute("data-ytprotit")+ex),o.getAttribute("data-ytprou
 
 
 
+var stopProp = false;
+var zoomIn=false;
+var scale=1;
+
+
 /*Checks the Direction of the Swipe*/
 function checkDirection(e) {
 if ((touchendY > touchstartY) && (touchendY - touchstartY > 20)) {
 minimize(true);
-}else if ((touchendY < touchstartY) && (touchstartY - touchendY > 20)) {{
+}else if ((touchendY < touchstartY) && (touchstartY - touchendY > 20)) {
 minimize(false);
+//console.log((touchstartY - touchendY ))
 }
 }
+
+/*for zoom in and out*/
+function getDistance(touches) {
+const [a, b] = touches;
+return Math.hypot(b.pageX - a.pageX, b.pageY - a.pageY);
 }
+
+
 
 /*touch start*/
 document.body.addEventListener('touchstart', e => {
-
 touchstartY = e.changedTouches[0].screenY;
+if (e.touches.length === 2) {
+initialDistance = getDistance(e.touches);
+}
 }, { capture: true });
+
+
+
+
+/*touch move*/
+document.body.addEventListener('touchmove', (e) => {
+
+
+if(stopProp){
+e.stopPropagation();
+}
+
+if (e.touches.length === 2 && initialDistance !== null) {
+const currentDistance = getDistance(e.touches);
+const z = currentDistance / initialDistance;
+
+stopProp=true;
+
+
+if((e.target.className.toString().includes("video-stream") || e.target.className.toString().includes("player-controls-background")) && document.fullscreenElement){
+
+if (z > 1.05) {
+var Vv=document.getElementsByClassName('video-stream')[0];
+zoomIn=true;
+scale=Math.max((screen.height / Vv.offsetHeight) , (screen.width / Vv.offsetWidth)); 
+addMaxButton();
+} else if (z < 0.95) {
+zoomIn=false;
+scale=1;
+addMaxButton();
+}
+}
+
+
+
+}
+},{capture:true});
+
+
+
+
+
 
 /*touch end*/
 document.body.addEventListener('touchend', e => {
-//console.log(e.target.className)
+
+
 touchendY = e.changedTouches[0].screenY;
 
 if((e.target.className.toString().includes("video-stream") || e.target.className.toString().includes("player-controls-background")) && !document.fullscreenElement){
 checkDirection();
 }
 
+if (e.touches.length < 2) {
+initialDistance = null; // reset
+
+setTimeout(()=>{
+stopProp=false;
+},500)
+
+}
+
 }, { capture: true });
+
+
 
 
 
 navigation.addEventListener("navigate", e => {
 if(e.destination.url.indexOf("watch") > -1 || e.destination.url.indexOf("shorts") > -1){
-
-
-
+  dislikes="...";
 fDislikes(e.destination.url);
 checkSponsors(e.destination.url);
-
-
-
 }
 });
 
@@ -1144,7 +1225,7 @@ player.setAttribute("ogTop",getComputedStyle(player).top)
 
 
 player.style.transform="scale(0.65)";
-player.style.top=(window.screen.height-(player.getBoundingClientRect().height*2))+"px";
+player.style.top=(window.screen.height-(player.getBoundingClientRect().height*2.5))+"px";
 player.style.zIndex="9999";
 
 
@@ -1259,7 +1340,7 @@ title:img[7][0]
 text+=`<center><img alt="${img[0][4]}" src="${img[0][0][0]}"></center>`;
 }
 
-//console.log(text,"\n\n\n-------- \n\n"+thoughts)
+//console.log(text,"\n\n\n-------- \n\n",thoughts)
 
 
 
@@ -1267,7 +1348,9 @@ text+=`<center><img alt="${img[0][4]}" src="${img[0][0][0]}"></center>`;
 
 
 let converter = new showdown.Converter();
+converter.setFlavor('github');
 let html = modifyTimestamps(converter.makeHtml(text));
+
 
 let thoughtsHtml=(thoughts != null) ? `<button onclick="(this.nextElementSibling.style.height=='auto') ? (this.children[0].style.transform='rotate(-90deg)',this.nextElementSibling.style.height='0') : (this.children[0].style.transform='rotate(90deg)',this.nextElementSibling.style.height='auto');" class="think" >Show Thinking 
 <svg xmlns="http://www.w3.org/2000/svg" style="transform:rotate(-90deg);margin-left:10px" width="16" height="16" fill="${isD ? "#ccc" : "#444"}" viewBox="0 0 16 16">
@@ -1403,6 +1486,9 @@ handleGeminiResponse(response);
 }
 
 
+var volSvg=`<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 0 24 24" width="16" focusable="false" aria-hidden="true" style="pointer-events: none;filter:drop-shadow(0px 0px 1px black);position:absolute;top:10%"><path fill="#fff" d="M11.485 2.143 3.913 6.687A6 6 0 001 11.832v.338a6 6 0 002.913 5.144l7.572 4.543A1 1 0 0013 21V3a1.001 1.001 0 00-1.515-.857Zm6.88 2.079a1 1 0 00-.001 1.414 9 9 0 010 12.728 1 1 0 001.414 1.414 11 11 0 000-15.556 1 1 0 00-1.413 0Zm-2.83 2.828a1 1 0 000 1.415 5 5 0 010 7.07 1 1 0 001.415 1.415 6.999 6.999 0 000-9.9 1 1 0 00-1.415 0Z"></path></svg>`;
+var brtSvg=`<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="16" viewBox="0 0 24 24" width="16" style="filter:drop-shadow(0px 0px 1px black);position:absolute;top:10%;"><rect fill="none" height="24" width="24"/><path fill="#fff" d="M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0 c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2 c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1 C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06 c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41 l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41 c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36 c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"/></svg>`;
+
 
 /*THE 0NE AND 0NLY FUNCTION*/
 async function pkc(){
@@ -1412,22 +1498,146 @@ if(window.location.href.indexOf("youtube.com/watch") > -1){
 
 try{
 var elm=document.getElementsByTagName("dislike-button-view-model")[0].children[0]; 
-elm.children[0].children[0].children[0].style.width="90px";
-elm.children[0].children[0].children[0].children[0].style.position="absolute";
+elm.children[0].children[0].style.width="auto";
+elm.children[0].children[0].style.paddingRight="15px";
 
-elm.children[0].children[0].children[0].children[0].style.left="15px";
+if(!document.getElementById("diskl")){
+  var diskl=document.createElement("span");
+  diskl.setAttribute("id","diskl");
+  diskl.innerHTML=dislikes;
+  diskl.style.marginLeft="5px";
+  
+insertAfter(elm.getElementsByClassName("yt-spec-button-shape-next__icon")[0],diskl);
 
-elm.parentElement.innerHTML=`<yt-button-shape class="yt-spec-button-shape-next__button-shape-wiz-class" nt="true">
-<button class="yt-spec-button-shape-next yt-spec-button-shape-next--tonal yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--segmented-end yt-spec-button-shape-next--enable-backdrop-filter-experiment" title="" aria-pressed="false" aria-label="Dislike this video" aria-disabled="false" nt="true" style="width: 80px;"><div class="yt-spec-button-shape-next__icon" aria-hidden="true" nt="true" style="position: absolute; left: 15px;"><c3-icon style="height: 24px; width: 24px;"><span class="yt-icon-shape yt-spec-icon-shape"><div style="width: 100%; height: 100%; display: block; fill: currentcolor;"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit; width: 100%; height: 100%;"><path d="M17,4h-1H6.57C5.5,4,4.59,4.67,4.38,5.61l-1.34,6C2.77,12.85,3.82,14,5.23,14h4.23l-1.52,4.94C7.62,19.97,8.46,21,9.62,21 c0.58,0,1.14-0.24,1.52-0.65L17,14h4V4H17z M10.4,19.67C10.21,19.88,9.92,20,9.62,20c-0.26,0-0.5-0.11-0.63-0.3 c-0.07-0.1-0.15-0.26-0.09-0.47l1.52-4.94l0.4-1.29H9.46H5.23c-0.41,0-0.8-0.17-1.03-0.46c-0.12-0.15-0.25-0.4-0.18-0.72l1.34-6 C5.46,5.35,5.97,5,6.57,5H16v8.61L10.4,19.67z M20,13h-3V5h3V13z"></path></svg></div></span></c3-icon></div><yt-touch-feedback-shape style="border-radius: inherit;"><div aria-hidden="true" class="yt-spec-touch-feedback-shape yt-spec-touch-feedback-shape--touch-response"><div class="yt-spec-touch-feedback-shape__stroke"></div><div class="yt-spec-touch-feedback-shape__fill"></div></div></yt-touch-feedback-shape>
+}else{
+document.getElementById("diskl").innerHTML=dislikes;
+}
 
-<span style="margin-left:20px;margin-bottom:3px;">${dislikes}</span>
+}catch(e){}
 
-</button></yt-button-shape>
-`;
 
-}catch(e){
+//Volume and brightness slider 
+try{
+
+if(localStorage.getItem("gesC") == "true"){
+
+var v= document.getElementById("player-container-id");
+var rect=v.getBoundingClientRect();
+
+var elStyle={
+height:"100%",
+width:rect.width*0.15+"px",
+display:"flex",
+"flex-direction":"column",
+"align-items":"center",
+"justify-content":"center",
+position:"absolute",
+top:"0px", 
+right:"0px",
+opacity:"0"
+};  
+  
+  
+
+var el=document.createElement("div");
+var elB=document.createElement("div");
+elB.setAttribute("id","brtS");
+el.setAttribute("id","volS");
+
+Object.assign(el.style,elStyle);
+Object.assign(elB.style,elStyle);
+elB.style.left="0";
+
+el.innerHTML=`${volSvg}<div style="position:absolute;bottom:5%;left:calc(50% - 1.5px);background:rgba(255,255,255,0.5); height:70%;width:3px;border-radius:3px;color:red;box-shadow:0px 0px 2px black;pointer-events:none" ><div style="background:white;width:100%;height:${vol * 100}%;border-radius:3px;position:absolute;bottom:0;box-shadow:0px 0px 2px black;" id="volIS"></div></div>`;
+elB.innerHTML=`${brtSvg}<div style="position:absolute;bottom:5%;left:calc(50% - 1.5px);background:rgba(255,255,255,0.5); height:70%;width:3px;border-radius:3px;color:red;box-shadow:0px 0px 2px black;pointer-events:none" ><div style="background:white;width:100%;height:${brt * 100}%;border-radius:3px;position:absolute;bottom:0;box-shadow:0px 0px 1px black;" id="brtIS"></div></div>`;
+
+
+if(!document.getElementById("brtS")){
+document.getElementById("player-container-id").appendChild(elB);
+
+elB.addEventListener("touchmove",(e)=>{
+e.preventDefault();
+elB.style.opacity="1";
+
+var diff= touchstartY - e.touches[0].pageY;
+
+if(diff > 0){
+brt +=sens;
+}else{
+brt -=sens;
+}
+
+if(brt > 1) brt=1;
+if(brt < 0) brt =0;
+
+touchstartY=e.touches[0].pageY;
+
+Android.setBrightness(brt);
+document.getElementById("brtIS").style.height=brt*100+"%";
+
+},{ passive: false })
+
+
+//hide the element after touch endas
+elB.addEventListener("touchend",(e)=>{
+elB.style.opacity="0";
+},{ passive: false });
 
 }
+
+
+
+
+
+if(!document.getElementById("volS")){
+document.getElementById("player-container-id").appendChild(el);
+
+el.addEventListener("touchmove",(e)=>{
+e.preventDefault();
+el.style.opacity="1";
+
+var diff= touchstartY - e.touches[0].pageY;
+
+if(diff > 0){
+vol +=sens;
+}else{
+vol -=sens;
+}
+
+if(vol > 1) vol=1;
+if(vol < 0) vol =0;
+
+touchstartY=e.touches[0].pageY;
+
+Android.setVolume(vol);
+document.getElementById("volIS").style.height=vol * 100 +"%";
+
+},{ passive: false })
+
+
+
+//hide the element after touch endas , yes endas
+el.addEventListener("touchend",(e)=>{
+el.style.opacity="0";
+},{ passive: false });
+
+}
+
+}
+
+  
+}catch(e){
+  console.log(e)
+}
+
+
+
+
+
+
+
+
+
 
 
 /*Check If Element Already Exists*/
@@ -1571,13 +1781,9 @@ geminiInfo();
 var ytproFavElem=document.createElement("div");
 sty(ytproFavElem);
 if(!isHeart()){
-ytproFavElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${c}" viewBox="0 0 16 16">
-<path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-</svg><span style="margin-left:8px">Heart<span>`;
+ytproFavElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path fill="${c}" d="M19.66 3.99c-2.64-1.8-5.9-.96-7.66 1.1-1.76-2.06-5.02-2.91-7.66-1.1-1.4.96-2.28 2.58-2.34 4.29-.14 3.88 3.3 6.99 8.55 11.76l.1.09c.76.69 1.93.69 2.69-.01l.11-.1c5.25-4.76 8.68-7.87 8.55-11.75-.06-1.7-.94-3.32-2.34-4.28zM12.1 18.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg><span style="margin-left:8px">Heart<span>`;
 }else{
-ytproFavElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#f00" viewBox="0 0 16 16">
-<path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-</svg><span style="margin-left:8px">Heart<span>`;
+ytproFavElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path fill="${c}" d="M13.35 20.13c-.76.69-1.93.69-2.69-.01l-.11-.1C5.3 15.27 1.87 12.16 2 8.28c.06-1.7.93-3.33 2.34-4.29 2.64-1.8 5.9-.96 7.66 1.1 1.76-2.06 5.02-2.91 7.66-1.1 1.41.96 2.28 2.59 2.34 4.29.14 3.88-3.3 6.99-8.55 11.76l-.1.09z"/></svg><span style="margin-left:8px">Heart<span>`;
 }
 ytproMainDiv.appendChild(ytproFavElem);
 ytproFavElem.addEventListener("click",()=>{ytProHeart(ytproFavElem);});
@@ -1599,11 +1805,7 @@ window.location.hash="download";
 var ytproPIPVidElem=document.createElement("div");
 sty(ytproPIPVidElem);
 ytproPIPVidElem.style.width="140px";
-ytproPIPVidElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${c}"  viewBox="0 0 16 16">
-<path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h13A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 12.5v-9zM1.5 3a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-13z"/>
-<path d="M8 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-3z"/>
-</svg>
-<span style="margin-left:8px">PIP Mode<span>`;
+ytproPIPVidElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="22" viewBox="0 0 24 24" width="22"><path fill="${c}" d="M18 7h-6c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1h6c.55 0 1-.45 1-1V8c0-.55-.45-1-1-1zm3-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm-1 16.01H4c-.55 0-1-.45-1-1V5.98c0-.55.45-1 1-1h16c.55 0 1 .45 1 1v12.03c0 .55-.45 1-1 1z"/></svg><span style="margin-left:8px">PIP Mode<span>`;
 ytproMainDiv.appendChild(ytproPIPVidElem);
 ytproPIPVidElem.addEventListener("click",
 function(){
@@ -1634,9 +1836,9 @@ ys.setAttribute("style",`width:50px;height:auto;position:relative;display:block;
 ysDown=document.createElement("div");
 ysDown.setAttribute("style",`
 height:48px;width:48px;display:flex;align-items:center;justify-content:center;
-background:rgba(0,0,0,.3);border-radius:50%;margin-bottom:20px;
+background:rgba(0,0,0,.3);border-radius:50%;margin-bottom:20px;backdrop-filter:blur(3px);
 `);
-ysDown.innerHTML=downBtn.replace(`fill="${c}"`,`fill="#fff"`).replace(`width="18"`,`width="30"`).replace(`height="18"`,`height="30"`);
+ysDown.innerHTML=downBtn.replaceAll(`${c}`,`#fff`).replace(`width="24"`,`width="30"`).replace(`height="24"`,`height="30"`);
 
 
 ysDown.addEventListener("click",
@@ -1649,19 +1851,15 @@ window.location.hash="download";
 ysHeart=document.createElement("div");
 ysHeart.setAttribute("style",`
 height:48px;width:48px;
-display:flex;align-items:center;justify-content:center;
+display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px);
 background:rgba(0,0,0,.3);border-radius:50%;margin-top:8px;margin-bottom:0px;
 `);
 
 
 if(!isHeart()){
-ysHeart.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#fff" viewBox="0 0 16 16">
-<path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-</svg>`;
+ysHeart.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path fill="#fff" d="M19.66 3.99c-2.64-1.8-5.9-.96-7.66 1.1-1.76-2.06-5.02-2.91-7.66-1.1-1.4.96-2.28 2.58-2.34 4.29-.14 3.88 3.3 6.99 8.55 11.76l.1.09c.76.69 1.93.69 2.69-.01l.11-.1c5.25-4.76 8.68-7.87 8.55-11.75-.06-1.7-.94-3.32-2.34-4.28zM12.1 18.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>`;
 }else{
-ysHeart.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#f00" viewBox="0 0 16 16">
-<path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-</svg>`;
+ysHeart.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path fill="#fff" d="M13.35 20.13c-.76.69-1.93.69-2.69-.01l-.11-.1C5.3 15.27 1.87 12.16 2 8.28c.06-1.7.93-3.33 2.34-4.29 2.64-1.8 5.9-.96 7.66 1.1 1.76-2.06 5.02-2.91 7.66-1.1 1.41.96 2.28 2.59 2.34 4.29.14 3.88-3.3 6.99-8.55 11.76l-.1.09z"/></svg>`;
 }
 
 
@@ -1675,14 +1873,18 @@ ytProHeart(ysHeart);
 
 
 try{
+  
+  if(document.getElementsByClassName("reel-player-overlay-actions")[0].children[0]){
+  
 document.getElementsByClassName("reel-player-overlay-actions")[0].insertBefore(ys,document.getElementsByClassName("reel-player-overlay-actions")[0].children[0]);
 ys.appendChild(ysDown);
 ys.appendChild(ysHeart);
+}
 }catch{}
 
 }
 
-try{document.querySelectorAll('[aria-label="Dislike this video"]')[0].nextElementSibling.children[0].innerHTML=dislikes;}catch{}
+try{document.querySelectorAll('dislike-button-view-model')[0].children[0].children[0].children[0].children[1].children[0].innerHTML=dislikes;}catch{}
 
 
 
@@ -1833,7 +2035,7 @@ title:ytplayer.config.args.raw_player_response?.videoDetails?.title.replaceAll("
 var g="16";
 var h=`<span style="margin-left:8px">Heart<span>`;
 (window.location.href.indexOf('youtube.com/shorts') > -1) ? h=``:h=`<span style="margin-left:8px">Heart<span>`;
-(window.location.href.indexOf('youtube.com/shorts') > -1) ? g="23" : g="16" ;
+(window.location.href.indexOf('youtube.com/shorts') > -1) ? g="24" : g="24" ;
 
 
 
@@ -1841,16 +2043,13 @@ if(localStorage.getItem("hearts")?.indexOf(vid) > -1){
 var j=JSON.parse(localStorage.getItem("hearts") || "{}");
 delete j[vid];
 localStorage.setItem("hearts",JSON.stringify(j));
-x.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="${g}" height="${g}" fill="${(window.location.href.indexOf('youtube.com/shorts') > -1) ? "#fff" : c }" viewBox="0 0 16 16">
-<path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-</svg>${h}`;
+x.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="${g}" height="${g}" fill="${(window.location.href.indexOf('youtube.com/shorts') > -1) ? "#fff" : c }" viewBox="0 0 24 24">
+<path d="M0 0h24v24H0V0z" fill="none"/><path fill="${(window.location.href.indexOf('youtube.com/shorts') > -1) ? "#fff" : c }" d="M19.66 3.99c-2.64-1.8-5.9-.96-7.66 1.1-1.76-2.06-5.02-2.91-7.66-1.1-1.4.96-2.28 2.58-2.34 4.29-.14 3.88 3.3 6.99 8.55 11.76l.1.09c.76.69 1.93.69 2.69-.01l.11-.1c5.25-4.76 8.68-7.87 8.55-11.75-.06-1.7-.94-3.32-2.34-4.28zM12.1 18.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>${h}`;
 }else{
 var j=JSON.parse(localStorage.getItem("hearts") || "{}");
 j[vid]=vDetails;
 localStorage.setItem("hearts",JSON.stringify(j));
-x.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="${g}" height="${g}" fill="#f00" viewBox="0 0 16 16">
-<path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-</svg>${h}`;
+x.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="${g}" height="${g}" viewBox="0 0 24 24" ><path d="M0 0h24v24H0V0z" fill="none"/><path fill="${(window.location.href.indexOf('youtube.com/shorts') > -1) ? "#fff" : c }" d="M13.35 20.13c-.76.69-1.93.69-2.69-.01l-.11-.1C5.3 15.27 1.87 12.16 2 8.28c.06-1.7.93-3.33 2.34-4.29 2.64-1.8 5.9-.96 7.66 1.1 1.76-2.06 5.02-2.91 7.66-1.1 1.41.96 2.28 2.59 2.34 4.29.14 3.88-3.3 6.99-8.55 11.76l-.1.09z"/></svg>${h}`;
 }
 
 }
@@ -1870,30 +2069,20 @@ return false;
 
 
 
-/*Refactoring the code after months , i really don't know what miracle this piece does*/
-//Refactoring again and now ik what it does lmao
 
+
+
+///PIP MODE CONFIG
 function removePIP(){
 
-
+isPIP=false;
 pauseAllowed = true;
-
-pipSize();
-
-
+document.exitFullscreen();
+ 
 document.getElementsByClassName('video-stream')[0].pause();
 setTimeout(()=>{
 document.getElementsByClassName('video-stream')[0].play();
-
-// was about to fix the bug , but realised i can fix it later
-/*
-if(isF){
-document.getElementById("player-container-id").requestFullscreen();
-}*/
-
 },5);
-
-//console.log("pauseAllowed: ",pauseAllowed)
 
 
 }
@@ -1902,29 +2091,11 @@ document.getElementById("player-container-id").requestFullscreen();
 
 
 function PIPlayer(pip = false){
-
-
-
+  
 var v=document.getElementsByClassName('video-stream')[0];
 
-
-
-if(!( (pip || (!pip && !v.paused)) && (window.location.pathname.indexOf("watch") > 0))) return; 
-
-
-
-
-//there's a bug , i will fix it later
-if(document.getElementById('player-container-id') === document.fullscreenElement) return;
-
-
-
-
-v.play();
-
-pauseAllowed = false;
-
-
+ 
+if(pip){
 
 if(v.getBoundingClientRect().height > v.getBoundingClientRect().width){
 Android.pipvid("portrait");
@@ -1933,23 +2104,14 @@ else{
 Android.pipvid("landscape");
 }
 
-//setTimeout(()=>{Android.bgPlay(v.currentTime*1000);},100);
+return;
+}
 
 
-
-var player=document.getElementById("player-container-id");
-var video = document.getElementsByClassName('video-stream')[0];
-
-player.setAttribute("ogTop",getComputedStyle(player).top)
-player.setAttribute("zI",getComputedStyle(player).zIndex)
-player.setAttribute("ogHeight",player.getBoundingClientRect().height)
-player.setAttribute("ogWidth",player.getBoundingClientRect().width)
-
-video.setAttribute("ogHeight",video.getBoundingClientRect().height)
-video.setAttribute("ogWidth",video.getBoundingClientRect().width);
-video.setAttribute("ogTop",getComputedStyle(video).top);
-
-
+v.requestFullscreen();
+v.play();
+pauseAllowed = false;
+isPIP=true;
 
 }
 
@@ -1957,80 +2119,6 @@ video.setAttribute("ogTop",getComputedStyle(video).top);
 
 
 
-function pipSize(){
-
-
-var player=document.getElementById("player-container-id");
-var video = document.getElementsByClassName('video-stream')[0];
-
-if(video == null || player == null) return;
-
-if(!pauseAllowed){
-
-
-
-
-Object.assign(player.style,{
-"z-index":9999999,
-top:0
-})
-
-
-Object.assign(video.style,{
-height:window.innerHeight+"px",
-width:window.innerWidth+"px",
-top:0,
-left:0,
-position:"fixed"
-});
-
-video.style.zIndex="999999999999999";
-
-
-
-document.getElementById("player-control-container").style.display="none";
-
-document.getElementById("movie_player").removeAttribute("style");
-
-
-//console.log("window",window.innerHeight,window.innerWidth)
-//console.log("video",document.getElementsByClassName('video-stream')[0].getBoundingClientRect().height,document.getElementsByClassName('video-stream')[0].getBoundingClientRect().width)
-
-}else{
-
-
-if(document.getElementsByClassName('video-stream')[0].getAttribute("ogTop") == null) return;
-
-
-Object.assign(player.style,{
-top:player.getAttribute("ogTop"),
-"z-index":player.getAttribute("zI"),
-});
-
-
-Object.assign(video.style,{
-height:video.getAttribute("ogHeight")+"px",
-width:video.getAttribute("ogWidth")+"px",
-top:video.getAttribute("ogTop"),
-"z-index":"auto",
-position:"absolute"
-});
-
-player.removeAttribute("ogTop");
-player.removeAttribute("zI");
-player.removeAttribute("ogHeight");
-player.removeAttribute("ogWidth");
-
-video.removeAttribute("ogTop");
-video.removeAttribute("ogHeight");
-video.removeAttribute("ogWidth");
-
-
-document.getElementById("player-control-container").style.display="block";
-
-}
-
-}
 
 
 
@@ -2049,10 +2137,8 @@ document.getElementById("player-control-container").style.display="block";
 // PIP mode , its a workaround for now , until i find a proper method
 // to allow the pip mode for the video element , like chromium browsers
 
-HTMLMediaElement.prototype.pause = function() {
-
-//console.log("PIP: "+PIPause,"Pauseallowed: " + pauseAllowed,"All: "+pauseAllowed || PIPause)
-
+HTMLMediaElement.prototype.pause = function(){
+  
 if (pauseAllowed || PIPause) {
 return originalPause.apply(this, arguments);
 }
@@ -2070,16 +2156,18 @@ this.play().catch(() => {});
 
 
 
-
-
-
+const originalExitFullscreen = document.exitFullscreen;
 const originalRequestFullscreen = Element.prototype.requestFullscreen;
+
+//exit full screen
+document.exitFullscreen = function (...args) {
+ if(!isPIP){ return originalExitFullscreen.apply(this, args);}
+};
+
+
+//request full screen
 Element.prototype.requestFullscreen = function (...args) {
-
-
 var video = document.getElementsByClassName('video-stream')[0];
-
-
 
 if(video.getBoundingClientRect().height > video.getBoundingClientRect().width){
 Android.fullScreen(true);
@@ -2115,6 +2203,139 @@ showHearts();
 
 
 
+// AdBlocker which removes the ad contents from the fetch requests itself !!
+(() => {
+const _origFetch = window.fetch;
+window.fetch = async function(input, init) {
+try {
+const url = (typeof input === 'string') ? input : input.url;
+
+//block ad urls
+if(url.includes("googleads.g.doubleclick.net") || url.includes("youtube.com/youtubei/v1/player/ad_break") || url.includes("youtube.com/pagead/adview") || url.includes("youtube.com/api/stats/ads")){
+
+//console.log("Blocked",url);
+return "";
+}else{
+
+
+const response = await _origFetch.apply(this, arguments);
+
+try {
+
+const clone = response.clone();
+let data = await clone.json();
+
+if(data.responseContext.webResponseContextExtensionData.webResponseContextPreloadData.preloadMessageNames[0] == "adSlotRenderer" || data.responseContext.webResponseContextExtensionData.webResponseContextPreloadData.preloadMessageNames[0] == "shortsAdsRenderer"){
+data={};
+}
+
+
+//remove the ad content
+delete data.adSlots;
+delete data.playerAds;
+delete data.adPlacements;
+delete data.adBreakHeartbeatParams;
+
+const newBody = JSON.stringify(data);
+
+// Build new headers (update content-length + content-type)
+const newHeaders = new Headers(response.headers);
+newHeaders.set("content-length", String(newBody.length));
+newHeaders.set("content-type", "application/json");
+
+// Return modified Response
+return new Response(newBody, {
+status: response.status,
+statusText: response.statusText,
+headers: newHeaders
+});
+} catch (e) {
+// not JSON, return original
+return response;
+}
+
+
+
+}
+
+} catch (e) { /* ignore logging errors */ }
+
+};
+
+
+})();
+
+
+
+//modified XHR for the same purpose
+const XHR = window.XMLHttpRequest;
+const origOpen = XHR.prototype.open;
+const origSend = XHR.prototype.send;
+
+XHR.prototype.open = function(method, url, ...rest) {
+this._interceptedMethod = method;
+this._interceptedUrl = url;
+return origOpen.apply(this, [method, url, ...rest]);
+};
+
+XHR.prototype.send = function(body) {
+// Block certain URLs
+if (
+this._interceptedUrl.includes("googleads.g.doubleclick.net") ||
+this._interceptedUrl.includes("youtube.com/youtubei/v1/player/ad_break") ||
+this._interceptedUrl.includes("youtube.com/pagead/adview") ||
+this._interceptedUrl.includes("youtube.com/api/stats/ads")
+) {
+console.warn("Blocked:", this._interceptedUrl);
+return;
+}
+
+// Intercept JSON responses
+this.addEventListener("readystatechange", function() {
+if (this.readyState === 4 && this.responseType === "" || this.responseType === "text") {
+try {
+// Try parsing response as JSON
+const contentType = this.getResponseHeader("Content-Type");
+if (contentType && contentType.includes("application/json")) {
+let json = JSON.parse(this.responseText);
+
+
+// ----------------------------------------
+if (json.adPlacements) {
+console.log("Removed ad placements from response!");
+json.adPlacements = []; // remove ads
+}
+
+//remove the ad content
+delete json.adSlots;
+delete json.playerAds;
+delete json.adPlacements;
+delete json.adBreakHeartbeatParams;
+
+
+// Redefine responseText to modified JSON
+Object.defineProperty(this, "responseText", { value: JSON.stringify(json) });
+Object.defineProperty(this, "response", { value: json });
+}
+} catch (err) {
+// Ignore non-JSON or parse errors
+}
+}
+});
+
+return origSend.apply(this, arguments);
+};
+
+
+
+
+
+
+
+
+
+
+
 
 /****** I LOVE YOU <3 *****/
 /*YT ADS BLOCKER*/
@@ -2133,7 +2354,7 @@ try{ads[x].remove();}catch{}
 }
 try{
 document.getElementsByClassName("ad-interrupting")[0].getElementsByTagName("video")[0].currentTime=document.getElementsByClassName("ad-interrupting")[0].getElementsByTagName("video")[0].duration;
-document.getElementsByClassName("ytp-skip-ad-button")[0].click();
+document.getElementsByClassName("ytp-ad-skip-button-modern")[0].click();
 
 }catch{}
 
@@ -2190,93 +2411,40 @@ try{document.getElementsByTagName("ytm-shorts-lockup-view-model")[x].remove();
 
 
 
-//Add Maximize Button
+//Add Maximize Gesture
 function addMaxButton(){
 
 
-
 var pElem=document.getElementById('player-container-id');
+var Ve=document.getElementById('player');
+var Vv=document.getElementsByClassName('video-stream')[0];
+
+
+
 if(pElem === document.fullscreenElement){
 
 
-//console.log(screen.height , window.innerHeight,((screen.height - window.innerHeight ) > 5))
-
-if((screen.height - window.innerHeight) > 5) return;
-
-
-
-
-var Vv=document.getElementsByClassName('video-stream')[0];
-
-var mE=document.createElement("div");
-mE.setAttribute("id","mE");
-mE.setAttribute("style",`position:absolute;right:60px;padding:15px;`);
-
-
-
-
-if(localStorage.getItem("fitS") == "true"){
-var scale = Math.max((screen.height / Vv.getBoundingClientRect().height) , (screen.width / Vv.getBoundingClientRect().width)); /// 2;
-mE.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#fff" viewBox="0 0 16 16">
-<path fill-rule="evenodd" d="M.172 15.828a.5.5 0 0 0 .707 0l4.096-4.096V14.5a.5.5 0 1 0 1 0v-3.975a.5.5 0 0 0-.5-.5H1.5a.5.5 0 0 0 0 1h2.768L.172 15.121a.5.5 0 0 0 0 .707zM15.828.172a.5.5 0 0 0-.707 0l-4.096 4.096V1.5a.5.5 0 1 0-1 0v3.975a.5.5 0 0 0 .5.5H14.5a.5.5 0 0 0 0-1h-2.768L15.828.879a.5.5 0 0 0 0-.707z"/>
-</svg>`;
+try{
+if(zoomIn){
+Ve.style.transform=`scale(${scale})`;
 }else{
-var scale = 1;
-mE.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#fff" viewBox="0 0 16 16">
-<path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707z"/>
-</svg>`;
+Ve.style.transform="scale(1)";  
 }
-
-
-console.log(scale)
-
-
-
-mE.addEventListener("click",()=>{
-var scale= Math.max((screen.height / Vv.getBoundingClientRect().height) , (screen.width / Vv.getBoundingClientRect().width)); 
-
-if (scale < 1) scale = 1;
-if((Vv.getBoundingClientRect().width / Vv.offsetWidth) > 1){
-mE.setAttribute("scale",scale);
-
-mE.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#fff" viewBox="0 0 16 16">
-<path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707z"/>
-</svg>`;
-}else{
-mE.setAttribute("scale",scale);
-mE.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#fff" viewBox="0 0 16 16">
-<path fill-rule="evenodd" d="M.172 15.828a.5.5 0 0 0 .707 0l4.096-4.096V14.5a.5.5 0 1 0 1 0v-3.975a.5.5 0 0 0-.5-.5H1.5a.5.5 0 0 0 0 1h2.768L.172 15.121a.5.5 0 0 0 0 .707zM15.828.172a.5.5 0 0 0-.707 0l-4.096 4.096V1.5a.5.5 0 1 0-1 0v3.975a.5.5 0 0 0 .5.5H14.5a.5.5 0 0 0 0-1h-2.768L15.828.879a.5.5 0 0 0 0-.707z"/>
-</svg>`;
-}
-});
-
-
-//https://youtube.com/watch?v=SInH_fP0deQ
-// <3
-
-if(document.getElementById("mE") == null) {
-document.getElementsByClassName("player-controls-bottom")[0].appendChild(mE);
-mE.setAttribute("scale",scale);
-}
-
-
-Vv.style.transform=`scale(${document.getElementById("mE").getAttribute("scale")})`;
+}catch{}
 
 
 }else{
 try{
-document.getElementsByClassName('video-stream')[0].style.transform="scale(1)";
-document.getElementById("mE").remove();
+Ve.style.transform="scale(1)";
 }catch{}
 }
 
 
-
 }
 
 
 
-
+//https://youtube.com/watch?v=SInH_fP0deQ
 
 
 
@@ -2293,18 +2461,29 @@ const config = { childList: true, subtree: true };
 
 const observer = new MutationObserver(() => {
 
+
+  
+  
 //ads Block
 adsBlock();
 
-//when video is in PIP
-pipSize();
 
 //mE button
 addMaxButton();
 
-
 //settingsTab
 addSettingsTab();
+
+
+try{
+var video = document.getElementsByClassName('video-stream')[0];
+if(video.getBoundingClientRect().height > video.getBoundingClientRect().width){
+Android.fullScreen(true);
+}
+else{
+Android.fullScreen(false);
+}}
+catch{}
 
 
 });
@@ -2328,10 +2507,10 @@ x.innerHTML=`
 Latest Version ${YTProVer} of YTPRO is available , update the YTPRO to get latest features.
 <br>- This update is mandatory as it fixes a ton of bugs and improves functionality <br>
 - Fixed PIP mode , BG Player , Downloads<br>
-- Now you can disable / enable codecs as per your choice<br>
-- Added media session in PIP Mode as well<br>
+- Fixed fitscreen bug , with pinch gesture<br>
+- Added gestures for brightness and volume control<br>
 - Optimized the UI of both Download and Settings menu<br>
-- Fixed the full screen bug<br>
+- Added new UI icons based on the latest YouTube's UI<br>
 - Fixed bugs and improved functionality<br>
 - for the full list <u onclick="Android.oplink('https://github.com/prateek-chaubey/YTPRO/releases');" >click here</u>
 <br>
