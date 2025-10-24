@@ -18,6 +18,7 @@ import android.provider.Settings;
 import java.net.URLEncoder;
 import android.content.SharedPreferences;
 import android.webkit.CookieManager;
+import android.media.AudioManager;
 
 public class MainActivity extends Activity {
 
@@ -603,6 +604,7 @@ public class MainActivity extends Activity {
   }
 
 }
+
 
 
 
