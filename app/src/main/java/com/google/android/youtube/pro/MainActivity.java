@@ -22,13 +22,16 @@ import android.webkit.CookieManager;
 public class MainActivity extends Activity {
 
   private boolean portrait = false;
-  BroadcastReceiver broadcastReceiver;
+  private BroadcastReceiver broadcastReceiver;
+  private AudioManager audioManager;
 
   private String icon = "";
   private String title = "";
   private String subtitle = "";
   private long duration;
   private boolean isPlaying = false;
+  private boolean mediaSession = false;
+  private boolean isPip = false;
   private boolean dL = false;
 
   private YTProWebview web;
@@ -109,6 +112,7 @@ public class MainActivity extends Activity {
 
         if (!url.contains("youtube.com/watch") && !url.contains("youtube.com/shorts") && isPlaying) {
           isPlaying = false;
+          mediaSession= false;
           stopService(new Intent(getApplicationContext(), ForegroundService.class));
         }
 
@@ -146,15 +150,43 @@ public class MainActivity extends Activity {
   @Override
   public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
     web.loadUrl(isInPictureInPictureMode ?
-      "javascript:document.getElementsByClassName('video-stream')[0].play();" :
+      "javascript:PIPlayer();" :
       "javascript:removePIP();");
+      
+      if(isInPictureInPictureMode){
+          isPip=true;
+      }else{
+          isPip=false;
+      }
 
   }
 
   @Override
   protected void onUserLeaveHint() {
     super.onUserLeaveHint();
-    web.loadUrl("javascript:PIPlayer();");
+   
+    if (android.os.Build.VERSION.SDK_INT >= 26 && web.getUrl().contains("watch")) {
+      
+         if(isPlaying){
+      
+           try {
+            PictureInPictureParams params;
+            isPip=true;
+            if (portrait) {
+               params = new PictureInPictureParams.Builder().setAspectRatio(new Rational(9, 16)).build();
+               enterPictureInPictureMode(params);
+             } else{
+              params = new PictureInPictureParams.Builder().setAspectRatio(new Rational(16, 9)).build();
+              enterPictureInPictureMode(params);
+             }
+           } catch (IllegalStateException e) {
+             e.printStackTrace();
+           }
+        }
+
+      } else {
+         Toast.makeText(getApplicationContext(), getString(R.string.no_pip), Toast.LENGTH_SHORT).show();
+      }
   }
 
   public class CustomWebClient extends WebChromeClient {
@@ -178,6 +210,9 @@ public class MainActivity extends Activity {
       this.mOriginalOrientation = portrait ?
         android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT :
         android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+      
+      if (isPip) this.mOriginalOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
+      
 
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
@@ -277,7 +312,6 @@ public class MainActivity extends Activity {
 
     @JavascriptInterface
     public void showToast(String txt) {
-
       Toast.makeText(getApplicationContext(), txt + "", Toast.LENGTH_SHORT).show();
     }
     @JavascriptInterface
@@ -316,7 +350,6 @@ public class MainActivity extends Activity {
     }
     @JavascriptInterface
     public void setBgPlay(boolean bgplay) {
-
       SharedPreferences prefs = getSharedPreferences("YTPRO", MODE_PRIVATE);
       prefs.edit().putBoolean("bgplay", bgplay).apply();
 
@@ -329,6 +362,7 @@ public class MainActivity extends Activity {
       subtitle = subtitlen;
       duration = dura;
       isPlaying = true;
+      mediaSession=true; 
 
       Intent intent = new Intent(getApplicationContext(), ForegroundService.class);
 
@@ -351,6 +385,7 @@ public class MainActivity extends Activity {
       title = titlen;
       subtitle = subtitlen;
       duration = (long)(dura);
+      isPlaying=true;
 
       getApplicationContext().sendBroadcast(new Intent("UPDATE_NOTIFICATION")
         .putExtra("icon", icon)
@@ -365,6 +400,7 @@ public class MainActivity extends Activity {
     @JavascriptInterface
     public void bgStop() {
       isPlaying = false;
+      mediaSession=false;
 
       stopService(new Intent(getApplicationContext(), ForegroundService.class));
 
@@ -372,6 +408,8 @@ public class MainActivity extends Activity {
     @JavascriptInterface
     public void bgPause(long ct) {
 
+       isPlaying=false;
+      
       getApplicationContext().sendBroadcast(new Intent("UPDATE_NOTIFICATION")
         .putExtra("icon", icon)
         .putExtra("title", title)
@@ -384,7 +422,9 @@ public class MainActivity extends Activity {
     }
     @JavascriptInterface
     public void bgPlay(long ct) {
-
+ 
+        isPlaying=true;
+      
       getApplicationContext().sendBroadcast(new Intent("UPDATE_NOTIFICATION")
         .putExtra("icon", icon)
         .putExtra("title", title)
@@ -397,7 +437,9 @@ public class MainActivity extends Activity {
     }
     @JavascriptInterface
     public void bgBuffer(long ct) {
-
+      
+        isPlaying=true;
+      
       getApplicationContext().sendBroadcast(new Intent("UPDATE_NOTIFICATION")
         .putExtra("icon", icon)
         .putExtra("title", title)
@@ -432,6 +474,57 @@ public class MainActivity extends Activity {
       return cookies;
     }
     @JavascriptInterface
+    public float getVolume() {
+        
+     int currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+     int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+
+     return (float) currentVolume / maxVolume;
+
+    }
+    @JavascriptInterface
+    public void setVolume(float volume) {
+      int max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+      int targetVolume = (int) (max * volume);
+
+     audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, targetVolume, 0);
+    }
+    @JavascriptInterface
+    public float getBrightness() {
+        
+       float brightnessPercent;
+        
+       try {
+        int sysBrightness = Settings.System.getInt(
+            getContentResolver(),
+            Settings.System.SCREEN_BRIGHTNESS
+        );
+        brightnessPercent = (sysBrightness / 255f) * 100f;
+       } catch (Settings.SettingNotFoundException e) {
+        brightnessPercent = 50f; // fallback
+       }
+       
+       return brightnessPercent;
+
+    }
+    @JavascriptInterface
+    public void setBrightness(final float brightnessValue){
+      
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+           final float brightness = Math.max(0f, Math.min(brightnessValue, 1f));
+
+           WindowManager.LayoutParams layout = getWindow().getAttributes();
+           layout.screenBrightness = brightness;
+           getWindow().setAttributes(layout);
+           
+         }
+      });     
+    
+    
+    }
+    @JavascriptInterface
     public void pipvid(String x) {
       if (android.os.Build.VERSION.SDK_INT >= 26) {
         try {
@@ -447,7 +540,7 @@ public class MainActivity extends Activity {
         }
 
       } else {
-        //   Toast.makeText(getApplicationContext(), getString(R.string.no_pip), Toast.LENGTH_SHORT).show();
+          Toast.makeText(getApplicationContext(), getString(R.string.no_pip), Toast.LENGTH_SHORT).show();
       }
     }
   }
@@ -510,5 +603,6 @@ public class MainActivity extends Activity {
   }
 
 }
+
 
 
