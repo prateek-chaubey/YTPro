@@ -41,6 +41,7 @@ public class MainActivity extends Activity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
+    
 
     SharedPreferences prefs = getSharedPreferences("YTPRO", MODE_PRIVATE);
 
@@ -57,6 +58,8 @@ public class MainActivity extends Activity {
   public void load(boolean dl) {
 
     web = findViewById(R.id.web);
+    audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+   
     web.getSettings().setJavaScriptEnabled(true);
     web.getSettings().setSupportZoom(true);
     web.getSettings().setBuiltInZoomControls(true);
@@ -604,6 +607,7 @@ public class MainActivity extends Activity {
   }
 
 }
+
 
 
 
