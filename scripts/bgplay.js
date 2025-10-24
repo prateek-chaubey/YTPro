@@ -1,6 +1,6 @@
 /*****YTPRO*******
 Author: Prateek Chaubey
-Version: 3.8.7
+Version: 3.9.2
 URI: https://github.com/prateek-chaubey/YTPRO
 */
 
@@ -246,4 +246,3 @@ handlers.nexttrack();
 function playPrev(){
 handlers.previoustrack();
 }
-
