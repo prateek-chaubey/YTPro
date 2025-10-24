@@ -189,7 +189,7 @@ public class MainActivity extends Activity {
         }
 
       } else {
-         Toast.makeText(getApplicationContext(), getString(R.string.no_pip), Toast.LENGTH_SHORT).show();
+         //Toast.makeText(getApplicationContext(), getString(R.string.no_pip), Toast.LENGTH_SHORT).show();
       }
   }
 
@@ -607,6 +607,7 @@ public class MainActivity extends Activity {
   }
 
 }
+
 
 
 
