@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
+    namespace "com.google.android.youtube.pro"  
     compileSdk 35
 
     defaultConfig {
@@ -22,3 +23,4 @@ android {
 dependencies {
     // Add your dependencies here
 }
+
