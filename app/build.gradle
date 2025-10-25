@@ -2,14 +2,14 @@ apply plugin: 'com.android.application'
 
 android {
 	useLibrary 'org.apache.http.legacy'
-	compileSdkVersion 33
+	compileSdkVersion 36
 	
 	defaultConfig {
 		applicationId "com.google.android.youtube.pro"
 		minSdkVersion 21
 		targetSdkVersion 36
 		versionCode 1
-		versionName "3.87"
+		versionName "3.92"
 	}
 	buildTypes {
 		release {
@@ -21,4 +21,5 @@ android {
 
 dependencies {
 }
+
 
