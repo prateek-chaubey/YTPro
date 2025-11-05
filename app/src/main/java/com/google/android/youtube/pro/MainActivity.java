@@ -153,9 +153,9 @@ public class MainActivity extends Activity {
 
   @Override
   public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
-    web.loadUrl(isInPictureInPictureMode ?
-      "javascript:PIPlayer();" :
-      "javascript:removePIP();");
+    web.evaluateJavascript(isInPictureInPictureMode ?
+      "PIPlayer();" :
+      "removePIP();",null);
       
       if(isInPictureInPictureMode){
           isPip=true;
@@ -559,21 +559,21 @@ public class MainActivity extends Activity {
 
         switch (action) {
         case "PLAY_ACTION":
-          web.loadUrl("javascript:playVideo();");
+          web.evaluateJavascript("playVideo();",null);
           Log.e("play", "play called");
           break;
         case "PAUSE_ACTION":
-          web.loadUrl("javascript:pauseVideo();");
+          web.evaluateJavascript("pauseVideo();",null);
           Log.e("pause", "pause called");
           break;
         case "NEXT_ACTION":
-          web.loadUrl("javascript:playNext();");
+          web.evaluateJavascript("playNext();",null);
           break;
         case "PREV_ACTION":
-          web.loadUrl("javascript:playPrev();");
+          web.evaluateJavascript("playPrev();",null);
           break;
         case "SEEKTO":
-          web.loadUrl("javascript:seekTo('" + intent.getExtras().getString("pos") + "');");
+          web.evaluateJavascript("seekTo('" + intent.getExtras().getString("pos") + "');",null);
 
           break;
         }
@@ -607,6 +607,7 @@ public class MainActivity extends Activity {
   }
 
 }
+
 
 
 
