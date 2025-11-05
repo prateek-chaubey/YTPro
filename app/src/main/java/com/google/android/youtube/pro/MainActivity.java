@@ -153,9 +153,9 @@ public class MainActivity extends Activity {
 
   @Override
   public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
-    web.evaluateJavascript(isInPictureInPictureMode ?
-      "PIPlayer();" :
-      "removePIP();",null);
+    web.loadUrl(isInPictureInPictureMode ?
+      "javascript:PIPlayer();" :
+      "javascript:removePIP();",null);
       
       if(isInPictureInPictureMode){
           isPip=true;
@@ -607,6 +607,7 @@ public class MainActivity extends Activity {
   }
 
 }
+
 
 
 
