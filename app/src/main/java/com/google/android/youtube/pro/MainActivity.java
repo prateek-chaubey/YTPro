@@ -19,6 +19,9 @@ import java.net.URLEncoder;
 import android.content.SharedPreferences;
 import android.webkit.CookieManager;
 import android.media.AudioManager;
+import java.net.*;
+import javax.net.ssl.HttpsURLConnection;
+
 
 public class MainActivity extends Activity {
 
@@ -96,9 +99,9 @@ public class MainActivity extends Activity {
       public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
         String url = request.getUrl().toString();
 
-        if (url.contains("youtube.com/cdn/npm")) {
+        if (url.contains("youtube.com/ytpro_cdn/npm")) {
 
-        String modifiedUrl = url.replace("youtube.com/cdn", "cdn.jsdelivr.net");
+        String modifiedUrl = url.replace("youtube.com/ytpro_cdn", "cdn.jsdelivr.net");
         try {
             URL newUrl = new URL(modifiedUrl);
             HttpsURLConnection connection = (HttpsURLConnection) newUrl.openConnection();
@@ -145,9 +148,9 @@ public class MainActivity extends Activity {
       public void onPageFinished(WebView p1, String url) {
 
         web.evaluateJavascript("if (window.trustedTypes && window.trustedTypes.createPolicy && !window.trustedTypes.defaultPolicy) {window.trustedTypes.createPolicy('default', {createHTML: (string) => string,createScriptURL: string => string, createScript: string => string, });}",null);
-        web.evaluateJavascript("(function () { var script = document.createElement('script'); script.src='https://youtube.com/cdn/npm/ytpro'; document.body.appendChild(script);  })();",null);
-        web.evaluateJavascript("(function () { var script = document.createElement('script'); script.src='https://youtube.com/cdn/npm/ytpro/bgplay.js'; document.body.appendChild(script);  })();",null);
-        web.evaluateJavascript("(function () { var script = document.createElement('script');script.type='module';script.src='https://youtube.com/cdn/npm/ytpro/innertube.js'; document.body.appendChild(script);  })();",null);
+        web.evaluateJavascript("(function () { var script = document.createElement('script'); script.src='https://youtube.com/ytpro_cdn/npm/ytpro'; document.body.appendChild(script);  })();",null);
+        web.evaluateJavascript("(function () { var script = document.createElement('script'); script.src='https://youtube.com/ytpro_cdn/npm/ytpro/bgplay.js'; document.body.appendChild(script);  })();",null);
+        web.evaluateJavascript("(function () { var script = document.createElement('script');script.type='module';script.src='https://youtube.com/ytpro_cdn/npm/ytpro/innertube.js'; document.body.appendChild(script);  })();",null);
 
         if (dl) {
 
@@ -650,6 +653,7 @@ public class MainActivity extends Activity {
   }
 
 }
+
 
 
 
