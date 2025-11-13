@@ -93,6 +93,49 @@ public class MainActivity extends Activity {
 
     web.setWebViewClient(new WebViewClient() {
       @Override
+      public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+        String url = request.getUrl().toString();
+
+        if (url.contains("youtube.com/cdn/npm")) {
+
+        String modifiedUrl = url.replace("youtube.com/cdn", "cdn.jsdelivr.net");
+        try {
+            URL newUrl = new URL(modifiedUrl);
+            HttpsURLConnection connection = (HttpsURLConnection) newUrl.openConnection();
+
+            connection.setUseCaches(false);
+            connection.setDefaultUseCaches(false);
+            connection.addRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate");
+            connection.addRequestProperty("Pragma", "no-cache");
+            connection.addRequestProperty("Expires", "0");
+            connection.setRequestProperty("User-Agent", "YTPRO");
+            connection.setRequestProperty("Accept", "*/*");
+
+            connection.setConnectTimeout(10000);
+            connection.setReadTimeout(10000);
+
+            connection.setRequestMethod("GET");
+
+            connection.connect();
+
+            String mimeType = connection.getContentType();
+            String encoding = connection.getContentEncoding();
+            if (encoding == null) encoding = "utf-8";
+
+            InputStream inputStream = connection.getInputStream();
+
+            return new WebResourceResponse(mimeType, encoding, inputStream);
+
+          } catch (Exception e) {
+            e.printStackTrace();
+            return super.shouldInterceptRequest(view, request);
+          }
+
+        }
+
+        return super.shouldInterceptRequest(view, request);
+     }
+      @Override
       public void onPageStarted(WebView p1, String p2, Bitmap p3) {
 
         super.onPageStarted(p1, p2, p3);
@@ -102,9 +145,9 @@ public class MainActivity extends Activity {
       public void onPageFinished(WebView p1, String url) {
 
         web.evaluateJavascript("if (window.trustedTypes && window.trustedTypes.createPolicy && !window.trustedTypes.defaultPolicy) {window.trustedTypes.createPolicy('default', {createHTML: (string) => string,createScriptURL: string => string, createScript: string => string, });}",null);
-        web.evaluateJavascript("(function () { var script = document.createElement('script'); script.src='https://cdn.jsdelivr.net/npm/ytpro'; document.body.appendChild(script);  })();",null);
-        web.evaluateJavascript("(function () { var script = document.createElement('script'); script.src='https://cdn.jsdelivr.net/npm/ytpro/bgplay.js'; document.body.appendChild(script);  })();",null);
-        web.evaluateJavascript("(function () { var script = document.createElement('script');script.type='module';script.src='https://cdn.jsdelivr.net/npm/ytpro/innertube.js'; document.body.appendChild(script);  })();",null);
+        web.evaluateJavascript("(function () { var script = document.createElement('script'); script.src='https://youtube.com/cdn/npm/ytpro'; document.body.appendChild(script);  })();",null);
+        web.evaluateJavascript("(function () { var script = document.createElement('script'); script.src='https://youtube.com/cdn/npm/ytpro/bgplay.js'; document.body.appendChild(script);  })();",null);
+        web.evaluateJavascript("(function () { var script = document.createElement('script');script.type='module';script.src='https://youtube.com/cdn/npm/ytpro/innertube.js'; document.body.appendChild(script);  })();",null);
 
         if (dl) {
 
@@ -607,6 +650,7 @@ public class MainActivity extends Activity {
   }
 
 }
+
 
 
 
