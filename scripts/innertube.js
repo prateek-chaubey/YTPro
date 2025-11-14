@@ -1,12 +1,13 @@
 /*****YTPRO*******
 Author: Prateek Chaubey
-Version: 3.9.2
+Version: 3.9.5
 URI: https://github.com/prateek-chaubey/YTPRO
 */
 
-import Jinter from 'https://cdn.jsdelivr.net/npm/jintr@3.3.1/+esm';
-import { BG } from 'https://cdn.jsdelivr.net/npm/bgutils-js@3.2.0/dist/index.min.js';
-import {Player,Innertube, ProtoUtils, UniversalCache, Utils } from 'https://cdn.jsdelivr.net/npm/youtubei.js@13.4.0/bundle/browser.min.js';
+import {BG} from 'https://youtube.com/ytpro_cdn/esm/bgutils-js@3.2.0/es2022/bgutils-js.bundle.mjs';
+import "https://youtube.com/ytpro_cdn/esm/acorn@8.15.0/es2022/acorn.mjs";
+import Jinter from 'https://youtube.com/ytpro_cdn/esm/jintr@3.3.1/es2022/jintr.bundle.mjs';
+import {Player,Innertube, ProtoUtils, UniversalCache, Utils } from 'https://youtube.com/ytpro_cdn/npm/youtubei.js@13.4.0/bundle/browser.min.js';
 
 
 
@@ -65,7 +66,6 @@ bgConfig
 return poTokenResult.poToken;
 
 }
-
 
 
 
