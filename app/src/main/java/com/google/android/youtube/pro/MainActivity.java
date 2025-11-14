@@ -97,87 +97,88 @@ public class MainActivity extends Activity {
     }
 
     web.setWebViewClient(new WebViewClient() {
-     @Override
-     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-    		String url = request.getUrl().toString();
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+            String url = request.getUrl().toString();
 
-    		if (url.contains("youtube.com/ytpro_cdn/")) {
-
-
-    			String modifiedUrl = null;
-
-    			if (url.contains("youtube.com/ytpro_cdn/esm")) {
-    				modifiedUrl = url.replace("youtube.com/ytpro_cdn/esm", "esm.sh");
-    			} else if (url.contains("youtube.com/ytpro_cdn/npm")) {
-    				modifiedUrl = url.replace("youtube.com/ytpro_cdn", "cdn.jsdelivr.net");
-    			}
-    			try {
-    				URL newUrl = new URL(modifiedUrl);
-    				HttpsURLConnection connection = (HttpsURLConnection) newUrl.openConnection();
-
-    				connection.setUseCaches(false);
-    				connection.setDefaultUseCaches(false);
-    				connection.addRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate");
-    				connection.addRequestProperty("Pragma", "no-cache");
-    				connection.addRequestProperty("Expires", "0");
-    				connection.setRequestProperty("User-Agent", "YTPRO");
-    				connection.setRequestProperty("Accept", "**");
-
-    				connection.setConnectTimeout(10000);
-    				connection.setReadTimeout(10000);
-
-    				connection.setRequestMethod("GET");
-
-    				connection.connect();
-
-    				String mimeType = connection.getContentType();
-    				String encoding = connection.getContentEncoding();
-    				if (encoding == null) encoding = "utf-8";
-    				String contentType = connection.getContentType();
-    				if (contentType == null) {
-    					contentType = "application/javascript";
-
-    					Map < String, String > headers = new HashMap < > ();
-    					headers.put("Access-Control-Allow-Origin", "*");
-    					headers.put("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    					headers.put("Access-Control-Allow-Headers", "*");
-    					headers.put("Content-Type", contentType);
-
-    					headers.put("Access-Control-Allow-Credentials", "true");
-    					headers.put("Cross-Origin-Resource-Policy", "cross-origin");
-
-    					if (request.getMethod().equals("OPTIONS")) {
-    						return new WebResourceResponse(
-    							"text/plain",
-    							"UTF-8",
-    							204,
-    							"No Content",
-    							headers,
-    							null
-    						);
-    					  }
+            if (url.contains("youtube.com/ytpro_cdn/")) {
 
 
+                String modifiedUrl = null;
 
-    					return new WebResourceResponse(
-    						mimeType,
-    						encoding,
-    						connection.getResponseCode(),
-    						"OK",
-    						headers,
-    						connection.getInputStream()
-    					);
+                if (url.contains("youtube.com/ytpro_cdn/esm")) {
+                    modifiedUrl = url.replace("youtube.com/ytpro_cdn/esm", "esm.sh");
+                } else if (url.contains("youtube.com/ytpro_cdn/npm")) {
+                    modifiedUrl = url.replace("youtube.com/ytpro_cdn", "cdn.jsdelivr.net");
+                }
+                try {
+                    URL newUrl = new URL(modifiedUrl);
+                    HttpsURLConnection connection = (HttpsURLConnection) newUrl.openConnection();
+
+                    connection.setUseCaches(false);
+                    connection.setDefaultUseCaches(false);
+                    connection.addRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate");
+                    connection.addRequestProperty("Pragma", "no-cache");
+                    connection.addRequestProperty("Expires", "0");
+                    connection.setRequestProperty("User-Agent", "YTPRO");
+                    connection.setRequestProperty("Accept", "**");
+
+                    connection.setConnectTimeout(10000);
+                    connection.setReadTimeout(10000);
+
+                    connection.setRequestMethod("GET");
+
+                    connection.connect();
+
+                    String mimeType = connection.getContentType();
+                    String encoding = connection.getContentEncoding();
+                    if (encoding == null) encoding = "utf-8";
+                    String contentType = connection.getContentType();
+                    if (contentType == null) {
+                        contentType = "application/javascript";
+                    }
+
+                        Map < String, String > headers = new HashMap < > ();
+                        headers.put("Access-Control-Allow-Origin", "*");
+                        headers.put("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+                        headers.put("Access-Control-Allow-Headers", "*");
+                        headers.put("Content-Type", contentType);
+
+                        headers.put("Access-Control-Allow-Credentials", "true");
+                        headers.put("Cross-Origin-Resource-Policy", "cross-origin");
+
+                        if (request.getMethod().equals("OPTIONS")) {
+                            return new WebResourceResponse(
+                                "text/plain",
+                                "UTF-8",
+                                204,
+                                "No Content",
+                                headers,
+                                null
+                            );
+                        }
 
 
-    				} catch (Exception e) {
-    					e.printStackTrace();
-    					return super.shouldInterceptRequest(view, request);
-    				}
 
-    			}
+                        return new WebResourceResponse(
+                            mimeType,
+                            encoding,
+                            connection.getResponseCode(),
+                            "OK",
+                            headers,
+                            connection.getInputStream()
+                        );
 
-    			return super.shouldInterceptRequest(view, request);
-    	}
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return super.shouldInterceptRequest(view, request);
+                    }
+
+                }
+
+                return super.shouldInterceptRequest(view, request);
+      }
       @Override
       public void onPageStarted(WebView p1, String p2, Bitmap p3) {
 
@@ -693,6 +694,7 @@ public class MainActivity extends Activity {
   }
 
 }
+
 
 
 
