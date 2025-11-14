@@ -1,8 +1,8 @@
 /*****YTPRO*******
 Author: Prateek Chaubey
-Version: 3.9.2
+Version: 3.9.5
 URI: https://github.com/prateek-chaubey/YTPRO
-Last Updated On: 25 Oct , 2025 , 12:01 IST
+Last Updated On: 14 Nov , 2025 , 15:57 IST
 */
 
 
@@ -20,7 +20,7 @@ s2: PN51tJhZscE
 */
 if(window.eruda == null && localStorage.getItem("devMode") == "true"){
 //ERUDA
-window.location.href=`javascript:(function () { var script = document.createElement('script'); script.src="//cdn.jsdelivr.net/npm/eruda"; document.body.appendChild(script); script.onload = function () { eruda.init();} })();`;
+window.location.href=`javascript:(function () { var script = document.createElement('script'); script.src="//youtube.com/ytpro_cdn/npm/eruda"; document.body.appendChild(script); script.onload = function () { eruda.init();} })();`;
 }
 /**/
 
@@ -58,10 +58,11 @@ var sens=0.005;
 var vol=Android.getVolume();
 var brt = Android.getBrightness()/100;
 
-if(localStorage.getItem("saveCInfo") == null  || localStorage.getItem("gesC") == null || localStorage.getItem("bgplay") == null){
+if(localStorage.getItem("saveCInfo") == null  || localStorage.getItem("gesC") == null || localStorage.getItem("gesM") == null || localStorage.getItem("bgplay") == null){
 localStorage.setItem("autoSpn","true");
 localStorage.setItem("bgplay","true");
 localStorage.setItem("gesC","true");
+localStorage.setItem("gesM","false");
 localStorage.setItem("fzoom","false");
 localStorage.setItem("saveCInfo","true");
 localStorage.setItem("geminiModel","2.5 Flash");
@@ -225,18 +226,18 @@ var addSettingsTab=()=>{
 if(document.getElementById("setDiv") == null){
 var setDiv=document.createElement("div");
 setDiv.setAttribute("style",`
-height:30px;width:30px;
 z-index:9999999999;
 font-size:22px;
-text-align:center;line-height:35px;
+text-align:center;
+line-height:35px;
+pointer-events:auto;
 `);
 setDiv.setAttribute("id","setDiv");
-var svg=document.createElement("div");
+var svg=document.createElement("ytm-pivot-bar-item-renderer");
 svg.innerHTML=`<svg fill="${ window.location.href.indexOf("watch") < 0 ? c : "#fff" }" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"  id="hSett"><path d="M12.844 1h-1.687a2 2 0 00-1.962 1.616 3 3 0 01-3.92 2.263 2 2 0 00-2.38.891l-.842 1.46a2 2 0 00.417 2.507 3 3 0 010 4.525 2 2 0 00-.417 2.507l.843 1.46a2 2 0 002.38.892 3.001 3.001 0 013.918 2.263A2 2 0 0011.157 23h1.686a2 2 0 001.963-1.615 3.002 3.002 0 013.92-2.263 2 2 0 002.38-.892l.842-1.46a2 2 0 00-.418-2.507 3 3 0 010-4.526 2 2 0 00.418-2.508l-.843-1.46a2 2 0 00-2.38-.891 3 3 0 01-3.919-2.263A2 2 0 0012.844 1Zm-1.767 2.347a6 6 0 00.08-.347h1.687a4.98 4.98 0 002.407 3.37 4.98 4.98 0 004.122.4l.843 1.46A4.98 4.98 0 0018.5 12a4.98 4.98 0 001.716 3.77l-.843 1.46a4.98 4.98 0 00-4.123.4A4.979 4.979 0 0012.843 21h-1.686a4.98 4.98 0 00-2.408-3.371 4.999 4.999 0 00-4.12-.399l-.844-1.46A4.979 4.979 0 005.5 12a4.98 4.98 0 00-1.715-3.77l.842-1.459a4.98 4.98 0 004.123-.399 4.981 4.981 0 002.327-3.025ZM16 12a4 4 0 11-7.999 0 4 4 0 018 0Zm-4 2a2 2 0 100-4 2 2 0 000 4Z"></path></svg>
 `;
 setDiv.appendChild(svg);
-insertAfter(document.getElementsByTagName("ytm-home-logo")[0],setDiv);
-
+insertAfter(document.getElementsByTagName("ytm-home-logo")[0],setDiv)
 if(document.getElementById("hSett") != null){
 document.getElementById("hSett").addEventListener("click",
 function(ev){
@@ -711,6 +712,8 @@ ytpSetI.innerHTML+=`<br><b style='font-size:18px' >YT PRO Settings</b>
 <br>
 <div>Gesture Controls <span onclick="sttCnf(this,'gesC');" style="${sttCnf(0,0,"gesC")}" ><b style="${sttCnf(0,1,"gesC")}"></b></span></div>
 <br>
+<div>Miniplayer Gesture <span onclick="sttCnf(this,'gesM');" style="${sttCnf(0,0,"gesM")}" ><b style="${sttCnf(0,1,"gesM")}"></b></span></div>
+<br>
 <div>Force Zoom <span onclick="sttCnf(this,'fzoom');" style="${sttCnf(0,0,"fzoom")}" ><b style="${sttCnf(0,1,"fzoom")}" ></b></span></div> 
 <br>
 <div>Background Play <span onclick="sttCnf(this,'bgplay');" style="${sttCnf(0,0,"bgplay")}" ><b style="${sttCnf(0,1,"bgplay")}" ></b></span></div> 
@@ -840,9 +843,9 @@ updateModel();
 Android.showToast("Your app is up to date");
 }
 
-fetch('https://cdn.jsdelivr.net/npm/ytpro', {cache: 'reload'});
-fetch('https://cdn.jsdelivr.net/npm/ytpro/bgplay.js', {cache: 'reload'});
-fetch('https://cdn.jsdelivr.net/npm/ytpro/innertube.js', {cache: 'reload'});
+fetch('https://youtube.com/ytpro_cdn/npm/ytpro', {cache: 'reload'});
+fetch('https://youtube.com/ytpro_cdn/npm/ytpro/bgplay.js', {cache: 'reload'});
+fetch('https://youtube.com/ytpro_cdn/npm/ytpro/innertube.js', {cache: 'reload'});
 }
 
 
@@ -914,7 +917,7 @@ document.getElementById("volS").remove();
 if(localStorage.getItem("devMode") == "false"){
 try{eruda.destroy();}catch{}
 }else{
-window.location.href=`javascript:(function () { var script = document.createElement('script'); script.src="//cdn.jsdelivr.net/npm/eruda"; document.body.appendChild(script); script.onload = function () { eruda.init();} })();`;
+window.location.href=`javascript:(function () { var script = document.createElement('script'); script.src="//youtube.com/ytpro_cdn/npm/eruda"; document.body.appendChild(script); script.onload = function () { eruda.init();} })();`;
 }
 
 
@@ -1100,7 +1103,7 @@ document.body.addEventListener('touchend', e => {
 
 touchendY = e.changedTouches[0].screenY;
 
-if((e.target.className.toString().includes("video-stream") || e.target.className.toString().includes("player-controls-background")) && !document.fullscreenElement){
+if((e.target.className.toString().includes("video-stream") || e.target.className.toString().includes("player-controls-background")) && !document.fullscreenElement && localStorage.getItem("gesM") == "true"){
 checkDirection();
 }
 
@@ -1169,7 +1172,7 @@ window.location.href=e.destination.url;
 var script = doc.createElement("script");
 var scriptSource=`window.addEventListener('DOMContentLoaded', function() {
 var script2 = document.createElement('script');
-script2.src="//cdn.jsdelivr.net/npm/ytpro";
+script2.src="//youtube.com/ytpro_cdn/npm/ytpro";
 document.body.appendChild(script2);
 });
 `;
@@ -1184,7 +1187,7 @@ window.location.href=e.destination.url;
 var script = doc.createElement("script");
 var scriptSource=`window.addEventListener('DOMContentLoaded', function() {
 var script2 = document.createElement('script');
-script2.src="//cdn.jsdelivr.net/npm/ytpro";
+script2.src="//youtube.com/ytpro_cdn/npm/ytpro";
 document.body.appendChild(script2);
 });
 `;
@@ -1448,7 +1451,7 @@ Android.getSNlM0e(secured);
 GeminiAT=await callbackSNlM0e();
 
 var sd = document.createElement('script');
-sd.src="//cdn.jsdelivr.net/npm/showdown/dist/showdown.min.js";
+sd.src="//youtube.com/ytpro_cdn/npm/showdown/dist/showdown.min.js";
 document.body.appendChild(sd);
 
 }
@@ -1520,6 +1523,7 @@ document.getElementById("diskl").innerHTML=dislikes;
 try{
 
 if(localStorage.getItem("gesC") == "true"){
+  
 
 var v= document.getElementById("player-container-id");
 var rect=v.getBoundingClientRect();
@@ -1624,6 +1628,7 @@ el.style.opacity="0";
 }
 
 }
+
 
   
 }catch(e){
@@ -1824,6 +1829,11 @@ PIPlayer(true);
 
 }else if(window.location.href.indexOf("youtube.com/shorts") > -1){
 
+
+let b = document.getElementById("brtS");
+let v = document.getElementById("volS");
+if (b) b.remove();
+if (v) v.remove();
 
 
 if(document.getElementById("ytproMainSDivE") == null){
@@ -2451,7 +2461,7 @@ Ve.style.transform="scale(1)";
 /*Mutation Observer*/
 //as i have been developing YTPRO for almost 4 years now
 //thus it still contains the code which i used when i was a
-//total noob in copy pasting , that time i wasn't aware of
+//totally noob in copy pasting , that time i wasn't aware of
 //plenty of things and by which i used `setInterval` instead
 //of mutation observer , i shall be optimizing the code in future
 //releases but rn only a few code blocks will be in the obesrver
