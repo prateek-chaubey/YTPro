@@ -212,6 +212,17 @@ public class MainActivity extends Activity {
     });
 
     setReceiver();
+
+    getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+        @Override
+        public void handleOnBackPressed() {
+            if (web.canGoBack()) {
+                web.goBack();
+            } else {
+                finish();
+            }
+        }
+    });
   }
 
   @Override
@@ -694,6 +705,7 @@ public class MainActivity extends Activity {
   }
 
 }
+
 
 
 
