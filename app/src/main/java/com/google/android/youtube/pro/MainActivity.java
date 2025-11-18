@@ -22,6 +22,8 @@ import android.media.AudioManager;
 import java.net.*;
 import javax.net.ssl.HttpsURLConnection;
 import java.util.*;
+import android.window.OnBackInvokedCallback;
+import android.window.OnBackInvokedDispatcher;
 
 
 
@@ -41,6 +43,7 @@ public class MainActivity extends Activity {
   private boolean dL = false;
 
   private YTProWebview web;
+  private OnBackInvokedCallback backCallback;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -213,16 +216,28 @@ public class MainActivity extends Activity {
 
     setReceiver();
 
-    getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-        @Override
-        public void handleOnBackPressed() {
-            if (web.canGoBack()) {
-                web.goBack();
-            } else {
-                finish();
+
+
+    if (android.os.Build.VERSION.SDK_INT >= 33) {
+    
+      OnBackInvokedDispatcher dispatcher = getOnBackInvokedDispatcher();
+        
+        backCallback = new OnBackInvokedCallback() {
+            @Override
+            public void onBackInvoked() {
+                if (web.canGoBack()) {
+                  web.goBack();
+                } else {
+                  finish();
+                }
             }
-        }
-    });
+        };
+        
+        dispatcher.registerOnBackInvokedCallback(
+            OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+            backCallback
+        );
+    }
   }
 
   @Override
@@ -701,10 +716,14 @@ public class MainActivity extends Activity {
       stopService(intent);
 
     if (broadcastReceiver != null) unregisterReceiver(broadcastReceiver);
-    
+
+    if (android.os.Build.VERSION.SDK_INT >= 33 && backCallback != null) {
+            getOnBackInvokedDispatcher().unregisterOnBackInvokedCallback(backCallback);
+    }
   }
 
 }
+
 
 
 
