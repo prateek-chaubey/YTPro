@@ -79,4 +79,4 @@ The available variables for gemini prompt are
 
 
 ## Disclaimer 
-This is an educational project trying to showcase the javascript injection into a webview for enhancing the productivity.
+This is an educational project aimed at showcasing javascript injection into a webview to enhance productivity.
