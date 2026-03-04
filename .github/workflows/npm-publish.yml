@@ -1,24 +1,32 @@
-
 name: Publish to NPM
 
 on:
- push:
-   paths:
-    - 'scripts/package.json'
-   branches: [ main ]
+  push:
+    paths:
+      - 'scripts/package.json'
+    branches: [ main ]
+
+permissions: {}
 
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     defaults:
       run:
         working-directory: ./scripts
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           registry-url: https://registry.npmjs.org/
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+
+      - run: npm install -g npm@latest
+
+      - run: npm ci
+
+      - run: npm publish --provenance --access public
