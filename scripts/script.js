@@ -2249,7 +2249,7 @@ delete data?.adPlacements;
 delete data?.adBreakHeartbeatParams;
 
 
-//newer version update: 09 Feb , 2026  23:27 IST
+//newer version update: 09 Feb , 2026 23:27 IST
 delete data?.[0]?.playerResponse?.adSlots;
 delete data?.[0]?.playerResponse?.playerAds;
 delete data?.[0]?.playerResponse?.adPlacements;
