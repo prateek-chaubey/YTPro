@@ -28,6 +28,102 @@ window.pauseAllowed = true; // allow pause by default
 var sTime=[];
 var webUrls=["m.youtube.com","youtube.com","yout.be","accounts.google.com"];
 var GeminiAT="";
+var YTProLocales = {
+    en: {
+        settings: "YT PRO Settings",
+        enterUrl: "Enter YouTube URL",
+        likedVideos: "Liked Videos",
+        checkUpdates: "Check for Updates",
+        autoskipSponsors: "Autoskip Sponsors",
+        gestureControls: "Gesture Controls",
+        miniplayerGesture: "Miniplayer Gesture",
+        forceZoom: "Force Zoom",
+        backgroundPlay: "Background Play",
+        hideShorts: "Hide Shorts",
+        singleGeminiChat: "Use single Gemini chat",
+        selectGeminiModel: "Select Gemini Model",
+        editGeminiPrompt: "Edit Gemini Prompt",
+        disableCodecs: "Disable Codecs",
+        reportBugs: "Report Bugs",
+        sponsor: "Become a Sponsor",
+        developerMode: "Developer Mode",
+        disclaimer: "Disclaimer",
+        disclaimerText: "This is an educational project aimed at showcasing javascript injection into a webview to enhance productivity.",
+        sourceCode: "You can find the source code at",
+        madeWith: "Made with",
+        by: "by Prateek Chaubey",
+        language: "Language",
+        english: "English",
+        chinese: "Simplified Chinese",
+        languageChanged: "Language changed. Reloading...",
+        upToDate: "Your app is up to date",
+        comments: "Comments",
+        commentsUnavailable: "Could not find the original YouTube comments on this page",
+        commentsOnlyWatch: "Comments are available on video pages",
+        openYouTubeComments: "Open YouTube comments",
+        originalCommentsOpened: "Opened original YouTube comments.",
+        liveChat: "Live chat",
+        liveChatOpened: "Opened YouTube live chat.",
+        download: "Download",
+        heart: "Heart",
+        pipMode: "PIP Mode",
+        noVideosFound: "No Videos Found",
+        likedVideosTitle: "Liked Videos"
+    },
+    zh: {
+        settings: "YT PRO 设置",
+        enterUrl: "输入 YouTube 链接",
+        likedVideos: "收藏的视频",
+        checkUpdates: "检查更新",
+        autoskipSponsors: "自动跳过赞助片段",
+        gestureControls: "手势控制",
+        miniplayerGesture: "小窗手势",
+        forceZoom: "强制缩放",
+        backgroundPlay: "后台播放",
+        hideShorts: "隐藏 Shorts",
+        singleGeminiChat: "使用单个 Gemini 对话",
+        selectGeminiModel: "选择 Gemini 模型",
+        editGeminiPrompt: "编辑 Gemini 提示词",
+        disableCodecs: "禁用编解码器",
+        reportBugs: "反馈问题",
+        sponsor: "赞助作者",
+        developerMode: "开发者模式",
+        disclaimer: "免责声明",
+        disclaimerText: "本项目用于展示如何通过 WebView 注入 JavaScript 来增强使用体验。",
+        sourceCode: "你可以在这里查看源代码：",
+        madeWith: "Made with",
+        by: "by Prateek Chaubey",
+        language: "语言",
+        english: "English",
+        chinese: "简体中文",
+        languageChanged: "语言已切换，正在重新加载...",
+        upToDate: "当前已是最新版本",
+        comments: "评论",
+        commentsUnavailable: "没有在当前页面找到 YouTube 原生评论区",
+        commentsOnlyWatch: "评论区仅在视频页面可用",
+        openYouTubeComments: "打开 YouTube 评论",
+        originalCommentsOpened: "已打开 YouTube 原生评论区。",
+        liveChat: "直播聊天",
+        liveChatOpened: "已打开 YouTube 直播聊天。",
+        download: "下载",
+        heart: "收藏",
+        pipMode: "画中画",
+        noVideosFound: "暂无视频",
+        likedVideosTitle: "收藏的视频"
+    }
+};
+
+function ytproLang(){
+    var saved = localStorage.getItem("ytproLang");
+    if(saved == "zh" || saved == "en") return saved;
+    return ((navigator.language || "").toLowerCase().indexOf("zh") == 0) ? "zh" : "en";
+}
+
+function ytproT(key){
+    var lang = ytproLang();
+    return (YTProLocales[lang] && YTProLocales[lang][key]) || YTProLocales.en[key] || key;
+}
+
 var GeminiModels = {
     "3.0 Pro": '[1,null,null,null,"9d8ca3786ebdfbea",null,null,0,[4],null,null,1]',
     "3.0 Flash": '[1,null,null,null,"fbb127bbb056c959",null,null,0,[4],null,null,1]',
@@ -714,7 +810,7 @@ margin-right:2%;
 color:${c};
 }
 </style>`;
-ytpSetI.innerHTML+=`<br><b style='font-size:18px' >YT PRO Settings</b>
+ytpSetI.innerHTML+=`<br><b style='font-size:18px' >${ytproT("settings")}</b>
 <span style="font-size:10px">v${YTProVer}</span>
 <br><br>
 <div data-action="follow" style="min-height:35px;height:auto;width:95%;margin:auto;background:#ee2a7b44;border-radius:30px;margin-bottom:15px;border:1px solid #ee2a7b;display:flex;padding:5px;gap:8px;">
@@ -728,69 +824,75 @@ ytpSetI.innerHTML+=`<br><b style='font-size:18px' >YT PRO Settings</b>
 
 </div>
 
-<div><input type="url" placeholder="Enter Youtube URL" id="ytproUrlInput" ></div>
+<div><input type="url" placeholder="${ytproT("enterUrl")}" id="ytproUrlInput" ></div>
 <br>
-<button data-action="hearts">Liked Videos
+<button data-action="hearts">${ytproT("likedVideos")}
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${isD ? "#ccc" : "#444"}" viewBox="0 0 16 16">
 <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
 </svg>
 </button>
 <br>
-<button data-action="checkUpdate">Check for Updates
+<button data-action="checkUpdate">${ytproT("checkUpdates")}
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${isD ? "#ccc" : "#444"}"  viewBox="0 0 16 16">
 <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
 </svg>
 </button>
 <br>
-<div>Autoskip Sponsors <span data-action="sttCnf" data-value="autoSpn" style="${sttCnf(0,0,"autoSpn")}" ><b style="${sttCnf(0,1,"autoSpn")}"></b></span></div>
+<div>${ytproT("autoskipSponsors")} <span data-action="sttCnf" data-value="autoSpn" style="${sttCnf(0,0,"autoSpn")}" ><b style="${sttCnf(0,1,"autoSpn")}"></b></span></div>
 <br>
-<div>Gesture Controls <span data-action="sttCnf" data-value="gesC" style="${sttCnf(0,0,"gesC")}" ><b style="${sttCnf(0,1,"gesC")}"></b></span></div>
+<div>${ytproT("gestureControls")} <span data-action="sttCnf" data-value="gesC" style="${sttCnf(0,0,"gesC")}" ><b style="${sttCnf(0,1,"gesC")}"></b></span></div>
 <br>
-<div>Miniplayer Gesture <span data-action="sttCnf" data-value="gesM" style="${sttCnf(0,0,"gesM")}" ><b style="${sttCnf(0,1,"gesM")}"></b></span></div>
+<div>${ytproT("miniplayerGesture")} <span data-action="sttCnf" data-value="gesM" style="${sttCnf(0,0,"gesM")}" ><b style="${sttCnf(0,1,"gesM")}"></b></span></div>
 <br>
-<div>Force Zoom <span data-action="sttCnf" data-value="fzoom"  style="${sttCnf(0,0,"fzoom")}" ><b style="${sttCnf(0,1,"fzoom")}" ></b></span></div> 
+<div>${ytproT("forceZoom")} <span data-action="sttCnf" data-value="fzoom"  style="${sttCnf(0,0,"fzoom")}" ><b style="${sttCnf(0,1,"fzoom")}" ></b></span></div> 
 <br>
-<div>Background Play <span data-action="sttCnf" data-value="bgplay" style="${sttCnf(0,0,"bgplay")}" ><b style="${sttCnf(0,1,"bgplay")}" ></b></span></div> 
+<div>${ytproT("backgroundPlay")} <span data-action="sttCnf" data-value="bgplay" style="${sttCnf(0,0,"bgplay")}" ><b style="${sttCnf(0,1,"bgplay")}" ></b></span></div> 
 <br>
-<div>Hide Shorts <span data-action="sttCnf" data-value="shorts" style="${sttCnf(0,0,"shorts")}" ><b style="${sttCnf(0,1,"shorts")}" ></b></span></div> 
+<div>${ytproT("hideShorts")} <span data-action="sttCnf" data-value="shorts" style="${sttCnf(0,0,"shorts")}" ><b style="${sttCnf(0,1,"shorts")}" ></b></span></div> 
 <br>
-<div>Use single Gemini chat <span data-action="sttCnf" data-value="saveCInfo" style="${sttCnf(0,0,"saveCInfo")}" ><b style="${sttCnf(0,1,"saveCInfo")}"></b></span></div>
+<div>${ytproT("singleGeminiChat")} <span data-action="sttCnf" data-value="saveCInfo" style="${sttCnf(0,0,"saveCInfo")}" ><b style="${sttCnf(0,1,"saveCInfo")}"></b></span></div>
 <br>
-<button data-action="geminiModels">Select Gemini Model
+<button data-action="geminiModels">${ytproT("selectGeminiModel")}
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${isD ? "#ccc" : "#444"}" viewBox="0 0 16 16">
 <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
 </svg>
 </button>
 <br>
-<button data-action="geminiPrompt">Edit Gemini Prompt
+<button data-action="geminiPrompt">${ytproT("editGeminiPrompt")}
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${isD ? "#ccc" : "#444"}" viewBox="0 0 16 16">
 <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
 </svg>
 </button>
 <br>
-<button data-action="disableCodecs">Disable Codecs
+<button data-action="disableCodecs">${ytproT("disableCodecs")}
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${isD ? "#ccc" : "#444"}" viewBox="0 0 16 16">
 <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
 </svg>
 </button>
 <br>
-<button data-action="issues">Report Bugs
+<button data-action="issues">${ytproT("reportBugs")}
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${isD ? "#ccc" : "#444"}" viewBox="0 0 16 16">
 <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
 </svg>
 </button>
 <br>
-<button style="font-weight:bolder;" data-action="sponsor">Become a Sponsor
+<button style="font-weight:bolder;" data-action="sponsor">${ytproT("sponsor")}
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="${isD ? "#ccc" : "#444"}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M5 2l6 6-6 6"/>
 </svg>
 
 </button>
 <br>
-<div>Developer Mode <span data-action="sttCnf" data-value="devMode" style="${sttCnf(0,0,"devMode")}" ><b style="${sttCnf(0,1,"devMode")}"></b></span></div>
+<button data-action="toggleLang">${ytproT("language")}: ${ytproLang() == "zh" ? ytproT("chinese") : ytproT("english")}
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${isD ? "#ccc" : "#444"}" viewBox="0 0 16 16">
+<path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
+</svg>
+</button>
+<br>
+<div>${ytproT("developerMode")} <span data-action="sttCnf" data-value="devMode" style="${sttCnf(0,0,"devMode")}" ><b style="${sttCnf(0,1,"devMode")}"></b></span></div>
 <br><br>
-<p style="font-size:1.25rem;width:calc(100% - 20px);margin:auto;text-align:left"><b style="font-weight:bold">Disclaimer</b>: This is an educational project aimed at showcasing javascript injection into a webview to enhance productivity.<br>
-You can find the source code at <a href="https://www.youtube.com/redirect?q=https://github.com/prateek-chaubey/YTPRO" style="font-family:monospace;" > https://github.com/prateek-chaubey/YTPRO</a>
+<p style="font-size:1.25rem;width:calc(100% - 20px);margin:auto;text-align:left"><b style="font-weight:bold">${ytproT("disclaimer")}</b>: ${ytproT("disclaimerText")}<br>
+${ytproT("sourceCode")} <a href="https://www.youtube.com/redirect?q=https://github.com/prateek-chaubey/YTPRO" style="font-family:monospace;" > https://github.com/prateek-chaubey/YTPRO</a>
 <br><br></p><br><br><br>
 
 <div class="geminiModels">
@@ -815,7 +917,7 @@ ${localStorage.getItem("prompt")}
 
 
 <div class="credit" >
-<z style="margin-right:6px">Made with </z>
+<z style="margin-right:6px">${ytproT("madeWith")} </z>
 
 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#fff" viewBox="-1 -1 18 18">
 <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314" 
@@ -824,7 +926,7 @@ stroke="black" ${ !isD ? "stroke-width='1'" : "" } stroke-linejoin="round" strok
 
 
 
-<z style="margin-left:6px">by Prateek Chaubey</z>
+<z style="margin-left:6px">${ytproT("by")}</z>
 </div>
 `;
 
@@ -865,6 +967,11 @@ var actionsList={
   },
   sponsor:()=>{
     Android.oplink('https://github.com/sponsors/prateek-chaubey');
+  },
+  toggleLang:()=>{
+    localStorage.setItem("ytproLang", ytproLang() == "zh" ? "en" : "zh");
+    Android.showToast(ytproT("languageChanged"));
+    window.location.reload();
   },
   savePrompt:(el)=>{
     localStorage.setItem('prompt',el.previousElementSibling.value);el.parentElement.style.display='none';
@@ -947,16 +1054,300 @@ a.click();
 }
 }
 
+function getVideoIdFromUrl(){
+if(window.location.pathname.indexOf("shorts") > -1){
+return window.location.pathname.replace("/shorts/","");
+}
+return new URLSearchParams(window.location.search).get("v");
+}
+
+function ytproPlayerResponse(){
+try{ if(window.ytInitialPlayerResponse) return window.ytInitialPlayerResponse; }catch(e){}
+try{ if(ytplayer?.config?.args?.raw_player_response) return ytplayer.config.args.raw_player_response; }catch(e){}
+try{ if(window.ytplayer?.config?.args?.raw_player_response) return window.ytplayer.config.args.raw_player_response; }catch(e){}
+return null;
+}
+
+function ytproIsLiveVideo(){
+var response = ytproPlayerResponse();
+try{
+var details = response?.videoDetails || {};
+var microformat = response?.microformat?.playerMicroformatRenderer || {};
+if(details.isLive || details.isLiveContent || microformat.liveBroadcastDetails || microformat.isLiveBroadcast) return true;
+}catch(e){}
+
+var selectors = ["ytm-live-chat-entry-point-renderer", "ytm-live-chat-renderer", "ytd-live-chat-frame", "yt-live-chat-app"];
+for(var i = 0; i < selectors.length; i++){
+if(document.querySelector(selectors[i])) return true;
+}
+
+try{
+var scripts = document.querySelectorAll("script");
+for(var j = 0; j < scripts.length; j++){
+var scriptText = scripts[j].textContent || "";
+if(scriptText.indexOf('"isLiveContent":true') > -1 || scriptText.indexOf('"isLive":true') > -1 || scriptText.indexOf('liveChatRenderer') > -1 || scriptText.indexOf('liveChatEndpoint') > -1 || scriptText.indexOf('liveBroadcastDetails') > -1) return true;
+}
+}catch(e){}
+
+try{
+var watchText = ((document.querySelector("ytm-watch") || document.body).innerText || "");
+if(/正在直播|直播中|实时聊天|直播聊天|聊天室|Live chat|Top chat|Chat replay/.test(watchText)) return true;
+}catch(e){}
+return false;
+}
+
+function ytproTapElement(el){
+if(!el) return;
+var rect = el.getBoundingClientRect();
+var x = rect.left + (rect.width / 2);
+var y = rect.top + (rect.height / 2);
+var opts = {bubbles:true, cancelable:true, composed:true, view:window, clientX:x, clientY:y};
+try{ el.dispatchEvent(new PointerEvent("pointerdown", opts)); }catch(e){}
+try{ el.dispatchEvent(new MouseEvent("mousedown", opts)); }catch(e){}
+try{ el.dispatchEvent(new PointerEvent("pointerup", opts)); }catch(e){}
+try{ el.dispatchEvent(new MouseEvent("mouseup", opts)); }catch(e){}
+try{ el.dispatchEvent(new MouseEvent("click", opts)); }catch(e){ try{ el.click(); }catch(_){} }
+}
+
+function openYouTubeLiveChat(){
+var selectors = ["ytm-live-chat-entry-point-renderer", "ytm-live-chat-renderer", "ytd-live-chat-frame", "yt-live-chat-app"];
+for(var i = 0; i < selectors.length; i++){
+var el = document.querySelector(selectors[i]);
+if(el){
+el.scrollIntoView({behavior:"smooth", block:"center"});
+var clickable = el.querySelector("button, a, [role='button']") || el;
+setTimeout(function(target, fallback){
+ytproTapElement(target);
+if(target !== fallback) ytproTapElement(fallback);
+}, 120, clickable, el);
+return true;
+}
+}
+
+var links = Array.from(document.querySelectorAll('a[href*="live_chat"], a[href*="live-chat"]'));
+for(var h = 0; h < links.length; h++){
+links[h].scrollIntoView({behavior:"smooth", block:"center"});
+setTimeout(function(target){ ytproTapElement(target); }, 120, links[h]);
+return true;
+}
+
+var liveLabels = ["Live chat", "Top chat", "Chat replay", "Open chat", "Show chat", "Chat", "实时聊天", "直播聊天", "直播聊天室", "热门聊天", "聊天室", "打开聊天", "显示聊天"];
+var candidates = Array.from(document.querySelectorAll("button, a, [role='button'], ytm-button-renderer, ytm-toggle-button-renderer"));
+for(var k = 0; k < candidates.length; k++){
+var label = ((candidates[k].innerText || "") + " " + (candidates[k].getAttribute("aria-label") || "") + " " + (candidates[k].title || "")).trim();
+for(var j = 0; j < liveLabels.length; j++){
+if(label.indexOf(liveLabels[j]) > -1){
+candidates[k].scrollIntoView({behavior:"smooth", block:"center"});
+setTimeout(function(target){ ytproTapElement(target); }, 120, candidates[k]);
+return true;
+}
+}
+}
+
+return false;
+}
+
+function ytproLiveChatUrl(vid){
+if(!vid) return "";
+return "https://www.youtube.com/live_chat?v=" + encodeURIComponent(vid) + "&embed_domain=m.youtube.com&is_popout=1";
+}
+
+function ytproOpenInternalUrl(url){
+if(!url) return;
+try{
+var link = document.createElement("a");
+link.href = url;
+link.target = "_self";
+link.rel = "noreferrer";
+link.style.display = "none";
+document.body.appendChild(link);
+link.click();
+link.remove();
+}catch(e){
+window.location.href = url;
+}
+}
+
+function ytproEmbedLiveChat(host, vid){
+var url = ytproLiveChatUrl(vid);
+if(!host || !url) return;
+var existing = document.getElementById("ytproLiveChatInline");
+if(existing){ existing.remove(); }
+
+var wrap = document.createElement("div");
+wrap.id = "ytproLiveChatInline";
+wrap.style.cssText = "margin-top:14px;border-radius:0;overflow:hidden;background:" + (isD ? "#0f0f0f" : "#fff") + ";border-top:1px solid " + (isD ? "#333" : "#ddd") + ";border-bottom:1px solid " + (isD ? "#333" : "#ddd") + ";";
+wrap.innerHTML = '<div style="height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:' + (isD ? "#202020" : "#f4f4f4") + ';">' +
+    '<b style="font-size:15px;">' + ytproT("liveChat") + '</b>' +
+    '<button data-action="closeInlineLiveChat" style="width:auto;min-width:42px;padding:7px 11px;border-radius:999px;background:' + (isD ? "#353535" : "#e6e6e6") + ';color:' + (isD ? "#fff" : "#111") + ';">X</button>' +
+    '</div>' +
+    '<iframe src="' + url.replaceAll('"', '&quot;') + '" referrerpolicy="origin" allow="autoplay; encrypted-media" style="display:block;width:100%;height:430px;border:0;background:' + (isD ? "#0f0f0f" : "#fff") + ';"></iframe>';
+
+wrap.addEventListener("click", function(ev){
+var btn = ev.target.closest("[data-action]");
+if(btn && btn.dataset.action === "closeInlineLiveChat") wrap.remove();
+});
+host.appendChild(wrap);
+wrap.scrollIntoView({behavior:"smooth", block:"center"});
+}
+
+function openOriginalComments(){
+var selectors = ["ytm-comments-entry-point-header-renderer", "ytm-comment-section-renderer", "ytd-comments-header-renderer", "ytd-comments"];
+for(var i = 0; i < selectors.length; i++){
+var el = document.querySelector(selectors[i]);
+if(el){
+el.scrollIntoView({behavior:"smooth", block:"center"});
+var clickable = el.querySelector("button, a, [role='button']") || el;
+setTimeout(function(target, fallback){
+ytproTapElement(target);
+if(target !== fallback) ytproTapElement(fallback);
+}, 120, clickable, el);
+return true;
+}
+}
+
+var sections = Array.from(document.querySelectorAll("ytm-item-section-renderer"));
+for(var k = 0; k < sections.length; k++){
+var text = sections[k].innerText || "";
+if(text.indexOf(ytproT("comments")) > -1 || text.indexOf("Comments") > -1 || text.indexOf("评论") > -1){
+sections[k].scrollIntoView({behavior:"smooth", block:"center"});
+setTimeout(function(target){ ytproTapElement(target); }, 120, sections[k]);
+return true;
+}
+}
+
+var anchors = Array.from(document.querySelectorAll('a'));
+for(var j = 0; j < anchors.length; j++){
+var href = anchors[j].href || "";
+if(href.indexOf("comment") > -1 || href.indexOf("replies") > -1){
+anchors[j].click();
+return true;
+}
+}
+return false;
+}
+
+function ensureCommentButton(){
+if(window.location.href.indexOf("youtube.com/watch") < 0 && window.location.href.indexOf("youtube.com/shorts") < 0) return;
+if(document.getElementById("ytproCommentsBtn") != null) return;
+var host = document.getElementById('ytproMainDivE');
+if(!host || !host.querySelector("div")) return;
+var btn = document.createElement("div");
+sty(btn);
+btn.id = "ytproCommentsBtn";
+btn.style.width = "96px";
+btn.style.position = "relative";
+btn.style.zIndex = "2147483647";
+btn.style.touchAction = "manipulation";
+btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 5h16v10H7l-3 3V5z" stroke="${c}" stroke-width="1.7" stroke-linejoin="round"/></svg><span style="margin-left:6px">${ytproT(ytproIsLiveVideo() ? "liveChat" : "comments")}</span>`;
+var ytproLastCommentsTouch = 0;
+function ytproActivateCommentsButton(ev){
+var now = Date.now();
+if(ev.type === "click" && now - ytproLastCommentsTouch < 700){
+ev.preventDefault();
+ev.stopPropagation();
+if(ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+return;
+}
+if(ev.type !== "click") ytproLastCommentsTouch = now;
+ev.preventDefault();
+ev.stopPropagation();
+if(ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+ytproCommentsPanel();
+}
+btn.addEventListener("touchend", ytproActivateCommentsButton, {capture:true, passive:false});
+btn.addEventListener("click", ytproActivateCommentsButton, true);
+var toolbar = host.querySelector("div");
+var anchor = toolbar.children.length > 1 ? toolbar.children[1] : null;
+if(anchor){
+toolbar.insertBefore(btn, anchor);
+}else{
+toolbar.appendChild(btn);
+}
+}
+
+function ytproShowInlineCommentsFallback(vid, autoLive){
+var existing = document.getElementById("ytproCommentsDiv");
+if(existing){ existing.remove(); }
+
+var isLiveFallback = !!autoLive;
+var comments = document.createElement("div");
+comments.id = "ytproCommentsDiv";
+comments.style.cssText = "width:100%;max-width:none;margin:8px 0 14px 0;padding:16px 0;border-radius:0;background:" + (isD ? "#202020" : "#f4f4f4") + ";color:" + (isD ? "#f5f5f5" : "#222") + ";box-sizing:border-box;font-size:14px;line-height:1.45;";
+comments.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;padding:0 16px;">' +
+    '<b style="font-size:18px;">' + ytproT(isLiveFallback ? "liveChat" : "comments") + '</b>' +
+    '<button data-action="closeComments" style="width:auto;min-width:42px;padding:8px 12px;border-radius:999px;background:' + (isD ? "#353535" : "#e6e6e6") + ';color:' + (isD ? "#fff" : "#111") + ';">X</button>' +
+    '</div>' +
+    (isLiveFallback ? '' : '<div style="padding:0 16px;">' + ytproT("commentsUnavailable") + '</div>') +
+    (isLiveFallback ? '' : '<div style="padding:0 16px;margin-top:12px;display:flex;flex-wrap:wrap;gap:10px;">' +
+    (vid ? '<button data-action="openNativeLiveChat" style="width:auto;min-width:160px;padding:10px 14px;border-radius:999px;background:' + d + ';color:' + c + ';">' + ytproT("liveChat") + '</button>' : '') +
+    '<button data-action="openNativeComments" style="width:auto;min-width:180px;padding:10px 14px;border-radius:999px;background:' + d + ';color:' + c + ';">' + ytproT("openYouTubeComments") + '</button>' +
+    '</div>') +
+    '<div style="padding:0 16px;margin-top:10px;font-size:12px;opacity:.72;">' + (vid ? vid : "") + '</div>';
+
+comments.addEventListener("click", function(ev){
+var btn = ev.target.closest("[data-action]");
+if(!btn) return;
+ev.preventDefault();
+ev.stopPropagation();
+if(ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+if(btn.dataset.action === "closeComments") comments.remove();
+if(btn.dataset.action === "openNativeLiveChat") ytproEmbedLiveChat(comments, vid);
+if(btn.dataset.action === "openNativeComments"){
+if(!openOriginalComments()) ytproOpenInternalUrl("https://m.youtube.com/watch?v=" + encodeURIComponent(vid || "") + "#comments");
+}
+});
+
+var host = document.getElementById("ytproMainDivE") || document.getElementById("player-container-id") || document.querySelector("ytm-watch");
+if(host && host.parentNode){
+host.parentNode.insertBefore(comments, host.nextSibling);
+}else{
+document.body.appendChild(comments);
+}
+if(isLiveFallback && vid){
+setTimeout(function(){ ytproEmbedLiveChat(comments, vid); }, 120);
+}
+comments.scrollIntoView({behavior:"smooth", block:"center"});
+}
+
+function ytproCommentsPanel(){
+var existing = document.getElementById("ytproCommentsDiv");
+if(existing){ existing.remove(); }
+
+if(!/youtube\.com\/(watch|shorts)/.test(window.location.href)){
+Android.showToast(ytproT("commentsOnlyWatch"));
+return;
+}
+
+if(openYouTubeLiveChat()){
+Android.showToast(ytproT("liveChatOpened"));
+return;
+}
+
+var vid = getVideoIdFromUrl();
+if(ytproIsLiveVideo()){
+ytproShowInlineCommentsFallback(vid, true);
+return;
+}
+
+if(openOriginalComments()){
+Android.showToast(ytproT("originalCommentsOpened"));
+return;
+}
+
+ytproShowInlineCommentsFallback(vid);
+}
+
 function checkUpdates(){
 if(parseFloat(Android.getInfo()) < parseFloat(YTProVer) ){
 updateModel();
 }else{
-Android.showToast("Your app is up to date");
+Android.showToast(ytproT("upToDate"));
 }
 
-fetch('https://youtube.com/ytpro_cdn/npm/ytpro', {cache: 'reload'});
-fetch('https://youtube.com/ytpro_cdn/npm/ytpro/bgplay.js', {cache: 'reload'});
-fetch('https://youtube.com/ytpro_cdn/npm/ytpro/innertube.js', {cache: 'reload'});
+fetch('https://youtube.com/ytpro_local/script.js', {cache: 'reload'});
+fetch('https://youtube.com/ytpro_local/bgplay.js', {cache: 'reload'});
+fetch('https://youtube.com/ytpro_local/innertube.js', {cache: 'reload'});
 }
 
 
@@ -1737,7 +2128,7 @@ insertAfter(document.getElementsByClassName('slim-video-action-bar-actions')[0],
 var ytproMainDiv=document.createElement("div");
 ytproMainDiv.setAttribute("style",`
 height:50px;width:100%;display:flex;overflow:auto;
-align-items:center;justify-content:center;padding-left:20px;padding-right:10px;
+align-items:center;justify-content:flex-start;padding-left:20px;padding-right:10px;
 `);
 ytproMainDivA.appendChild(ytproMainDiv);
 
@@ -1862,9 +2253,9 @@ geminiInfo();
 var ytproFavElem=document.createElement("div");
 sty(ytproFavElem);
 if(!isHeart()){
-ytproFavElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path fill="${c}" d="M19.66 3.99c-2.64-1.8-5.9-.96-7.66 1.1-1.76-2.06-5.02-2.91-7.66-1.1-1.4.96-2.28 2.58-2.34 4.29-.14 3.88 3.3 6.99 8.55 11.76l.1.09c.76.69 1.93.69 2.69-.01l.11-.1c5.25-4.76 8.68-7.87 8.55-11.75-.06-1.7-.94-3.32-2.34-4.28zM12.1 18.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg><span style="margin-left:8px">Heart<span>`;
+ytproFavElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path fill="${c}" d="M19.66 3.99c-2.64-1.8-5.9-.96-7.66 1.1-1.76-2.06-5.02-2.91-7.66-1.1-1.4.96-2.28 2.58-2.34 4.29-.14 3.88 3.3 6.99 8.55 11.76l.1.09c.76.69 1.93.69 2.69-.01l.11-.1c5.25-4.76 8.68-7.87 8.55-11.75-.06-1.7-.94-3.32-2.34-4.28zM12.1 18.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg><span style="margin-left:8px">${ytproT("heart")}<span>`;
 }else{
-ytproFavElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path fill="${c}" d="M13.35 20.13c-.76.69-1.93.69-2.69-.01l-.11-.1C5.3 15.27 1.87 12.16 2 8.28c.06-1.7.93-3.33 2.34-4.29 2.64-1.8 5.9-.96 7.66 1.1 1.76-2.06 5.02-2.91 7.66-1.1 1.41.96 2.28 2.59 2.34 4.29.14 3.88-3.3 6.99-8.55 11.76l-.1.09z"/></svg><span style="margin-left:8px">Heart<span>`;
+ytproFavElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path fill="${c}" d="M13.35 20.13c-.76.69-1.93.69-2.69-.01l-.11-.1C5.3 15.27 1.87 12.16 2 8.28c.06-1.7.93-3.33 2.34-4.29 2.64-1.8 5.9-.96 7.66 1.1 1.76-2.06 5.02-2.91 7.66-1.1 1.41.96 2.28 2.59 2.34 4.29.14 3.88-3.3 6.99-8.55 11.76l-.1.09z"/></svg><span style="margin-left:8px">${ytproT("heart")}<span>`;
 }
 ytproMainDiv.appendChild(ytproFavElem);
 ytproFavElem.addEventListener("click",()=>{ytProHeart(ytproFavElem);});
@@ -1875,7 +2266,7 @@ ytproFavElem.addEventListener("click",()=>{ytProHeart(ytproFavElem);});
 var ytproDownVidElem=document.createElement("div");
 sty(ytproDownVidElem);
 ytproDownVidElem.style.width="140px";
-ytproDownVidElem.innerHTML=`${downBtn.replace('width="18"','width="24"').replace('height="18"','height="24"')}<span style="margin-left:2px">Download<span>`;
+ytproDownVidElem.innerHTML=`${downBtn.replace('width="18"','width="24"').replace('height="18"','height="24"')}<span style="margin-left:2px">${ytproT("download")}<span>`;
 ytproMainDiv.appendChild(ytproDownVidElem);
 ytproDownVidElem.addEventListener("click",
 function(){
@@ -1886,7 +2277,7 @@ window.location.hash="download";
 var ytproPIPVidElem=document.createElement("div");
 sty(ytproPIPVidElem);
 ytproPIPVidElem.style.width="140px";
-ytproPIPVidElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="22" viewBox="0 0 24 24" width="22"><path fill="${c}" d="M18 7h-6c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1h6c.55 0 1-.45 1-1V8c0-.55-.45-1-1-1zm3-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm-1 16.01H4c-.55 0-1-.45-1-1V5.98c0-.55.45-1 1-1h16c.55 0 1 .45 1 1v12.03c0 .55-.45 1-1 1z"/></svg><span style="margin-left:8px">PIP Mode<span>`;
+ytproPIPVidElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="22" viewBox="0 0 24 24" width="22"><path fill="${c}" d="M18 7h-6c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1h6c.55 0 1-.45 1-1V8c0-.55-.45-1-1-1zm3-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm-1 16.01H4c-.55 0-1-.45-1-1V5.98c0-.55.45-1 1-1h16c.55 0 1 .45 1 1v12.03c0 .55-.45 1-1 1z"/></svg><span style="margin-left:8px">${ytproT("pipMode")}<span>`;
 ytproMainDiv.appendChild(ytproPIPVidElem);
 ytproPIPVidElem.addEventListener("click",
 function(){
@@ -2300,6 +2691,7 @@ window.onhashchange=()=>{
 try{document.getElementById("outerdownytprodiv").remove();}catch{}
 try{document.getElementById("outerheartsdiv").remove();}catch{}
 try{document.getElementById("settingsprodiv").remove();}catch{}
+try{document.getElementById("ytproCommentsDiv").remove();}catch{}
 //try{document.querySelector("#ytproDownloadIndicator").remove();}catch{}
 //try{document.querySelector("#ytProDownloaderDiv").remove();}catch{}
 if(window.location.hash == "#download"){
@@ -2309,6 +2701,8 @@ ytproSettings();
 }
 else if(window.location.hash == "#hearts"){
 showHearts();
+}else if(window.location.hash == "#comments"){
+ytproCommentsPanel();
 }
 
 
@@ -2617,6 +3011,7 @@ addMaxButton();
 
 //settingsTab
 addSettingsTab();
+ensureCommentButton();
 
 
 try{

@@ -1,0 +1,7 @@
+<resources>
+	<string name="grant_mic">请授予麦克风权限以使用语音识别</string>
+	<string name="grant_storage">请授予存储权限以下载文件</string>
+	<string name="no_pip">当前 Android 版本不支持画中画</string>
+	<string name="dl_started">已开始下载</string>
+	<string name="dl">下载</string>
+</resources>
