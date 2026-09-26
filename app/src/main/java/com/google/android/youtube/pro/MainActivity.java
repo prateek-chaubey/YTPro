@@ -166,8 +166,8 @@ public class MainActivity extends Activity {
 
     @Override
     public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
-        web.evaluateJavascript(isInPictureInPictureMode ? "PIPlayer();" : "removePIP();", null);
         isPip = isInPictureInPictureMode;
+        web.evaluateJavascript(isInPictureInPictureMode ? "PIPlayer();" : "removePIP();", null);
     }
 
     @Override
@@ -176,7 +176,24 @@ public class MainActivity extends Activity {
         if (Build.VERSION.SDK_INT >= 26 && web.getUrl() != null && web.getUrl().contains("watch")) {
             if (isPlaying) {
                 try {
-                    isPip = true;
+
+         /**Webview requires gesture for FullScreenView which is used for PiP mode , this does that ig.*/
+         web.loadUrl("javascript:showCurtain();");
+         long downTime = SystemClock.uptimeMillis();
+         long eventTime = downTime;
+
+         float x = web.getWidth() / 2f;
+         float y = 10f; 
+         MotionEvent down = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_DOWN, x, y, 0);
+         web.dispatchTouchEvent(down);
+
+         eventTime += 15; 
+         MotionEvent up = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_UP, x, y, 0);
+         web.dispatchTouchEvent(up);
+         down.recycle();
+         up.recycle();
+         web.loadUrl( "javascript:hideCurtain();");
+                 
                     PictureInPictureParams params = new PictureInPictureParams.Builder()
                             .setAspectRatio(new Rational(portrait ? 9 : 16, portrait ? 16 : 9))
                             .build();
