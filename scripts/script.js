@@ -1,8 +1,8 @@
 /*****YTPRO*******
 Author: Prateek Chaubey
-Version: 3.9.8
+Version: 4.0.0
 URI: https://github.com/prateek-chaubey/YTPRO
-Last Updated On: 1 May , 2026 , 19:25 IST
+Last Updated On: 26 Sep , 2026 , 22:25 IST
 */
 
 
@@ -17,7 +17,7 @@ var script = document.createElement('script'); script.src="//youtube.com/ytpro_c
 if(!YTProVer){
 
 /*Few Stupid Inits*/
-var YTProVer="3.98";
+var YTProVer="4.0";
 var ytoldV="";
 var isF=false;   //what is this for?
 var isAp=false; // oh it's for bg play 
@@ -29,15 +29,15 @@ var sTime=[];
 var webUrls=["m.youtube.com","youtube.com","yout.be","accounts.google.com"];
 var GeminiAT="";
 var GeminiModels = {
-    "3.0 Pro": '[1,null,null,null,"9d8ca3786ebdfbea",null,null,0,[4],null,null,1]',
-    "3.0 Flash": '[1,null,null,null,"fbb127bbb056c959",null,null,0,[4],null,null,1]',
-    "3.0 Flash Thinking": '[1,null,null,null,"5bf011840784117a",null,null,0,[4],null,null,1]',
-    "3.0 Pro Plus": '[1,null,null,null,"e6fa609c3fa255c0",null,null,0,[4],null,null,4]',
-    "3.0 Flash Plus": '[1,null,null,null,"56fdd199312815e2",null,null,0,[4],null,null,4]',
-    "3.0 Flash Thinking Plus": '[1,null,null,null,"e051ce1aa80aa576",null,null,0,[4],null,null,4]',
-    "3.0 Pro Advanced": '[1,null,null,null,"e6fa609c3fa255c0",null,null,0,[4],null,null,2]',
-    "3.0 Flash Advanced": '[1,null,null,null,"56fdd199312815e2",null,null,0,[4],null,null,2]',
-    "3.0 Flash Thinking Advanced": '[1,null,null,null,"e051ce1aa80aa576",null,null,0,[4],null,null,2]'
+    "3.1 Pro": '[1,null,null,null,"9d8ca3786ebdfbea",null,null,0,[4,5,6,8],null,null,1, null,null,3]',
+    "3.6 Flash":               '[1,null,null,null,"fbb127bbb056c959",null,null,0,[4,5,6,8],null,null,1, null,null,1]',
+    "3.5 Flash-Lite":          '[1,null,null,null,"cf41b0e0dd7d53e5",null,null,0,[4,5,6,8],null,null,1, null,null,6]',
+    "3.1 Pro Plus":            '[1,null,null,null,"e6fa609c3fa255c0",null,null,0,[4,5,6,8],null,null,4, null,null,3]',
+    "3.6 Flash Plus":          '[1,null,null,null,"56fdd199312815e2",null,null,0,[4,5,6,8],null,null,4, null,null,1]',
+    "3.5 Flash Lite Plus":     '[1,null,null,null,"8c46e95b1a07cecc",null,null,0,[4,5,6,8],null,null,4, null,null,6]',
+    "3.1 Pro Advanced":        '[1,null,null,null,"e6fa609c3fa255c0",null,null,0,[4,5,6,8],null,null,2, null,null,3]',
+    "3.6 Flash Advanced":      '[1,null,null,null,"56fdd199312815e2",null,null,0,[4,5,6,8],null,null,2, null,null,1]',
+    "3.5 Flash Lite Advanced": '[1,null,null,null,"8c46e95b1a07cecc",null,null,0,[4,5,6,8],null,null,2, null,null,6]'
 };
 
 var YTPROCodecs={
@@ -61,8 +61,8 @@ localStorage.setItem("gesC","true");
 localStorage.setItem("gesM","false");
 localStorage.setItem("fzoom","false");
 localStorage.setItem("saveCInfo","true");
-localStorage.setItem("geminiModel","3.0 Flash");
-localStorage.setItem("prompt","Give me details about this YouTube video Id: {videoId} , a detailed summary of timestamps with facts , resources and reviews of the main content");
+localStorage.setItem("geminiModel","3.5 Flash-Lite");
+localStorage.setItem("prompt",`Give me details about this YouTube video Id: {videoId} , titled "{title}" , a detailed summary of timestamps with facts , resources and reviews of the main content`);
 localStorage.setItem("devMode","false");
 
 localStorage.setItem("block_60fps","false");
@@ -80,8 +80,18 @@ if(localStorage.getItem("fzoom") == "true"){
 document.getElementsByName("viewport")[0].setAttribute("content","");
 }
 
-if (["2.0 Flash", "2.0 Flash Thinking", "2.5 Flash", "2.5 Pro"].includes(localStorage.getItem('geminiModel'))) {
-localStorage.setItem('geminiModel', "3.0 Flash");
+if ([
+    "3.0 Pro",
+    "3.0 Flash",
+    "3.0 Flash Thinking",
+    "3.0 Pro Plus",
+    "3.0 Flash Plus",
+    "3.0 Flash Thinking Plus",
+    "3.0 Pro Advanced",
+    "3.0 Flash Advanced",
+    "3.0 Flash Thinking Advanced"
+].includes(localStorage.getItem('geminiModel'))) {
+localStorage.setItem('geminiModel', "3.5 Flash-Lite");
 }
 
 
@@ -472,23 +482,20 @@ clearInterval(unV);
 
 /*Funtion to set Element Styles*/
 function sty(e,v){
-var s={
+Object.assign(e.style,{
 display:"flex",
 alignItems:"center",
 justifyContent:"center",
 fontWeight:"550",
 height:"65%",
-minWidth:"80px",
+minWidth:"22%",
 width:"auto",
 borderRadius:"20px",
 background:d,
 fontSize:"12px",
 marginRight:"5px",
 textAlign:"center",
-};
-for(x in s){
-e.style[x]=s[x];
-}
+})
 }
 
 
@@ -753,6 +760,8 @@ ytpSetI.innerHTML+=`<br><b style='font-size:18px' >YT PRO Settings</b>
 <div>Background Play <span data-action="sttCnf" data-value="bgplay" style="${sttCnf(0,0,"bgplay")}" ><b style="${sttCnf(0,1,"bgplay")}" ></b></span></div> 
 <br>
 <div>Hide Shorts <span data-action="sttCnf" data-value="shorts" style="${sttCnf(0,0,"shorts")}" ><b style="${sttCnf(0,1,"shorts")}" ></b></span></div> 
+<br>
+<div>Hide Community Posts <span data-action="sttCnf" data-value="communityPosts" style="${sttCnf(0,0,"communityPosts")}" ><b style="${sttCnf(0,1,"communityPosts")}" ></b></span></div> 
 <br>
 <div>Use single Gemini chat <span data-action="sttCnf" data-value="saveCInfo" style="${sttCnf(0,0,"saveCInfo")}" ><b style="${sttCnf(0,1,"saveCInfo")}"></b></span></div>
 <br>
@@ -1343,18 +1352,28 @@ callbackGeminiClient.resolve = resolve;
 
 
 
+
 /*Handles the reponse*/
 function handleGeminiResponse(res){
 
 
 /*Extract the body from the response*/
-const getBody=(x)=>{
-for(var i in x){
+const getBody=(lines)=>{
+  
+let linesJSON=JSON.parse(lines[2]).findLast(arr =>{
 try{
-var json=JSON.parse(x[i][2]);
-if(json[4]?.[0]?.[0].indexOf("rc_") > -1) return json;
-}catch(e){console.log("JSON parse error: "+e);}}
-}
+  let js=JSON.parse(arr[2]);
+  if(js?.[4]?.[0]?.[0]?.indexOf("rc_") > -1) return js;  
+}catch(e){
+  console.log("err",e)
+}           
+});
+
+
+return JSON.parse(linesJSON?.[2] || "[]");
+  
+};
+
 
 /*Modifies the timestamps , to handle them inside the video element*/
 const modifyTimestamps=(x)=>{
@@ -1376,19 +1395,19 @@ return html;
 
 
 
-
 /*checks if the object is empty*/
 var response=res.stream;
 
 if (response == undefined) return document.getElementById("GeminiResponse").innerHTML=`<center style="margin-top:15px" > An error Occurred while connecting to Gemini`;
 
+
+
 var lines=response.split("\n");
-var responseJson=JSON.parse(lines[2])
+var body=getBody(lines);
 
 
-var body=getBody(responseJson) || [];
+if(body.length === 0) return document.getElementById("GeminiResponse").innerHTML=`<center style="margin-top:15px" > An error Occurred while connecting to Gemini`;
 
-//console.log(body)
 
 var chat=[];
 
@@ -1513,7 +1532,7 @@ var headers=JSON.stringify({
 "accept": "*/*",
 "accept-language": "en",
 "content-type":"application/x-www-form-urlencoded;charset=UTF-8",
-"x-goog-ext-525001261-jspb": GeminiModels[localStorage.getItem('geminiModel')], 
+"x-goog-ext-525001261-jspb": GeminiModels[localStorage.getItem('geminiModel')],
 "x-same-domain": "1",
 "cookie": secured,
 "Referer": "https://gemini.google.com/",
@@ -1534,7 +1553,7 @@ document.body.appendChild(sd);
 
 
 
-var prompt=localStorage.getItem('prompt').replaceAll("{url}",window.location.href).replaceAll("{videoId}",new URL(window.location.href).searchParams.get("v")).replaceAll("{title}",document.getElementsByClassName('slim-video-metadata-header')[0].textContent.replaceAll("|","").replaceAll("\\","").replaceAll("?","").replaceAll("*","").replaceAll("<","").replaceAll("/","").replaceAll(":","").replaceAll('"',"").replaceAll(">","")); 
+var prompt=localStorage.getItem('prompt').replaceAll("{url}",window.location.href).replaceAll("{videoId}",new URL(window.location.href).searchParams.get("v")).replaceAll("{title}",document.getElementsByClassName('slim-video-information-title')[0].textContent); 
 //`send me details with timestamps and images related to this youtube com video ${}`;
 // , including all the aspects and scopes with timestamp , add facts in the analysis as well ,Here's the youtube 
 
@@ -1546,12 +1565,12 @@ if(localStorage.getItem("saveCInfo") == "true" && localStorage.getItem("geminiCh
 chat = localStorage.getItem("geminiChatInfo").split(",");
 }
 
+  
+  
 const formData = new URLSearchParams();
-formData.append("f.req", JSON.stringify([
-null,
-JSON.stringify([[prompt],null,chat])
-]));
+formData.append("f.req", JSON.stringify([null,JSON.stringify([[prompt],null,chat])]));
 
+  
 formData.append("at", GeminiAT);
 
 
@@ -1579,16 +1598,17 @@ var elm=document.getElementsByTagName("dislike-button-view-model")[0].children[0
 elm.children[0].children[0].style.width="auto";
 elm.children[0].children[0].style.paddingRight="15px";
 
+let dislikesHtml=`<span class="slim-video-subtitle-substring slim-video-information-dislike-count"><span class="ytAttributedStringHost" dir="auto" aria-label="2.9m" role="text" style="">${dislikes} dislikes</span></span>`
+
 if(!document.getElementById("diskl")){
   var diskl=document.createElement("span");
   diskl.setAttribute("id","diskl");
-  diskl.innerHTML=dislikes;
-  diskl.style.marginLeft="5px";
+  diskl.innerHTML=dislikesHtml;
   
-insertAfter(elm.getElementsByClassName("yt-spec-button-shape-next__icon")[0],diskl);
+insertAfter(document.getElementsByClassName("slim-video-information-like-count")[0],diskl);
 
 }else{
-document.getElementById("diskl").innerHTML=dislikes;
+document.getElementById("diskl").innerHTML=dislikesHtml;
 }
 
 }catch(e){}
@@ -1737,21 +1757,20 @@ insertAfter(document.getElementsByClassName('slim-video-action-bar-actions')[0],
 var ytproMainDiv=document.createElement("div");
 ytproMainDiv.setAttribute("style",`
 height:50px;width:100%;display:flex;overflow:auto;
-align-items:center;justify-content:center;padding-left:20px;padding-right:10px;
+align-items:center;justify-content:center;
 `);
 ytproMainDivA.appendChild(ytproMainDiv);
 
 /*Gemini Button*/
 var ytproGemini=document.createElement("div");
 sty(ytproGemini);
-ytproGemini.style.width="115px";
+ytproGemini.style.width="30px";
 ytproGemini.style.height="calc(65% - 4.5px)";
 ytproGemini.style.position="relative";
 ytproGemini.style.background=`linear-gradient(${isD ? "#272727,#272727" : "#f2f2f2,#f2f2f2"}) padding-box , linear-gradient(16deg ,#4285f4 ,#9b72cb ,#d96570) border-box`;
 ytproGemini.style.border="2px solid transparent";
 ytproGemini.innerHTML=`
-<svg style="height:16px;width:16px" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M16 8.016A8.522 8.522 0 008.016 16h-.032A8.521 8.521 0 000 8.016v-.032A8.521 8.521 0 007.984 0h.032A8.522 8.522 0 0016 7.984v.032z" fill="url(#prefix__paint0_radial_980_20147)"/><defs><radialGradient id="prefix__paint0_radial_980_20147" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(16.1326 5.4553 -43.70045 129.2322 1.588 6.503)"><stop offset=".067" stop-color="#9168C0"/><stop offset=".343" stop-color="#5684D1"/><stop offset=".672" stop-color="#1BA1E3"/></radialGradient></defs></svg>
-<span style="margin-left:4px">Gemini</span>
+<svg style="height:20px;width:20px" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M16 8.016A8.522 8.522 0 008.016 16h-.032A8.521 8.521 0 000 8.016v-.032A8.521 8.521 0 007.984 0h.032A8.522 8.522 0 0016 7.984v.032z" fill="url(#prefix__paint0_radial_980_20147)"/><defs><radialGradient id="prefix__paint0_radial_980_20147" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(16.1326 5.4553 -43.70045 129.2322 1.588 6.503)"><stop offset=".067" stop-color="#9168C0"/><stop offset=".343" stop-color="#5684D1"/><stop offset=".672" stop-color="#1BA1E3"/></radialGradient></defs></svg>
 <style type="text/css">
 #GeminiResponse img{
 max-width:90%;
@@ -1862,9 +1881,9 @@ geminiInfo();
 var ytproFavElem=document.createElement("div");
 sty(ytproFavElem);
 if(!isHeart()){
-ytproFavElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path fill="${c}" d="M19.66 3.99c-2.64-1.8-5.9-.96-7.66 1.1-1.76-2.06-5.02-2.91-7.66-1.1-1.4.96-2.28 2.58-2.34 4.29-.14 3.88 3.3 6.99 8.55 11.76l.1.09c.76.69 1.93.69 2.69-.01l.11-.1c5.25-4.76 8.68-7.87 8.55-11.75-.06-1.7-.94-3.32-2.34-4.28zM12.1 18.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg><span style="margin-left:8px">Heart<span>`;
+ytproFavElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path fill="${c}" d="M19.66 3.99c-2.64-1.8-5.9-.96-7.66 1.1-1.76-2.06-5.02-2.91-7.66-1.1-1.4.96-2.28 2.58-2.34 4.29-.14 3.88 3.3 6.99 8.55 11.76l.1.09c.76.69 1.93.69 2.69-.01l.11-.1c5.25-4.76 8.68-7.87 8.55-11.75-.06-1.7-.94-3.32-2.34-4.28zM12.1 18.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>`;
 }else{
-ytproFavElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path fill="${c}" d="M13.35 20.13c-.76.69-1.93.69-2.69-.01l-.11-.1C5.3 15.27 1.87 12.16 2 8.28c.06-1.7.93-3.33 2.34-4.29 2.64-1.8 5.9-.96 7.66 1.1 1.76-2.06 5.02-2.91 7.66-1.1 1.41.96 2.28 2.59 2.34 4.29.14 3.88-3.3 6.99-8.55 11.76l-.1.09z"/></svg><span style="margin-left:8px">Heart<span>`;
+ytproFavElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path fill="${c}" d="M13.35 20.13c-.76.69-1.93.69-2.69-.01l-.11-.1C5.3 15.27 1.87 12.16 2 8.28c.06-1.7.93-3.33 2.34-4.29 2.64-1.8 5.9-.96 7.66 1.1 1.76-2.06 5.02-2.91 7.66-1.1 1.41.96 2.28 2.59 2.34 4.29.14 3.88-3.3 6.99-8.55 11.76l-.1.09z"/></svg>`;
 }
 ytproMainDiv.appendChild(ytproFavElem);
 ytproFavElem.addEventListener("click",()=>{ytProHeart(ytproFavElem);});
@@ -1874,8 +1893,8 @@ ytproFavElem.addEventListener("click",()=>{ytProHeart(ytproFavElem);});
 /*Download Button*/
 var ytproDownVidElem=document.createElement("div");
 sty(ytproDownVidElem);
-ytproDownVidElem.style.width="140px";
-ytproDownVidElem.innerHTML=`${downBtn.replace('width="18"','width="24"').replace('height="18"','height="24"')}<span style="margin-left:2px">Download<span>`;
+//ytproDownVidElem.style.width="140px";
+ytproDownVidElem.innerHTML=`${downBtn.replace('width="18"','width="24"').replace('height="18"','height="24"')}`;
 ytproMainDiv.appendChild(ytproDownVidElem);
 ytproDownVidElem.addEventListener("click",
 function(){
@@ -1885,8 +1904,8 @@ window.location.hash="download";
 /*PIP Button*/
 var ytproPIPVidElem=document.createElement("div");
 sty(ytproPIPVidElem);
-ytproPIPVidElem.style.width="140px";
-ytproPIPVidElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="22" viewBox="0 0 24 24" width="22"><path fill="${c}" d="M18 7h-6c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1h6c.55 0 1-.45 1-1V8c0-.55-.45-1-1-1zm3-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm-1 16.01H4c-.55 0-1-.45-1-1V5.98c0-.55.45-1 1-1h16c.55 0 1 .45 1 1v12.03c0 .55-.45 1-1 1z"/></svg><span style="margin-left:8px">PIP Mode<span>`;
+//ytproPIPVidElem.style.width="140px";
+ytproPIPVidElem.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="22" viewBox="0 0 24 24" width="22"><path fill="${c}" d="M18 7h-6c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1h6c.55 0 1-.45 1-1V8c0-.55-.45-1-1-1zm3-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm-1 16.01H4c-.55 0-1-.45-1-1V5.98c0-.55.45-1 1-1h16c.55 0 1 .45 1 1v12.03c0 .55-.45 1-1 1z"/></svg>`;
 ytproMainDiv.appendChild(ytproPIPVidElem);
 ytproPIPVidElem.addEventListener("click",
 function(){
@@ -1945,9 +1964,9 @@ border-radius:50%;margin-bottom:0px;
 
 
 if(!isHeart()){
-ysHeart.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path fill="#fff" d="M19.66 3.99c-2.64-1.8-5.9-.96-7.66 1.1-1.76-2.06-5.02-2.91-7.66-1.1-1.4.96-2.28 2.58-2.34 4.29-.14 3.88 3.3 6.99 8.55 11.76l.1.09c.76.69 1.93.69 2.69-.01l.11-.1c5.25-4.76 8.68-7.87 8.55-11.75-.06-1.7-.94-3.32-2.34-4.28zM12.1 18.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>`;
+ysHeart.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="28" viewBox="0 0 24 24" width="28"><path d="M0 0h24v24H0V0z" fill="none"/><path fill="#fff" d="M19.66 3.99c-2.64-1.8-5.9-.96-7.66 1.1-1.76-2.06-5.02-2.91-7.66-1.1-1.4.96-2.28 2.58-2.34 4.29-.14 3.88 3.3 6.99 8.55 11.76l.1.09c.76.69 1.93.69 2.69-.01l.11-.1c5.25-4.76 8.68-7.87 8.55-11.75-.06-1.7-.94-3.32-2.34-4.28zM12.1 18.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>`;
 }else{
-ysHeart.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path fill="#fff" d="M13.35 20.13c-.76.69-1.93.69-2.69-.01l-.11-.1C5.3 15.27 1.87 12.16 2 8.28c.06-1.7.93-3.33 2.34-4.29 2.64-1.8 5.9-.96 7.66 1.1 1.76-2.06 5.02-2.91 7.66-1.1 1.41.96 2.28 2.59 2.34 4.29.14 3.88-3.3 6.99-8.55 11.76l-.1.09z"/></svg>`;
+ysHeart.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" height="28" viewBox="0 0 24 24" width="28"><path d="M0 0h24v24H0V0z" fill="none"/><path fill="#fff" d="M13.35 20.13c-.76.69-1.93.69-2.69-.01l-.11-.1C5.3 15.27 1.87 12.16 2 8.28c.06-1.7.93-3.33 2.34-4.29 2.64-1.8 5.9-.96 7.66 1.1 1.76-2.06 5.02-2.91 7.66-1.1 1.41.96 2.28 2.59 2.34 4.29.14 3.88-3.3 6.99-8.55 11.76l-.1.09z"/></svg>`;
 }
 
 
@@ -1962,19 +1981,23 @@ ytProHeart(ysHeart);
 
 try{
   
-  if(document.getElementsByClassName("reel-player-overlay-actions")[0].children[0]){
+if(document.getElementsByClassName("ytwReelActionBarViewModelHost")[0].children[0]){
   
-document.getElementsByClassName("reel-player-overlay-actions")[0].insertBefore(ys,document.getElementsByClassName("reel-player-overlay-actions")[0].children[1]);
+document.getElementsByClassName("ytwReelActionBarViewModelHost")[0].insertBefore(ys,document.getElementsByClassName("ytwReelActionBarViewModelHost")[0].children[0]);
 
-ys.appendChild(ysDown);
 ys.appendChild(ysHeart);
+ys.appendChild(ysDown);
 }
 }catch{}
 
 }
 
-try{document.querySelectorAll('dislike-button-view-model')[0].children[0].children[0].children[0].children[1].children[0].innerHTML=dislikes;}catch{}
 
+if(!document.getElementById("ytShortsDislikes")){
+try{document.querySelectorAll('like-button-view-model')[0].children[0].children[0].children[0].insertAdjacentHTML("beforeend",`<span style="height:3px;width:3px;border-radius:50%;box-shadow:0px 0px 3px black;margin:3px;background:white">&nbsp;</span><span id="ytShortsDislikes" style="font-weight:bold;text-shadow:0px 0px 3px black;">${dislikes}</span>`);}catch{}
+}else{
+document.getElementById("ytShortsDislikes").innerHTML=dislikes;
+}
 
 
 
@@ -2046,10 +2069,10 @@ return ytproHh.innerHTML+="No Videos Found";
 for(var n=Object.keys(v).length - 1; n >  -1 ; n--){
 var x=Object.keys(v)[n];
 ytproHh.innerHTML+=`<li class="thum" >
-<img data-action="navigateInternalYtMweb" data-id="${x}" src="${v[x].thumb}" ><br>
+<img data-action="navigateInternalYtMweb" data-id="${x}" style="object-fit:contain;" src="${v[x].thumb}" ><br>
 <div style="width:calc(100% - 170px);margin-left:5px;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical; -webkit-line-clamp:3;overflow:hidden;text-overflow:ellipsis;" data-action="navigateInternalYtMweb" data-id="${x}" >${v[x].title}</div>
 <div style="width:calc(100% - (100% - 35px))">
-<svg data-action="remHeart" data-id="${x}" xmlns="http://www.w3.org/2000/svg" width="20" height="20" style="margin-left:0px;" fill="#f24" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+<svg data-action="remHeart" data-id="${x}" xmlns="http://www.w3.org/2000/svg" width="20" height="20" style="margin-left:0px;" fill="${c}" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
 <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
 </svg>
 </span>
@@ -2107,15 +2130,26 @@ function ytProHeart(x){
 
 var vid=(new URLSearchParams(window.location.search)).get('v') || window.location.pathname.replace("/shorts/","");
 
-var video=document.getElementsByClassName('video-stream')[0];
+var video = document.getElementsByClassName('video-stream')[0];
 var canvas = document.createElement('canvas');
-canvas.style.width = "1600px"; 
-canvas.style.height = "900px";
-canvas.style.background="black";
 var context = canvas.getContext('2d');
 
-(window.location.pathname.indexOf("shorts") > -1) ? context.drawImage(video,105, 0, 90,160) :  context.drawImage(video,0, 0, 320,180);
+var isShorts = window.location.pathname.indexOf("shorts") > -1;
 
+if (isShorts) {
+  canvas.width = 90;
+  canvas.height = 160;
+  context.fillStyle = "black";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+} else {
+  canvas.width = 320;
+  canvas.height = 180;
+  context.fillStyle = "black";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+}
+  
 var dataURI = canvas.toDataURL('image/jpeg');
 
 
@@ -2144,8 +2178,6 @@ title:ytplayer.config.args.raw_player_response?.videoDetails?.title.replaceAll("
 
 
 var g="16";
-var h=`<span style="margin-left:8px">Heart<span>`;
-(window.location.href.indexOf('youtube.com/shorts') > -1) ? h=``:h=`<span style="margin-left:8px">Heart<span>`;
 (window.location.href.indexOf('youtube.com/shorts') > -1) ? g="24" : g="24" ;
 
 
@@ -2155,12 +2187,12 @@ var j=JSON.parse(localStorage.getItem("hearts") || "{}");
 delete j[vid];
 localStorage.setItem("hearts",JSON.stringify(j));
 x.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="${g}" height="${g}" fill="${(window.location.href.indexOf('youtube.com/shorts') > -1) ? "#fff" : c }" viewBox="0 0 24 24">
-<path d="M0 0h24v24H0V0z" fill="none"/><path fill="${(window.location.href.indexOf('youtube.com/shorts') > -1) ? "#fff" : c }" d="M19.66 3.99c-2.64-1.8-5.9-.96-7.66 1.1-1.76-2.06-5.02-2.91-7.66-1.1-1.4.96-2.28 2.58-2.34 4.29-.14 3.88 3.3 6.99 8.55 11.76l.1.09c.76.69 1.93.69 2.69-.01l.11-.1c5.25-4.76 8.68-7.87 8.55-11.75-.06-1.7-.94-3.32-2.34-4.28zM12.1 18.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>${h}`;
+<path d="M0 0h24v24H0V0z" fill="none"/><path fill="${(window.location.href.indexOf('youtube.com/shorts') > -1) ? "#fff" : c }" d="M19.66 3.99c-2.64-1.8-5.9-.96-7.66 1.1-1.76-2.06-5.02-2.91-7.66-1.1-1.4.96-2.28 2.58-2.34 4.29-.14 3.88 3.3 6.99 8.55 11.76l.1.09c.76.69 1.93.69 2.69-.01l.11-.1c5.25-4.76 8.68-7.87 8.55-11.75-.06-1.7-.94-3.32-2.34-4.28zM12.1 18.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>`;
 }else{
 var j=JSON.parse(localStorage.getItem("hearts") || "{}");
 j[vid]=vDetails;
 localStorage.setItem("hearts",JSON.stringify(j));
-x.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="${g}" height="${g}" viewBox="0 0 24 24" ><path d="M0 0h24v24H0V0z" fill="none"/><path fill="${(window.location.href.indexOf('youtube.com/shorts') > -1) ? "#fff" : c }" d="M13.35 20.13c-.76.69-1.93.69-2.69-.01l-.11-.1C5.3 15.27 1.87 12.16 2 8.28c.06-1.7.93-3.33 2.34-4.29 2.64-1.8 5.9-.96 7.66 1.1 1.76-2.06 5.02-2.91 7.66-1.1 1.41.96 2.28 2.59 2.34 4.29.14 3.88-3.3 6.99-8.55 11.76l-.1.09z"/></svg>${h}`;
+x.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="${g}" height="${g}" viewBox="0 0 24 24" ><path d="M0 0h24v24H0V0z" fill="none"/><path fill="${(window.location.href.indexOf('youtube.com/shorts') > -1) ? "#fff" : c }" d="M13.35 20.13c-.76.69-1.93.69-2.69-.01l-.11-.1C5.3 15.27 1.87 12.16 2 8.28c.06-1.7.93-3.33 2.34-4.29 2.64-1.8 5.9-.96 7.66 1.1 1.76-2.06 5.02-2.91 7.66-1.1 1.41.96 2.28 2.59 2.34 4.29.14 3.88-3.3 6.99-8.55 11.76l-.1.09z"/></svg>`;
 }
 
 }
@@ -2479,6 +2511,17 @@ a.style.display = 'none';
 /*Remove Promotion Element*/
 try{document.getElementsByTagName("ytm-paid-content-overlay-renderer")[0].style.display="none";}catch{}
 
+
+
+
+/*Hide Community Posts*/
+if(localStorage.getItem("communityPosts") == "true"){
+
+document.querySelectorAll("ytm-backstage-post-thread-renderer")?.forEach(el => el.remove());
+  
+}
+ 
+
 /*Hide Shorts*/
 if(localStorage.getItem("shorts") == "true"){
 
@@ -2596,7 +2639,7 @@ el.appendChild(elm);
 //totally noob in copy pasting , that time i wasn't aware of
 //plenty of things and by which i used `setInterval` instead
 //of mutation observer , i shall be optimizing the code in future
-//releases but rn only a few code blocks will be in the obesrver
+//releases but rn only a few code blocks will be in the observer
 
 const targetNode = document.body;
 const config = { childList: true, subtree: true };
@@ -2647,20 +2690,19 @@ x.setAttribute("style",`height:100%;width:100%;position:fixed;display:grid;align
 
 x.innerHTML=`
 <div style="height:auto;width:70%;padding:20px;background:rgba(0,0,0,.6);border:1px solid #888;box-shadow:0px 0px 5px black;color:white;backdrop-filter:blur(10px);border-radius:15px;margin:auto">
-<h2> Mandatory Update </h2><br>
+<h2> Update Available</h2><br>
 Latest Version ${YTProVer} of YTPRO is available , update the YTPRO to get latest features.
-<br>- This update is mandatory as it fixes a ton of bugs and improves functionality <br>
-- Fixed Downloads, switched to SABR downloader<br>
-- Added muxing to the youtube videos<br>
-- Fixed gestures for brightness and volume control<br>
-- Optimized the UI of both Download and Settings menu<br>
-- Added speed increase upto 10x<br>
+<br>
+- Fixed Downloader<br>
+- Added container lables on Audio Only<br>
+- Fixed Gemini Bugs , added new models<br>
+- Optimized overall UI<br>
 - Fixed bugs and improved functionality<br>
 - for the full list <u data-action="url" >click here</u>
 <br>
 <br>
 <div style="display:flex;">
-<!--<button style="border:0;border-radius:10px;height:30px;width:150px;background:;" data-action="cancel">Cancel</button>-->
+<button style="border:0;border-radius:10px;height:30px;width:150px;background:;" data-action="cancel">Cancel</button>
 <button style="border:0;border-radius:10px;height:30px;width:150px;background:rgba(255,50,50,.7);float:right;" data-action="download" >Download</button>
 </div>
 
@@ -2685,11 +2727,9 @@ x.addEventListener("click",(e)=>{
 document.body.appendChild(x);
 }
 
+ 
 
-
-
-
-window.onload = function(){ 
+window.onload = function(){
 if(parseFloat(Android.getInfo()) < parseFloat(YTProVer) && (window.location.href == "https://m.youtube.com/" || window.location.href == "https://m.youtube.com") ){
 updateModel();
 }
@@ -2725,7 +2765,22 @@ event.stopPropagation();
 },
 true);
 
+function showCurtain(){
+  const el=document.createElement("div");
+  Object.assign(el.style,{
+    position:"fixed",
+    zIndex:"9999999",
+    width:"100%",
+    height:"100%",
+    top:0,
+    left:0
+  })
+  el.id="ytProCurtain"
+  document.body.appendChild(el)
+}
 
-
+  function hideCurtain(){
+    document.getElementById("ytProCurtain")?.remove()
+  }
 
 }
