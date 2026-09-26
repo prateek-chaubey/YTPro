@@ -74,6 +74,9 @@ return new Response(mockedApiCode, { status: 200, headers: { 'Content-Type': 'te
 if (url.pathname.startsWith('/s/player/')) {
 url.hostname = 'www.youtube.com';
 headers.delete('Cookie');
+headers.delete('Authorization');
+headers.delete('X-Goog-AuthUser');
+headers.delete('X-Goog-Visitor-Id');
 headers.set('Origin',  'https://www.youtube.com');
 headers.set('Referer', 'https://www.youtube.com/');
 } else {
