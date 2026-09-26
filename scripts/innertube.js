@@ -1,8 +1,8 @@
 /*****YTPRO*******
 Author: Prateek Chaubey
-Version: 3.9.8
+Version: 4.0.0
 URI: https://github.com/prateek-chaubey/YTPRO
-Last Updated On: 1 May , 2026 , 19:25 IST
+Last Updated On: 19 Sep , 2026 , 07:11 IST
 */
 
 
@@ -32,28 +32,21 @@ videoId=new URLSearchParams(window.location.search).get("v");
 if (!videoId) { window.Android?.showToast?.('No video ID found in URL.'); return; }
 
 // Imports
-const { Innertube, Platform, Constants } = await import(
-'https://cdn.jsdelivr.net/npm/youtubei.js@17.0.1/bundle/browser.min.js'
+const { Innertube, Platform, Constants,IRawResponse } = await import(
+'https://cdn.jsdelivr.net/npm/youtubei.js@18.0.0/bundle/browser.min.js'
 );
-const { SabrStream } = await import('https://esm.sh/googlevideo@4.0.4/sabr-stream');
-const { buildSabrFormat , EnabledTrackTypes } = await import('https://esm.sh/googlevideo@4.0.4/utils');
-const { BG, buildURL, getHeaders } = await import('https://esm.sh/bgutils-js@3.2.0');
+const { SabrStream } = await import('https://esm.sh/googlevideo@4.1.1/sabr-stream');
+const { buildSabrFormat , EnabledTrackTypes } = await import('https://esm.sh/googlevideo@4.1.1/utils');
 
-Platform.shim.eval = async (data, env) => {
-const props = [];
-if (env.n)   props.push(`n: exportedVars.nFunction("${env.n}")`);
-if (env.sig) props.push(`sig: exportedVars.sigFunction("${env.sig}")`);
-return new Function(`${data.output}\nreturn { ${props.join(', ')} }`)();
-};
+const { BotGuardClient, getChallenge } = await import('https://esm.sh/bgutils-js@4.0.3/botguard');
+const { WebPoSignalOutput } = await import('https://esm.sh/bgutils-js@4.0.3/shared-types');
+const { buildURL, getHeaders, USER_AGENT, parseLooseJSON } = await import('https://esm.sh/bgutils-js@4.0.3/utils');
+const { WebPoMinter } = await import('https://esm.sh/bgutils-js@4.0.3/webpo');
 
-// Create Innertube (WEB Client Setup & Proxy)
-const cookies = window.Android?.getAllCookies?.('https://www.youtube.com') ?? '';
 
-const yt = await Innertube.create({
-cookie: cookies,
-retrieve_player: true,
-generate_session_locally: true,
-fetch: async (input, init = {}) => {
+
+
+async function fetchFunction(input, init = {}) {
 
 
 const reqUrl = input instanceof Request ? input.url : input.toString();
@@ -96,15 +89,52 @@ body = await input.arrayBuffer();
 }
 return fetch(url.toString(), { method, headers, body, credentials: 'omit' });
 }
-});
+
+
+
+  
+
+Platform.shim.eval = async (data, env) => {
+const props = [];
+if (env.n)   props.push(`n: exportedVars.nFunction("${env.n}")`);
+if (env.sig) props.push(`sig: exportedVars.sigFunction("${env.sig}")`);
+return new Function(`${data.output}\nreturn { ${props.join(', ')} }`)();
+};
+
+// Create Innertube (WEB Client Setup & Proxy)
+const cookies = window.Android?.getAllCookies?.('https://www.youtube.com') ?? '';
+
+const yt = await Innertube.create({
+cookie: cookies,
+retrieve_player: true,
+generate_session_locally: true,
+fetch: fetchFunction});
+
+
+
+
+  
 
 // PoToken Generator 
 let placeholderPoToken = null;
-try { placeholderPoToken = BG.PoToken.generatePlaceholder(videoId); } catch (e) {}
 
+  
 async function generateFullPoToken() {
 try {
-const challengeResponse = await yt.getAttestationChallenge('ENGAGEMENT_TYPE_UNBOUND');
+
+const initialAttestationData = document.body.innerHTML.match(/window\.ytAtN\(\s*({[\s\S]*?})\s*\)/);
+const initialAttestationDataJson = parseLooseJSON(initialAttestationData[1]);
+
+
+const payload = {
+  engagementType: 'ENGAGEMENT_TYPE_UNBOUND',
+  eacrToken: initialAttestationDataJson.T
+};
+
+
+const challengeResponse =  await yt.actions.execute('/att/get', { parse: true, ...payload });
+
+
 const bg = challengeResponse.bg_challenge;
 
 const challenge = {
@@ -124,10 +154,10 @@ const interpreterJsRes = await fetch(
 const interpreterJS = await interpreterJsRes.text();
 
 new Function(interpreterJS)();
-const bgClient = await BG.BotGuardClient.create({
+const bgClient = await BotGuardClient.create({
 program:    challenge.program,
 globalName: challenge.globalName,
-globalObj:  window,
+globalObject:  window,
 });
 
 const webPoSignalOutput = [];
@@ -144,7 +174,7 @@ await integrityTokenRes.json();
 
 if (!integrityToken) throw new Error('Empty integrity token');
 
-const minter  = await BG.WebPoMinter.create(
+const minter  = await WebPoMinter.create(
 { integrityToken, estimatedTtlSecs, mintRefreshThreshold, websafeFallbackToken },
 webPoSignalOutput
 );
@@ -156,11 +186,14 @@ return null;
 }
 }
 
-const fullTokenPromise = await generateFullPoToken();
+const fullTokenPromise =await generateFullPoToken();
 
 const info = await yt.getBasicInfo(videoId, { client: 'WEB' });
+
+ 
 const player = yt.session.player;
 const streamingData = info.streaming_data;
+  
 
 if (!streamingData || !player) { 
 window.Android?.showToast?.('No streaming data or player found.'); 
@@ -452,7 +485,7 @@ isWebm:aud.container == "webm",
 audioItag:aud.itag
 });
 
-formatLi.innerHTML=`${downBtn}<span style="margin-left:10px;">${aud.audioQuality.replaceAll("AUDIO_QUALITY_"," ")} | ${aud.sizeFormatted}`;
+formatLi.innerHTML=`${downBtn}<span style="margin-left:10px;">${aud.audioQuality.replaceAll("AUDIO_QUALITY_"," ")} | ${aud.container.toUpperCase()} | ${aud.sizeFormatted}`;
 audioOnlyDiv.appendChild(formatLi);
 });
 
@@ -1155,6 +1188,5 @@ div.style.bottom="calc(50% + 40px)";
 })
 
 }
-
 
 
