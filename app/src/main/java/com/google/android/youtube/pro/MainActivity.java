@@ -26,6 +26,8 @@ import com.google.android.youtube.pro.webview.YTProWebViewClient;
 import com.google.android.youtube.pro.webview.YTProWebChromeClient;
 import com.google.android.youtube.pro.webview.WebAppInterface;
 import com.google.android.youtube.pro.webview.BinaryStreamManager;
+import android.view.MotionEvent;
+import android.os.SystemClock;
 
 import com.google.android.youtube.pro.receivers.MediaCommandReceiver;
 
