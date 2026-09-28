@@ -20,8 +20,8 @@
 
 ## Download YT PRO
 
-<a href="https://nightly.link/prateek-chaubey/YTPro/workflows/gradle/main/YTPRO.zip"><img src="https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/nightlyapk.png" height=80></a>
 <a href="https://github.com/prateek-chaubey/YTPro/releases/latest"><img src="https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/githubapk.png" height=70></a>
+<a href="https://nightly.link/prateek-chaubey/YTPro/workflows/gradle/main/YTPRO.zip"><img src="https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/nightlyapk.png" height=80></a>
 
 #### Screenshots
 | | | |
