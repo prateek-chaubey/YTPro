@@ -20,13 +20,14 @@
 
 ## Download YT PRO
 
-[![Download zip](https://custom-icon-badges.herokuapp.com/badge/-Download-ff0000?style=for-the-badge&logo=download&logoColor=white "Download Apk")](https://nightly.link/prateek-chaubey/YTPro/workflows/gradle/main/YTPRO.zip)
+<a href="https://nightly.link/prateek-chaubey/YTPro/workflows/gradle/main/YTPRO.zip"><img src="https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/nightlyapk.png" height=80></a>
+<a href="https://github.com/prateek-chaubey/YTPro/releases/latest"><img src="https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/githubapk.png" height=70></a>
 
 #### Screenshots
 | | | |
 |:--:|:--:|:--:| 
-|<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/screen3.jpg'  > | <img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/screen2.jpg'  > |<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/screen5.jpg'  > | 
-|<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/screen6.jpg'  > | <img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/screen4.jpg'  > |<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/screen1.jpg'  > |
+|<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/ss1.png'  > | <img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/ss5.png'  > |<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/ss2.png'  > | 
+|<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/ss4.png'  > | <img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/ss3.png'  > |<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/ss6.png'  > |
 
 
 ## Features
