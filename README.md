@@ -12,12 +12,6 @@
 
 </div>
 
-### Become a Sponsor 
----
-> [!TIP]
-> If you like this project, consider [sponsoring](https://github.com/sponsors/prateek-chaubey) to support the author 🙁
----
-
 ## Download YT PRO
 
 <a href="https://github.com/prateek-chaubey/YTPro/releases/latest"><img src="https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/githubapk.png" height=70></a>
