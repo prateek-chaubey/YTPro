@@ -1,4 +1,3 @@
-
 <p align="center">
 <img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/ytpro.gif' height=150  >
 </p>
@@ -13,21 +12,16 @@
 
 </div>
 
-### Become a Sponsor 
----
-> [!TIP]
-> If you like this project, consider [sponsoring](https://github.com/sponsors/prateek-chaubey) to support the author 🌸
----
-
 ## Download YT PRO
 
-[![Download zip](https://custom-icon-badges.herokuapp.com/badge/-Download-ff0000?style=for-the-badge&logo=download&logoColor=white "Download Apk")](https://nightly.link/prateek-chaubey/YTPro/workflows/gradle/main/YTPRO.zip)
+<a href="https://github.com/prateek-chaubey/YTPro/releases/latest"><img src="https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/githubapk.png" height=70></a>
+<a href="https://nightly.link/prateek-chaubey/YTPro/workflows/gradle/main/YTPRO.zip"><img src="https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/nightlyapk.png" height=80></a>
 
 #### Screenshots
 | | | |
 |:--:|:--:|:--:| 
-|<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/screen3.jpg'  > | <img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/screen2.jpg'  > |<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/screen5.jpg'  > | 
-|<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/screen6.jpg'  > | <img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/screen4.jpg'  > |<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/screen1.jpg'  > |
+|<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/ss1.png'  > | <img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/ss5.png'  > |<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/ss2.png'  > | 
+|<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/ss4.png'  > | <img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/ss3.png'  > |<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/ss6.png'  > |
 
 
 ## Features
@@ -35,9 +29,10 @@
    * Summarise Vidoes
    * Customisable prompts and models
  * Video Downloader
- * Shorts Downloader 
+ * Shorts Downloader
+ * In-built Video and Audio Muxer
  * Thumbnails Downloader
- * Captions Downloader 
+ * Captions Downloader
  * Ads Blocker
  * Minimize Video
  * Picture in Picture Mode
@@ -49,7 +44,8 @@
  * Skip Sponsers
  * Force Zoom
  * Hide Shorts
- * APK size under 50KB
+ * Upto 10x video speed 
+ * Minimal APK size
  * Adaptive UI icons
  * Minimal
  * Almost 0 Internal Dependencies
@@ -63,9 +59,9 @@ The available variables for gemini prompt are
 * `{videoId}` : Video Id of the video
 
 ## ToDo
- * Add basic features to the video player
  * Enhance Audio
- * Merging Adaptive Formats
+ * Skip Silence 
+ 
 
 ### Credits
  * [Sponsor Block](https://github.com/ajayyy/SponsorBlock)
@@ -79,4 +75,4 @@ The available variables for gemini prompt are
 
 
 ## Disclaimer 
-This is an educational project trying to showcase the javascript injection into a webview for enhancing the productivity.
+This is an educational project aimed at showcasing javascript injection into a webview to enhance productivity.
