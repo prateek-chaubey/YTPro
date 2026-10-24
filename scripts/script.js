@@ -752,8 +752,6 @@ ytpSetI.innerHTML+=`<br><b style='font-size:18px' >YT PRO Settings</b>
 <br>
 <div>Background Play <span data-action="sttCnf" data-value="bgplay" style="${sttCnf(0,0,"bgplay")}" ><b style="${sttCnf(0,1,"bgplay")}" ></b></span></div> 
 <br>
-<div>Hide Shorts <span data-action="sttCnf" data-value="shorts" style="${sttCnf(0,0,"shorts")}" ><b style="${sttCnf(0,1,"shorts")}" ></b></span></div> 
-<br>
 <div>Use single Gemini chat <span data-action="sttCnf" data-value="saveCInfo" style="${sttCnf(0,0,"saveCInfo")}" ><b style="${sttCnf(0,1,"saveCInfo")}"></b></span></div>
 <br>
 <button data-action="geminiModels">Select Gemini Model
@@ -2480,8 +2478,6 @@ a.style.display = 'none';
 try{document.getElementsByTagName("ytm-paid-content-overlay-renderer")[0].style.display="none";}catch{}
 
 /*Hide Shorts*/
-if(localStorage.getItem("shorts") == "true"){
-
 
 for( x in document.getElementsByClassName("big-shorts-singleton")){
 try{document.getElementsByClassName("big-shorts-singleton")[x].remove();
@@ -2498,7 +2494,6 @@ try{document.getElementsByTagName("ytm-shorts-lockup-view-model")[x].remove();
 
 }
 
-}
 }
 
 

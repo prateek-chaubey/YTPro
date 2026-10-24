@@ -83,7 +83,7 @@
 			android:foregroundServiceType="mediaPlayback"
 			/>
 
-		<receiver android:name=".utils.NotificationActionReceiver"/>
+		<receiver android:name=".receivers.NotificationActionReceiver"/>
 	</application>
 </manifest>
 

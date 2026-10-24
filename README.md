@@ -34,7 +34,6 @@
    * Summarise Vidoes
    * Customisable prompts and models
  * Video Downloader
- * Shorts Downloader
  * In-built Video and Audio Muxer
  * Thumbnails Downloader
  * Captions Downloader
@@ -48,7 +47,6 @@
  * Enable / disable media codecs
  * Skip Sponsers
  * Force Zoom
- * Hide Shorts
  * Upto 10x video speed 
  * Minimal APK size
  * Adaptive UI icons
