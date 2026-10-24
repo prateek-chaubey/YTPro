@@ -2487,17 +2487,24 @@ try{document.getElementsByClassName("big-shorts-singleton")[x].remove();
 for( x in document.getElementsByTagName("ytm-reel-shelf-renderer")){
 try{document.getElementsByTagName("ytm-reel-shelf-renderer")[x].remove();
 }catch{}
+}
 
 for( x in document.getElementsByTagName("ytm-shorts-lockup-view-model")){
 try{document.getElementsByTagName("ytm-shorts-lockup-view-model")[x].remove();
 }catch{}
-
 }
 
+var pivotShorts = document.getElementsByClassName("pivot-shorts");
+for(let i = pivotShorts.length - 1; i >= 0; i--) {
+  try {
+    let parentRenderer = pivotShorts[i].closest('ytm-pivot-bar-item-renderer');
+    if (parentRenderer) {
+      parentRenderer.remove();
+    } else {
+      pivotShorts[i].remove();
+    }
+  } catch(e) {}
 }
-
-
-
 
 }
 

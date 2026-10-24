@@ -1,3 +1,8 @@
 build/
 app/build/
 .gradle/
+
+/app/build/
+/.gradle/
+/build/
+/local.properties
