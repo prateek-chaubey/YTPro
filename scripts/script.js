@@ -8,7 +8,7 @@ Last Updated On: 26 Sep , 2026 , 22:25 IST
 
 
 
-if(window.eruda == null && localStorage.getItem("devMode") == "true"){
+if(window.eruda == null && localStorage.getItem("devMode") == "true"localStorage.setItem("seekSeconds","5");{
 //ERUDA
 var script = document.createElement('script'); script.src="//youtube.com/ytpro_cdn/npm/eruda"; document.body.appendChild(script); script.onload=()=>{eruda.init();}
 }
@@ -48,7 +48,55 @@ audio:["Opus","Mp4a"]
 let touchstartY = 0;
 let touchendY = 0;
 let initialDistance=null;
+/* ===== Configurable Double-Tap Seek ===== */
+let lastTapTime = 0;
+let lastTapX = 0;
 
+document.addEventListener('touchend', function(e) {
+    const video = document.querySelector('.video-stream');
+    if (!video || isNaN(video.duration)) return;
+
+    const now = Date.now();
+    const touch = e.changedTouches[0];
+    const x = touch.clientX;
+
+    if (now - lastTapTime < 300 && Math.abs(x - lastTapX) < 45) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const seek = parseInt(localStorage.getItem("seekSeconds") || "5");
+        const isLeft = x < window.innerWidth / 2;
+        const newTime = isLeft 
+            ? Math.max(0, video.currentTime - seek)
+            : Math.min(video.duration, video.currentTime + seek);
+
+        video.currentTime = newTime;
+        showSeekFeedback((isLeft ? "−" : "+") + seek + "s", isLeft);
+    }
+
+    lastTapTime = now;
+    lastTapX = x;
+}, {passive: false, capture: true});
+
+function showSeekFeedback(text, isLeft) {
+    let el = document.getElementById('ytpro-seek-feedback');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'ytpro-seek-feedback';
+        el.style.cssText = `position:fixed;top:50%;transform:translateY(-50%);
+            background:rgba(0,0,0,0.75);color:#fff;padding:10px 16px;
+            border-radius:25px;font-size:17px;font-weight:600;z-index:999999;
+            pointer-events:none;transition:opacity .25s;`;
+        document.body.appendChild(el);
+    }
+    el.style.left = isLeft ? '18px' : 'auto';
+    el.style.right = isLeft ? 'auto' : '18px';
+    el.textContent = text;
+    el.style.opacity = '1';
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.style.opacity = '0', 650);
+}
+/* ===== Fin Configurable Seek ===== */
 //swipe controls
 var sens=0.005;
 var vol=Android.getVolume();
